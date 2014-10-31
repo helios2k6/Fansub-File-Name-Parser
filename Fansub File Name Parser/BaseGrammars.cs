@@ -30,8 +30,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-[assembly: InternalsVisibleTo("Tests")]
-[assembly: CLSCompliant(false)]
+
 namespace FansubFileNameParser
 {
 	internal static class BaseGrammars
