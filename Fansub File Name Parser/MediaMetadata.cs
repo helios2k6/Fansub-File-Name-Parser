@@ -34,7 +34,13 @@ namespace FansubFileNameParser
     public sealed class MediaMetadata : IEquatable<MediaMetadata>, ISerializable
     {
         #region private fields
-
+        private readonly string AudioCodecKey = "Audio Codec";
+        private readonly string CRC32Key = "CRC 32";
+        private readonly string PixelBitDepthKey = "Pixel Bit Depth";
+        private readonly string ResolutionKey = "Resolution";
+        private readonly string VideoCodecKey = "Video Codec";
+        private readonly string VideoMediaKey = "Video Media";
+        private readonly string VideoModeKey = "Video Meode";
         #endregion
 
         #region ctor
@@ -54,7 +60,13 @@ namespace FansubFileNameParser
 
         private MediaMetadata(SerializationInfo info, StreamingContext context)
         {
-
+            AudioCodec = info.GetString(AudioCodecKey);
+            CRC32 = info.GetString(CRC32Key);
+            PixelBitDepth = info.GetString(PixelBitDepthKey);
+            Resolution = info.GetString(ResolutionKey);
+            VideoCodec = info.GetString(VideoCodecKey);
+            VideoMedia = info.GetString(VideoMediaKey);
+            VideoMode = info.GetString(VideoModeKey);
         }
         #endregion
 
@@ -129,6 +141,12 @@ namespace FansubFileNameParser
         #endregion
 
         #region public methods
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public override string ToString()
         {
             var builder = new StringBuilder();
@@ -145,9 +163,16 @@ namespace FansubFileNameParser
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+        /// </summary>
+        /// <param name="other">The <see cref="System.Object" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
         public override bool Equals(object other)
         {
-            if(EqualsPreamble(other) == false)
+            if (EqualsPreamble(other) == false)
             {
                 return false;
             }
@@ -155,6 +180,12 @@ namespace FansubFileNameParser
             return Equals(other as MediaMetadata);
         }
 
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// </returns>
         public override int GetHashCode()
         {
             return AudioCodec.GetHashCode()
@@ -166,9 +197,16 @@ namespace FansubFileNameParser
                 ^ VideoMode.GetHashCode();
         }
 
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+        /// </returns>
         public bool Equals(MediaMetadata other)
         {
-            if(EqualsPreamble(other) == false)
+            if (EqualsPreamble(other) == false)
             {
                 return false;
             }
@@ -182,8 +220,20 @@ namespace FansubFileNameParser
                 && Equals(VideoMode, other.VideoMode);
         }
 
+        /// <summary>
+        /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with the data needed to serialize the target object.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> to populate with data.</param>
+        /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext" />) for this serialization.</param>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            info.AddValue(AudioCodecKey, AudioCodec);
+            info.AddValue(CRC32Key, CRC32);
+            info.AddValue(PixelBitDepthKey, PixelBitDepth);
+            info.AddValue(ResolutionKey, Resolution);
+            info.AddValue(VideoCodecKey, VideoCodec);
+            info.AddValue(VideoMediaKey, VideoMedia);
+            info.AddValue(VideoModeKey, VideoMode);
         }
         #endregion
 

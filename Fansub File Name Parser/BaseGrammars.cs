@@ -33,48 +33,83 @@ using System.Threading.Tasks;
 
 namespace FansubFileNameParser
 {
-	internal static class BaseGrammars
-	{
-		#region basic parsers
-		public static readonly Parser<string> Line = Parse.AnyChar.AtLeastOnce().Text();
-		public static readonly Parser<string> Identifier = Parse.Letter.AtLeastOnce().Text().Token();
-		public static readonly Parser<string> Underscore = Parse.Char('_').AtLeastOnce().Text();
-		public static readonly Parser<string> Dash = Parse.Char('-').AtLeastOnce().Text();
-		public static readonly Parser<string> OpenParenthesis = Parse.Char('(').Once().Text();
-		public static readonly Parser<string> ClosedParenthesis = Parse.Char(')').Once().Text();
-		public static readonly Parser<string> OpenSquareBracket = Parse.Char('[').Once().Text();
-		public static readonly Parser<string> ClosedSquareBracket = Parse.Char(']').Once().Text();
-		#endregion
-		#region identifier parsers
-		public static readonly Parser<string> IdentifierUntilUnderscore = Parse.Letter.Until(Underscore).Text();
-		public static readonly Parser<string> IdentifierUntilUnderscoreOrFullWord = IdentifierUntilUnderscore.Or(Identifier);
+    internal static class BaseGrammars
+    {
+        #region basic parsers
+        public static readonly Parser<string> Line = Parse.AnyChar.AtLeastOnce().Text();
+        public static readonly Parser<string> Identifier = Parse.Letter.AtLeastOnce().Text().Token();
+        public static readonly Parser<string> Underscore = Parse.Char('_').AtLeastOnce().Text();
+        public static readonly Parser<string> Dash = Parse.Char('-').AtLeastOnce().Text();
+        public static readonly Parser<string> OpenParenthesis = Parse.Char('(').Once().Text();
+        public static readonly Parser<string> ClosedParenthesis = Parse.Char(')').Once().Text();
+        public static readonly Parser<string> OpenSquareBracket = Parse.Char('[').Once().Text();
+        public static readonly Parser<string> ClosedSquareBracket = Parse.Char(']').Once().Text();
+        #endregion
+        #region identifier parsers
+        public static readonly Parser<string> IdentifierUntilUnderscore = Parse.Letter.Until(Underscore).Text();
+        public static readonly Parser<string> IdentifierUntilUnderscoreOrFullWord = IdentifierUntilUnderscore.Or(Identifier);
 
-		public static readonly Parser<string> IdentifierUntilDash = Parse.Letter.Until(Dash).Text();
-		public static readonly Parser<string> IdentifierUntilDashOrFullWord = IdentifierUntilDash.Or(Identifier);
-		#endregion
-		#region line parsers
-		public static readonly Parser<string> LineUntilDash = Parse.AnyChar.Until(Dash).Text();
-		public static readonly Parser<string> LineUntilDashOrFullLine = LineUntilDash.Or(Line);
+        public static readonly Parser<string> IdentifierUntilDash = Parse.Letter.Until(Dash).Text();
+        public static readonly Parser<string> IdentifierUntilDashOrFullWord = IdentifierUntilDash.Or(Identifier);
+        #endregion
+        #region bracket parsers
+        public static readonly Parser<string> SquareBracketEnclosedText =
+            (from openBracket in OpenSquareBracket
+             from content in Parse.CharExcept(']').Many().Text()
+             from closedBracket in ClosedSquareBracket
+             select content).Token();
 
-		public static readonly Parser<string> LineUntilUnderscore = Parse.AnyChar.Until(Underscore).Text();
-		public static readonly Parser<string> LineUntilUnderscoreOrFullLine = LineUntilUnderscore.Or(Line);
+        public static readonly Parser<string> SquareBracketEnclosedTextWithBracket =
+            (from openBracket in OpenSquareBracket
+             from content in Parse.CharExcept(']').Many().Text()
+             from closedBracket in ClosedSquareBracket
+             select string.Concat(openBracket, content, closedBracket)).Token();
 
-		public static readonly Parser<string> LineUntilOpenSquareBracket = Parse.AnyChar.Until(OpenSquareBracket).Text();
-		public static readonly Parser<string> LineUntilOpenParenthesis = Parse.AnyChar.Until(OpenParenthesis).Text();
-		public static readonly Parser<string> LineUntilSquareBracketOrParenthesis = LineUntilOpenSquareBracket.Or(LineUntilOpenParenthesis).Text();
+        public static readonly Parser<string> ParenthesisEnclosedText =
+            (from openParenthesis in OpenParenthesis
+             from content in Parse.CharExcept(')').Many().Text()
+             from closedParenthesis in ClosedParenthesis
+             select content).Token();
 
-		public static readonly Parser<string> LineUntilDigit = Parse.AnyChar.Until(Parse.Number).Text();
-		public static readonly Parser<string> LineUntilDigitOrFullLine = LineUntilDigit.Or(Line);
-		#endregion
-		#region lexers
-		#region lexers by identifiers
-		public static readonly Parser<IEnumerable<string>> IdentifiersSeparatedByUnderscore = IdentifierUntilUnderscoreOrFullWord.Many();
-		public static readonly Parser<IEnumerable<string>> IdentifiersSeparatedByDash = IdentifierUntilDashOrFullWord.Many();
-		#endregion
-		#region lexers by line
-		public static readonly Parser<IEnumerable<string>> LinesSeparatedByUnderscore = LineUntilUnderscoreOrFullLine.Many();
-		public static readonly Parser<IEnumerable<string>> LinesSeparatedByDash = LineUntilDashOrFullLine.Many();
-		#endregion
-		#endregion
-	}
+        public static readonly Parser<string> ParenthesisEnclosedTextWithParenthesis =
+            (from openParenthesis in OpenParenthesis
+             from content in Parse.CharExcept(')').Many().Text()
+             from closedParenthesis in ClosedParenthesis
+             select string.Concat(openParenthesis, content, closedParenthesis)).Token();
+        #endregion
+        #region line parsers
+        public static readonly Parser<string> LineUntilDash = Parse.AnyChar.Until(Dash).Text();
+        public static readonly Parser<string> LineUntilDashOrFullLine = LineUntilDash.Or(Line);
+
+        public static readonly Parser<string> LineUntilUnderscore = Parse.AnyChar.Until(Underscore).Text();
+        public static readonly Parser<string> LineUntilUnderscoreOrFullLine = LineUntilUnderscore.Or(Line);
+
+        public static readonly Parser<string> LineUntilOpenSquareBracket = Parse.AnyChar.Until(OpenSquareBracket).Text();
+        public static readonly Parser<string> LineUntilOpenParenthesis = Parse.AnyChar.Until(OpenParenthesis).Text();
+        public static readonly Parser<string> LineUntilSquareBracketOrParenthesis = LineUntilOpenSquareBracket.Or(LineUntilOpenParenthesis).Text();
+
+        public static readonly Parser<string> LineUntilDigit = Parse.AnyChar.Until(Parse.Number).Text();
+        public static readonly Parser<string> LineUntilDigitOrFullLine = LineUntilDigit.Or(Line);
+        #endregion
+        #region lexers
+        #region lexers by identifiers
+        public static readonly Parser<IEnumerable<string>> IdentifiersSeparatedByUnderscore = IdentifierUntilUnderscoreOrFullWord.Many();
+        public static readonly Parser<IEnumerable<string>> IdentifiersSeparatedByDash = IdentifierUntilDashOrFullWord.Many();
+        #endregion
+        #region lexers by line
+        public static readonly Parser<IEnumerable<string>> LinesSeparatedByUnderscore = LineUntilUnderscoreOrFullLine.Many();
+        public static readonly Parser<IEnumerable<string>> LinesSeparatedByDash = LineUntilDashOrFullLine.Many();
+        #endregion
+        #region lexers by brackets
+        public static readonly Parser<IEnumerable<string>> TagLexerWithBrackets =
+            SquareBracketEnclosedTextWithBracket.Or(ParenthesisEnclosedTextWithParenthesis).Many();
+
+        public static readonly Parser<IEnumerable<string>> GrindTagsWithBracketsOutOfMajorContent =
+            from fansubGroup in SquareBracketEnclosedText.Optional()
+            from content in Parse.CharExcept(c => c == '[' || c == '(', "Brackets").Many().Text()
+            from tags in TagLexerWithBrackets
+            select tags;
+        #endregion
+        #endregion
+    }
 }
