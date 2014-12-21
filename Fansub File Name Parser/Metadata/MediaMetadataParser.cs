@@ -29,6 +29,9 @@ using System.Text.RegularExpressions;
 
 namespace FansubFileNameParser.Metadata
 {
+    /// <summary>
+    /// Parses media metadata from the file name tags
+    /// </summary>
     public static class MediaMetadataParser
     {
         #region private fields

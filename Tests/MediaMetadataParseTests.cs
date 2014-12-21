@@ -22,52 +22,38 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Metadata;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using UnitTests.Models;
+
 namespace Tests
 {
     [TestClass]
     public sealed class MediaMetadataParseTests
     {
         [TestMethod]
-        public void ParseAudioTags()
+        public void ParseAllTags()
         {
+            var model = TestModel.CreateMediaDataTestModel();
 
-        }
+            foreach(var kvp in model)
+            {
+                string tags = kvp.Key;
+                MediaMetadata metadata = kvp.Value;
 
-        [TestMethod]
-        public void ParsePixelBitDepthTags()
-        {
+                MediaMetadata experimental;
 
-        }
+                if(MediaMetadataParser.TryParseMediaMetadata(tags, out experimental))
+                {
+                    if(metadata.Equals(experimental) == false)
+                    {
+                        Console.WriteLine();
+                    }
 
-        [TestMethod]
-        public void ParseVideoCodecTags()
-        {
-
-        }
-
-        [TestMethod]
-        public void ParseVideoMediaTags()
-        {
-
-        }
-
-        [TestMethod]
-        public void ParseVideoModeTags()
-        {
-
-        }
-
-        [TestMethod]
-        public void ParseCrc32()
-        {
-
-        }
-
-        [TestMethod]
-        public void ParseResolution()
-        {
-
+                    Assert.AreEqual<MediaMetadata>(metadata, experimental);
+                }
+            }
         }
     }
 }

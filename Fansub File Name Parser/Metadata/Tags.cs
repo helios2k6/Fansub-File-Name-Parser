@@ -98,7 +98,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video media tags.
         /// </value>
-        public static readonly ISet<string> VideoMediaTags
+        public static IEnumerable<string> VideoMediaTags
         {
             get
             {
@@ -120,7 +120,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video mode tags.
         /// </value>
-        public static readonly ISet<string> VideoModeTags
+        public static IEnumerable<string> VideoModeTags
         {
             get
             {

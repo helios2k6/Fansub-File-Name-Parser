@@ -24,7 +24,10 @@
 
 using FansubFileNameParser;
 using FansubFileNameParser.Metadata;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace UnitTests.Models
 {
@@ -50,6 +53,9 @@ namespace UnitTests.Models
             {"[Lunar] Bleach - 05 v2 [F2C9454F].avi", new FansubFile("Lunar", "Bleach", 5, ".avi")}
         };
 
+        private static readonly Lazy<IEnumerable<KeyValuePair<string, MediaMetadata>>> InputToMediaMetadataMap =
+            new Lazy<IEnumerable<KeyValuePair<string, MediaMetadata>>>(InitMediaMetadataTestModel);
+
         /// <summary>
         /// Creates a new test model.
         /// </summary>
@@ -59,9 +65,87 @@ namespace UnitTests.Models
             return new Dictionary<string, FansubFile>(InputToFansubFileMap);
         }
 
-        public static IDictionary<string, MediaMetadata> CreateMediaMetadataTestModel()
+        /// <summary>
+        /// Creates the media data test model.
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<KeyValuePair<string, MediaMetadata>> CreateMediaDataTestModel()
         {
-            var mapResult = new Dictionary<string, MediaMetadata>();
+            return InputToMediaMetadataMap.Value;
+        }
+
+        private static IEnumerable<KeyValuePair<string, MediaMetadata>> CreateMapping(
+            string audioTag,
+            string pixelBitDepthTag,
+            string videoCodecTag,
+            string videoMediaTag,
+            string videoModeTag,
+            string crc32,
+            string resolutionAsString,
+            int width,
+            int height)
+        {
+            var list = new List<string>
+            {
+                audioTag,
+                pixelBitDepthTag,
+                videoCodecTag,
+                videoMediaTag,
+                videoModeTag,
+                crc32,
+                resolutionAsString,
+            };
+
+            for(int i = 0; i < 127; i++)
+            {
+                var builder = new StringBuilder();
+                var mediaMetadata = new MediaMetadata();
+
+                for (int j = 0; j < 7; j++)
+                {
+                    var token = list[j];
+
+                    int bitAt = (1 << j) & i;
+                    if(bitAt > 0)
+                    {
+                        builder.Append("[").Append(token).Append("]");
+
+                        switch(j)
+                        {
+                            case 0:
+                                mediaMetadata.AudioCodec = token;
+                                break;
+                            case 1:
+                                mediaMetadata.PixelBitDepth = token;
+                                break;
+                            case 2:
+                                mediaMetadata.VideoCodec = token;
+                                break;
+                            case 3:
+                                mediaMetadata.VideoMedia = token;
+                                break;
+                            case 4:
+                                mediaMetadata.VideoMode = token;
+                                break;
+                            case 5:
+                                mediaMetadata.CRC32 = token;
+                                break;
+                            case 6:
+                                mediaMetadata.Resolution = new Resolution(width, height);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                yield return new KeyValuePair<string, MediaMetadata>(builder.ToString(), mediaMetadata);
+            }
+        }
+
+        private static IEnumerable<KeyValuePair<string, MediaMetadata>> InitMediaMetadataTestModel()
+        {
+            IEnumerable<KeyValuePair<string, MediaMetadata>> kvps = Enumerable.Empty<KeyValuePair<string, MediaMetadata>>();
 
             foreach(var audioTag in Tags.AudioTags)
             {
@@ -77,19 +161,87 @@ namespace UnitTests.Models
                                 var crc32 = "01234567";
 
                                 //Generate resolution
-                                var resolution1 = "1920x1080";
-                                var resolution2 = "1280x720";
-                                var resolution3 = "1920 x 1080";
-                                var resolution4 = "1280 x 720";
-                                var resolution5 = "720 x 480";
-                                var resolution6 = "720x480";
+                                var res1 = "1920x1080";
+                                var res2 = "1280x720";
+                                var res3 = "720x480";
+                                var res4 = "1920 x 1080";
+                                var res5 = "1280 x 720";
+                                var res6 = "720 x 480";
+
+                                var map1 = CreateMapping(
+                                    audioTag,
+                                    pixelBitDepthTag,
+                                    videoCodecTag,
+                                    videoMediaTag,
+                                    videoModeTag,
+                                    crc32,
+                                    res1,
+                                    1920,
+                                    1080);
+
+                                var map2 = CreateMapping(
+                                    audioTag,
+                                    pixelBitDepthTag,
+                                    videoCodecTag,
+                                    videoMediaTag,
+                                    videoModeTag,
+                                    crc32,
+                                    res2,
+                                    1280,
+                                    720);
+
+                                var map3 = CreateMapping(
+                                    audioTag,
+                                    pixelBitDepthTag,
+                                    videoCodecTag,
+                                    videoMediaTag,
+                                    videoModeTag,
+                                    crc32,
+                                    res3,
+                                    720,
+                                    480);
+
+                                var map4 = CreateMapping(
+                                    audioTag,
+                                    pixelBitDepthTag,
+                                    videoCodecTag,
+                                    videoMediaTag,
+                                    videoModeTag,
+                                    crc32,
+                                    res4,
+                                    1920,
+                                    1080);
+
+                                var map5 = CreateMapping(
+                                    audioTag,
+                                    pixelBitDepthTag,
+                                    videoCodecTag,
+                                    videoMediaTag,
+                                    videoModeTag,
+                                    crc32,
+                                    res5,
+                                    1280,
+                                    720);
+
+                                var map6 = CreateMapping(
+                                    audioTag,
+                                    pixelBitDepthTag,
+                                    videoCodecTag,
+                                    videoMediaTag,
+                                    videoModeTag,
+                                    crc32,
+                                    res6,
+                                    720,
+                                    480);
+
+                                kvps = kvps.Concat(map1).Concat(map2).Concat(map3).Concat(map4).Concat(map5).Concat(map6);
                             }
                         }
                     }
                 }
             }
 
-            return mapResult;
+            return kvps;
         }
     }
 }

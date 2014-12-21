@@ -106,7 +106,7 @@ namespace FansubFileNameParser
 
         public static readonly Parser<IEnumerable<string>> GrindTagsWithBracketsOutOfMajorContent =
             from fansubGroup in SquareBracketEnclosedText.Or(ParenthesisEnclosedText).Optional()
-            from content in Parse.CharExcept(c => c == '[' || c == '(', "Brackets").Many().Text()
+            from content in Parse.CharExcept(c => c == '[' || c == '(', "Brackets").Many().Text().Optional()
             from tags in TagLexerWithBrackets
             select tags;
         #endregion
