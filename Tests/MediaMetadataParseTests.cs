@@ -22,9 +22,52 @@
  * THE SOFTWARE.
  */
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+namespace Tests
+{
+    [TestClass]
+    public sealed class MediaMetadataParseTests
+    {
+        [TestMethod]
+        public void ParseAudioTags()
+        {
 
-using System;
-using System.Runtime.CompilerServices;
+        }
 
-[assembly: InternalsVisibleTo("Tests")]
-[assembly: CLSCompliant(false)]
+        [TestMethod]
+        public void ParsePixelBitDepthTags()
+        {
+
+        }
+
+        [TestMethod]
+        public void ParseVideoCodecTags()
+        {
+
+        }
+
+        [TestMethod]
+        public void ParseVideoMediaTags()
+        {
+
+        }
+
+        [TestMethod]
+        public void ParseVideoModeTags()
+        {
+
+        }
+
+        [TestMethod]
+        public void ParseCrc32()
+        {
+
+        }
+
+        [TestMethod]
+        public void ParseResolution()
+        {
+
+        }
+    }
+}

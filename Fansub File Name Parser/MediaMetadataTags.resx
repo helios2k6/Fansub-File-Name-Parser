@@ -120,13 +120,67 @@
   <data name="AAC" xml:space="preserve">
     <value>AAC</value>
   </data>
+  <data name="BD" xml:space="preserve">
+    <value>BD</value>
+  </data>
+  <data name="BDRIP" xml:space="preserve">
+    <value>BDRIP</value>
+  </data>
+  <data name="BLURAY" xml:space="preserve">
+    <value>BLURAY</value>
+  </data>
   <data name="DTS" xml:space="preserve">
     <value>DTS</value>
+  </data>
+  <data name="DVD" xml:space="preserve">
+    <value>DVD</value>
+  </data>
+  <data name="DVDRIP" xml:space="preserve">
+    <value>DVDRIP</value>
+  </data>
+  <data name="EightBit" xml:space="preserve">
+    <value>8BIT</value>
+  </data>
+  <data name="EightBitWithSpace" xml:space="preserve">
+    <value>8 BIT</value>
   </data>
   <data name="FLAC" xml:space="preserve">
     <value>FLAC</value>
   </data>
+  <data name="H264" xml:space="preserve">
+    <value>H264</value>
+  </data>
   <data name="OGG" xml:space="preserve">
     <value>OGG</value>
+  </data>
+  <data name="TenBit" xml:space="preserve">
+    <value>10BIT</value>
+  </data>
+  <data name="TenBitWithSpace" xml:space="preserve">
+    <value>10 BIT</value>
+  </data>
+  <data name="TV" xml:space="preserve">
+    <value>TV</value>
+  </data>
+  <data name="X264" xml:space="preserve">
+    <value>X264</value>
+  </data>
+  <data name="XVID" xml:space="preserve">
+    <value>XVID</value>
+  </data>
+  <data name="AC3" xml:space="preserve">
+    <value>AC3</value>
+  </data>
+  <data name="FourEightyP" xml:space="preserve">
+    <value>480P</value>
+  </data>
+  <data name="MP3" xml:space="preserve">
+    <value>MP3</value>
+  </data>
+  <data name="SevenTwentyP" xml:space="preserve">
+    <value>720P</value>
+  </data>
+  <data name="TenEightyP" xml:space="preserve">
+    <value>1080P</value>
   </data>
 </root>

@@ -25,7 +25,8 @@
 using System;
 using System.Runtime.Serialization;
 using System.Text;
-namespace FansubFileNameParser
+
+namespace FansubFileNameParser.Metadata
 {
     /// <summary>
     /// Represents the media metadata that is encoded into a fansub file name
@@ -52,7 +53,7 @@ namespace FansubFileNameParser
             AudioCodec = string.Empty;
             CRC32 = string.Empty;
             PixelBitDepth = string.Empty;
-            Resolution = string.Empty;
+            Resolution = new Resolution();
             VideoCodec = string.Empty;
             VideoMedia = string.Empty;
             VideoMode = string.Empty;
@@ -63,7 +64,7 @@ namespace FansubFileNameParser
             AudioCodec = info.GetString(AudioCodecKey);
             CRC32 = info.GetString(CRC32Key);
             PixelBitDepth = info.GetString(PixelBitDepthKey);
-            Resolution = info.GetString(ResolutionKey);
+            Resolution = (Resolution)info.GetValue(ResolutionKey, typeof(Resolution));
             VideoCodec = info.GetString(VideoCodecKey);
             VideoMedia = info.GetString(VideoMediaKey);
             VideoMode = info.GetString(VideoModeKey);
@@ -107,7 +108,7 @@ namespace FansubFileNameParser
         /// <value>
         /// The resolution.
         /// </value>
-        public string Resolution { get; set; }
+        public Resolution Resolution { get; set; }
 
         /// <summary>
         /// Gets or sets the video codec.

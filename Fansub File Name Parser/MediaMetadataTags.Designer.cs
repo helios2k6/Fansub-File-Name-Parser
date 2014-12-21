@@ -70,11 +70,83 @@ namespace FansubFileNameParser {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to AC3.
+        /// </summary>
+        internal static string AC3 {
+            get {
+                return ResourceManager.GetString("AC3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BD.
+        /// </summary>
+        internal static string BD {
+            get {
+                return ResourceManager.GetString("BD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BDRIP.
+        /// </summary>
+        internal static string BDRIP {
+            get {
+                return ResourceManager.GetString("BDRIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BLURAY.
+        /// </summary>
+        internal static string BLURAY {
+            get {
+                return ResourceManager.GetString("BLURAY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to DTS.
         /// </summary>
         internal static string DTS {
             get {
                 return ResourceManager.GetString("DTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DVD.
+        /// </summary>
+        internal static string DVD {
+            get {
+                return ResourceManager.GetString("DVD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DVDRIP.
+        /// </summary>
+        internal static string DVDRIP {
+            get {
+                return ResourceManager.GetString("DVDRIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 8BIT.
+        /// </summary>
+        internal static string EightBit {
+            get {
+                return ResourceManager.GetString("EightBit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 8 BIT.
+        /// </summary>
+        internal static string EightBitWithSpace {
+            get {
+                return ResourceManager.GetString("EightBitWithSpace", resourceCulture);
             }
         }
         
@@ -88,11 +160,101 @@ namespace FansubFileNameParser {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 480P.
+        /// </summary>
+        internal static string FourEightyP {
+            get {
+                return ResourceManager.GetString("FourEightyP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to H264.
+        /// </summary>
+        internal static string H264 {
+            get {
+                return ResourceManager.GetString("H264", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MP3.
+        /// </summary>
+        internal static string MP3 {
+            get {
+                return ResourceManager.GetString("MP3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OGG.
         /// </summary>
         internal static string OGG {
             get {
                 return ResourceManager.GetString("OGG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 720P.
+        /// </summary>
+        internal static string SevenTwentyP {
+            get {
+                return ResourceManager.GetString("SevenTwentyP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 10BIT.
+        /// </summary>
+        internal static string TenBit {
+            get {
+                return ResourceManager.GetString("TenBit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 10 BIT.
+        /// </summary>
+        internal static string TenBitWithSpace {
+            get {
+                return ResourceManager.GetString("TenBitWithSpace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1080P.
+        /// </summary>
+        internal static string TenEightyP {
+            get {
+                return ResourceManager.GetString("TenEightyP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TV.
+        /// </summary>
+        internal static string TV {
+            get {
+                return ResourceManager.GetString("TV", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to X264.
+        /// </summary>
+        internal static string X264 {
+            get {
+                return ResourceManager.GetString("X264", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to XVID.
+        /// </summary>
+        internal static string XVID {
+            get {
+                return ResourceManager.GetString("XVID", resourceCulture);
             }
         }
     }
