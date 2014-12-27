@@ -128,7 +128,7 @@ namespace FansubFileNameParser.Metadata
             crc32Checksum = string.Empty;
 
             var upperCased = tag.ToUpperInvariant();
-            var matches = CRC32Regex.Match(tag);
+            var matches = CRC32Regex.Match(upperCased);
 
             if (matches.Success)
             {
