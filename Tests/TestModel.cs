@@ -96,6 +96,10 @@ namespace UnitTests.Models
                 resolutionAsString,
             };
 
+            var dummyFansubGroupTag = "[Dummy]";
+            var dummyFansubAnimeName = "Dummy Fansub - 01";
+            var dummyFileExtension = ".dummy";
+
             for(int i = 0; i < 127; i++)
             {
                 var builder = new StringBuilder();
@@ -108,7 +112,9 @@ namespace UnitTests.Models
                     int bitAt = (1 << j) & i;
                     if(bitAt > 0)
                     {
+                        builder.Append(dummyFansubGroupTag).Append(dummyFansubAnimeName);
                         builder.Append("[").Append(token).Append("]");
+                        builder.Append(dummyFileExtension);
 
                         switch(j)
                         {
