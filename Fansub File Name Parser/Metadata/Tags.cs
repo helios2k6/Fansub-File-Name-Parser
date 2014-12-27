@@ -69,6 +69,7 @@ namespace FansubFileNameParser.Metadata
                     MediaMetadataTags.EightBitWithSpace,
                     MediaMetadataTags.TenBit,
                     MediaMetadataTags.TenBitWithSpace,
+                    MediaMetadataTags.Hi10P,
                 };
             }
         }

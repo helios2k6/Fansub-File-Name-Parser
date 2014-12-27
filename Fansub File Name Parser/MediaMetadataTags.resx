@@ -183,4 +183,7 @@
   <data name="TenEightyP" xml:space="preserve">
     <value>1080P</value>
   </data>
+  <data name="Hi10P" xml:space="preserve">
+    <value>HI10P</value>
+  </data>
 </root>

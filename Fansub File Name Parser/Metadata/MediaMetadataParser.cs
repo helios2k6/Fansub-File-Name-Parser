@@ -24,6 +24,7 @@
 
 
 using Sprache;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -36,7 +37,7 @@ namespace FansubFileNameParser.Metadata
     {
         #region private fields
         private static readonly Regex CRC32Regex = new Regex(@"([A-F]|\d){8}");
-        private static readonly Regex ResolutionRegEx = new Regex(@"(\d{3,4})\s?x\s?(\d{3,4})");
+        private static readonly Regex ResolutionRegEx = new Regex(@"(\D*)(\d{3,4})\s?x\s?(\d{3,4})(\D*)");
         #endregion
 
         #region public methods
@@ -108,7 +109,8 @@ namespace FansubFileNameParser.Metadata
 
             foreach (var tagCandidate in tagMatches)
             {
-                if (upperCased.Contains(tagCandidate))
+                var tagCandidateUpperCased = tagCandidate.ToUpperInvariant();
+                if (upperCased.Contains(tagCandidateUpperCased))
                 {
                     outputResult = tagCandidate;
                     return true;
@@ -141,7 +143,23 @@ namespace FansubFileNameParser.Metadata
 
         private static bool TryGetPixelBitDepth(string tag, out string pixelBitDepth)
         {
-            return TryFilterTag(tag, Tags.PixelBitDepthTags, out pixelBitDepth);
+            if (TryFilterTag(tag, Tags.PixelBitDepthTags, out pixelBitDepth))
+            {
+                if (pixelBitDepth.Equals(MediaMetadataTags.Hi10P, StringComparison.OrdinalIgnoreCase)
+                    || pixelBitDepth.Equals(MediaMetadataTags.TenBit, StringComparison.OrdinalIgnoreCase)
+                    || pixelBitDepth.Equals(MediaMetadataTags.TenBitWithSpace, StringComparison.OrdinalIgnoreCase))
+                {
+                    pixelBitDepth = MediaMetadataTags.TenBitWithSpace;
+                }
+                else
+                {
+                    pixelBitDepth = MediaMetadataTags.EightBitWithSpace;
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         private static bool TryGetResolution(string tag, out Resolution resolution)
@@ -152,10 +170,10 @@ namespace FansubFileNameParser.Metadata
 
             if (matches.Success)
             {
-                if (matches.Captures.Count >= 3)
+                if (matches.Groups.Count >= 4)
                 {
-                    var widthString = matches.Groups[1].Value;
-                    var heightString = matches.Groups[2].Value;
+                    var widthString = matches.Groups[2].Value;
+                    var heightString = matches.Groups[3].Value;
 
                     int width, height;
                     if (int.TryParse(widthString, out width) && int.TryParse(heightString, out height))
