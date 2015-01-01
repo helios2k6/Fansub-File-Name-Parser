@@ -145,17 +145,7 @@ namespace FansubFileNameParser.Metadata
         {
             if (TryFilterTag(tag, Tags.PixelBitDepthTags, out pixelBitDepth))
             {
-                if (pixelBitDepth.Equals(MediaMetadataTags.Hi10P, StringComparison.OrdinalIgnoreCase)
-                    || pixelBitDepth.Equals(MediaMetadataTags.TenBit, StringComparison.OrdinalIgnoreCase)
-                    || pixelBitDepth.Equals(MediaMetadataTags.TenBitWithSpace, StringComparison.OrdinalIgnoreCase))
-                {
-                    pixelBitDepth = MediaMetadataTags.TenBitWithSpace;
-                }
-                else
-                {
-                    pixelBitDepth = MediaMetadataTags.EightBitWithSpace;
-                }
-
+                pixelBitDepth = Tags.TranslatePixelBitDepth(pixelBitDepth);
                 return true;
             }
 

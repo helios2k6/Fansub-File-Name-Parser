@@ -104,6 +104,8 @@ namespace UnitTests.Models
             {
                 var builder = new StringBuilder();
                 var mediaMetadata = new MediaMetadata();
+                
+                builder.Append(dummyFansubGroupTag).Append(dummyFansubAnimeName);
 
                 for (int j = 0; j < 7; j++)
                 {
@@ -112,9 +114,8 @@ namespace UnitTests.Models
                     int bitAt = (1 << j) & i;
                     if(bitAt > 0)
                     {
-                        builder.Append(dummyFansubGroupTag).Append(dummyFansubAnimeName);
+                       
                         builder.Append("[").Append(token).Append("]");
-                        builder.Append(dummyFileExtension);
 
                         switch(j)
                         {
@@ -144,6 +145,8 @@ namespace UnitTests.Models
                         }
                     }
                 }
+                
+                builder.Append(dummyFileExtension);
 
                 yield return new KeyValuePair<string, MediaMetadata>(builder.ToString(), mediaMetadata);
             }
@@ -157,6 +160,8 @@ namespace UnitTests.Models
             {
                 foreach(var pixelBitDepthTag in Tags.PixelBitDepthTags)
                 {
+                    var translatedPixelBitDepthTag = Tags.TranslatePixelBitDepth(pixelBitDepthTag);
+
                     foreach(var videoCodecTag in Tags.VideoCodecTags)
                     {
                         foreach(var videoMediaTag in Tags.VideoMediaTags)
@@ -176,7 +181,7 @@ namespace UnitTests.Models
 
                                 var map1 = CreateMapping(
                                     audioTag,
-                                    pixelBitDepthTag,
+                                    translatedPixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
@@ -187,7 +192,7 @@ namespace UnitTests.Models
 
                                 var map2 = CreateMapping(
                                     audioTag,
-                                    pixelBitDepthTag,
+                                    translatedPixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
@@ -198,7 +203,7 @@ namespace UnitTests.Models
 
                                 var map3 = CreateMapping(
                                     audioTag,
-                                    pixelBitDepthTag,
+                                    translatedPixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
@@ -209,7 +214,7 @@ namespace UnitTests.Models
 
                                 var map4 = CreateMapping(
                                     audioTag,
-                                    pixelBitDepthTag,
+                                    translatedPixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
@@ -220,7 +225,7 @@ namespace UnitTests.Models
 
                                 var map5 = CreateMapping(
                                     audioTag,
-                                    pixelBitDepthTag,
+                                    translatedPixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
@@ -231,7 +236,7 @@ namespace UnitTests.Models
 
                                 var map6 = CreateMapping(
                                     audioTag,
-                                    pixelBitDepthTag,
+                                    translatedPixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,

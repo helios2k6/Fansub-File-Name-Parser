@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using System;
 using System.Collections.Generic;
 
 namespace FansubFileNameParser.Metadata
@@ -132,6 +133,35 @@ namespace FansubFileNameParser.Metadata
                     MediaMetadataTags.TenEightyP,
                 };
             }
+        }
+
+        /// <summary>
+        /// Translates the pixel bit depth.
+        /// </summary>
+        /// <param name="pixelBitDepth">The pixel bit depth.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">If <paramref name="pixelBitDepth"/> is null</exception>
+        /// <exception cref="System.ArgumentException">If <paramref name="pixelBitDepth"/> does not correspond to a pixel format</exception>
+        public static string TranslatePixelBitDepth(string pixelBitDepth)
+        {
+            if (string.IsNullOrWhiteSpace(pixelBitDepth))
+            {
+                throw new ArgumentNullException(pixelBitDepth);
+            }
+
+            if (pixelBitDepth.Equals(MediaMetadataTags.Hi10P, StringComparison.OrdinalIgnoreCase)
+                || pixelBitDepth.Equals(MediaMetadataTags.TenBit, StringComparison.OrdinalIgnoreCase)
+                || pixelBitDepth.Equals(MediaMetadataTags.TenBitWithSpace, StringComparison.OrdinalIgnoreCase))
+            {
+                return MediaMetadataTags.TenBitWithSpace;
+            } 
+            else if(pixelBitDepth.Equals(MediaMetadataTags.EightBit)
+                || pixelBitDepth.Equals(MediaMetadataTags.EightBitWithSpace))
+            {
+                return MediaMetadataTags.EightBitWithSpace; 
+            }
+
+            throw new ArgumentException("String passed in does not correspond to a pixel format");
         }
     }
 }
