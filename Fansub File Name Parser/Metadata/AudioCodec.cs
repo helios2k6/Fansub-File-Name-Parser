@@ -32,12 +32,33 @@ namespace FansubFileNameParser.Metadata
     [Serializable]
     public enum AudioCodec
     {
+        /// <summary>
+        /// Designates the default and unknown audio codec
+        /// </summary>
         Unknown = 0,
+        /// <summary>
+        /// The AAC audio codec
+        /// </summary>
         AAC = 1 << 0,
+        /// <summary>
+        /// The AC3 audio codec
+        /// </summary>
         AC3 = 1 << 1,
+        /// <summary>
+        /// The DTS audio codec
+        /// </summary>
         DTS = 1 << 2,
+        /// <summary>
+        /// The FLAC audio codec
+        /// </summary>
         FLAC = 1 << 3,
+        /// <summary>
+        /// The MP3 audio codec
+        /// </summary>
         MP3 = 1 << 4,
+        /// <summary>
+        /// The OGG audio codec
+        /// </summary>
         OGG = 1 << 5,
     }
 }

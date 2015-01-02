@@ -40,6 +40,12 @@ namespace FansubFileNameParser.Metadata
         #endregion
 
         #region public methods
+        /// <summary>
+        /// Tries the parse media metadata.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <param name="metadata">The metadata.</param>
+        /// <returns>True if any media metadata could be parsed. False otherwise</returns>
         public static bool TryParseMediaMetadata(string fileName, out MediaMetadata metadata)
         {
             metadata = default(MediaMetadata);

@@ -32,9 +32,21 @@ namespace FansubFileNameParser.Metadata
     [Serializable]
     public enum VideoMedia
     {
+        /// <summary>
+        /// The default video media. 
+        /// </summary>
         Unknown = 0,
+        /// <summary>
+        /// Designates media taken from a Bluray disk
+        /// </summary>
         Bluray = 1 << 0,
+        /// <summary>
+        /// Designates media taken from a TV broadcast
+        /// </summary>
         Broadcast = 1 << 1,
+        /// <summary>
+        /// Designates media taken from a DVD 
+        /// </summary>
         DVD = 1 << 2,
     }
 }

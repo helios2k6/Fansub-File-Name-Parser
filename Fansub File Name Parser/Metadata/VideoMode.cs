@@ -31,12 +31,33 @@ namespace FansubFileNameParser.Metadata
     [Serializable]
     public enum VideoMode
     {
+        /// <summary>
+        /// The default video mode
+        /// </summary>
         Unknown = 0,
+        /// <summary>
+        /// Designates 480i video
+        /// </summary>
         FourEightyInterlaced = 1 << 0,
+        /// <summary>
+        /// Designates 480p video
+        /// </summary>
         FourEightyProgressive = 1 << 1,
+        /// <summary>
+        /// Designates 576i video
+        /// </summary>
         FiveSeventySixInterlaced = 1 << 2,
+        /// <summary>
+        /// Designates 720p video
+        /// </summary>
         SevenTwentyProgressive = 1 << 3,
+        /// <summary>
+        /// Designates 1080i video
+        /// </summary>
         TenEightyInterlaced = 1 << 4,
+        /// <summary>
+        /// Designates 1080p video
+        /// </summary>
         TenEightyProgressive = 1 << 5,
     }
 }

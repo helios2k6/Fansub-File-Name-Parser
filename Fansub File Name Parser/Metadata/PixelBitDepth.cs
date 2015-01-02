@@ -32,8 +32,17 @@ namespace FansubFileNameParser.Metadata
     [Serializable]
     public enum PixelBitDepth
     {
+        /// <summary>
+        /// The default pixel bit-depth of any color space
+        /// </summary>
         Unknown = 0,
+        /// <summary>
+        /// Designates eight bits of pixel depth
+        /// </summary>
         EightBits = 1 << 0,
+        /// <summary>
+        /// Designates ten bits of pixel depth
+        /// </summary>
         TenBits = 1 << 1,
     }
 }

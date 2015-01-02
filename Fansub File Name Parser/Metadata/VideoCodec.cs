@@ -32,10 +32,25 @@ namespace FansubFileNameParser.Metadata
     [Serializable]
     public enum VideoCodec
     {
+        /// <summary>
+        /// The default video codec
+        /// </summary>
         Unknown = 0,
+        /// <summary>
+        /// The H264 video codec
+        /// </summary>
         H264 = 1 << 0,
+        /// <summary>
+        /// The XVID video codec
+        /// </summary>
         XVID = 1 << 1,
+        /// <summary>
+        /// The VC1 video codec
+        /// </summary>
         VC1 = 1 << 2,
+        /// <summary>
+        /// The VP8 video codec
+        /// </summary>
         VP8 = 1 << 3,
     }
 }
