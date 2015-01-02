@@ -38,18 +38,18 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The audio tags.
         /// </value>
-        public static IEnumerable<string> AudioTags
+        public static IEnumerable<KeyValuePair<string, AudioCodec>> AudioTags
         {
             get
             {
-                return new HashSet<string>
+                return new Dictionary<string, AudioCodec>
                 {
-                    MediaMetadataTags.AAC,
-                    MediaMetadataTags.AC3,
-                    MediaMetadataTags.DTS,
-                    MediaMetadataTags.FLAC,
-                    MediaMetadataTags.MP3,
-                    MediaMetadataTags.OGG,
+                    {MediaMetadataTags.AAC, AudioCodec.AAC},
+                    {MediaMetadataTags.AC3, AudioCodec.AC3},
+                    {MediaMetadataTags.DTS, AudioCodec.DTS},
+                    {MediaMetadataTags.FLAC, AudioCodec.FLAC},
+                    {MediaMetadataTags.MP3, AudioCodec.MP3},
+                    {MediaMetadataTags.OGG, AudioCodec.OGG},
                 };
             }
         }
@@ -60,17 +60,17 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The pixel bit depth tags.
         /// </value>
-        public static IEnumerable<string> PixelBitDepthTags
+        public static IEnumerable<KeyValuePair<string, PixelBitDepth>> PixelBitDepthTags
         {
             get
             {
-                return new HashSet<string>
+                return new Dictionary<string, PixelBitDepth>
                 {
-                    MediaMetadataTags.EightBit,
-                    MediaMetadataTags.EightBitWithSpace,
-                    MediaMetadataTags.TenBit,
-                    MediaMetadataTags.TenBitWithSpace,
-                    MediaMetadataTags.Hi10P,
+                    {MediaMetadataTags.EightBit, PixelBitDepth.EightBits},
+                    {MediaMetadataTags.EightBitWithSpace, PixelBitDepth.EightBits},
+                    {MediaMetadataTags.TenBit, PixelBitDepth.TenBits},
+                    {MediaMetadataTags.TenBitWithSpace, PixelBitDepth.TenBits},
+                    {MediaMetadataTags.Hi10P, PixelBitDepth.TenBits},
                 };
             }
         }
@@ -81,15 +81,16 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video codec tags.
         /// </value>
-        public static IEnumerable<string> VideoCodecTags
+        public static IEnumerable<KeyValuePair<string, VideoCodec>> VideoCodecTags
         {
             get
             {
-                return new HashSet<string>
+                return new Dictionary<string, VideoCodec>
                 {
-                    MediaMetadataTags.H264,
-                    MediaMetadataTags.X264,
-                    MediaMetadataTags.XVID,
+                    {MediaMetadataTags.H264, VideoCodec.H264},
+                    {MediaMetadataTags.X264, VideoCodec.H264},
+                    {MediaMetadataTags.VC1, VideoCodec.VC1},
+                    {MediaMetadataTags.XVID, VideoCodec.XVID},
                 };
             }
         }
@@ -100,18 +101,18 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video media tags.
         /// </value>
-        public static IEnumerable<string> VideoMediaTags
+        public static IEnumerable<KeyValuePair<string, VideoMedia>> VideoMediaTags
         {
             get
             {
-                return new HashSet<string>
+                return new Dictionary<string, VideoMedia>
                 {
-                    MediaMetadataTags.BD,
-                    MediaMetadataTags.BDRIP,
-                    MediaMetadataTags.BLURAY,
-                    MediaMetadataTags.DVD,
-                    MediaMetadataTags.DVDRIP,
-                    MediaMetadataTags.TV,
+                    {MediaMetadataTags.BD, VideoMedia.Bluray},
+                    {MediaMetadataTags.BDRIP, VideoMedia.Bluray},
+                    {MediaMetadataTags.BLURAY, VideoMedia.Bluray},
+                    {MediaMetadataTags.DVD, VideoMedia.DVD},
+                    {MediaMetadataTags.DVDRIP, VideoMedia.DVD},
+                    {MediaMetadataTags.TV, VideoMedia.Broadcast},
                 };
             }
         }
@@ -122,46 +123,21 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video mode tags.
         /// </value>
-        public static IEnumerable<string> VideoModeTags
+        public static IEnumerable<KeyValuePair<string, VideoMode>> VideoModeTags
         {
             get
             {
-                return new HashSet<string>
+                return new Dictionary<string, VideoMode>
                 {
-                    MediaMetadataTags.FourEightyP,
-                    MediaMetadataTags.SevenTwentyP,
-                    MediaMetadataTags.TenEightyP,
+                    {MediaMetadataTags.FourEightyI, VideoMode.FourEightyInterlaced},
+                    {MediaMetadataTags.FourEightIWithSpace, VideoMode.FourEightyInterlaced},
+                    {MediaMetadataTags.FourEightyP, VideoMode.FourEightyProgressive},
+                    {MediaMetadataTags.SevenTwentyP, VideoMode.SevenTwentyProgressive},
+                    {MediaMetadataTags.TenEightyP, VideoMode.TenEightyProgressive},
+                    {MediaMetadataTags.TenEightyI, VideoMode.TenEightyInterlaced},
+                    {MediaMetadataTags.TenEightyIWithSpace, VideoMode.TenEightyInterlaced},
                 };
             }
-        }
-
-        /// <summary>
-        /// Translates the pixel bit depth.
-        /// </summary>
-        /// <param name="pixelBitDepth">The pixel bit depth.</param>
-        /// <returns></returns>
-        /// <exception cref="System.ArgumentNullException">If <paramref name="pixelBitDepth"/> is null</exception>
-        /// <exception cref="System.ArgumentException">If <paramref name="pixelBitDepth"/> does not correspond to a pixel format</exception>
-        public static string TranslatePixelBitDepth(string pixelBitDepth)
-        {
-            if (string.IsNullOrWhiteSpace(pixelBitDepth))
-            {
-                throw new ArgumentNullException(pixelBitDepth);
-            }
-
-            if (pixelBitDepth.Equals(MediaMetadataTags.Hi10P, StringComparison.OrdinalIgnoreCase)
-                || pixelBitDepth.Equals(MediaMetadataTags.TenBit, StringComparison.OrdinalIgnoreCase)
-                || pixelBitDepth.Equals(MediaMetadataTags.TenBitWithSpace, StringComparison.OrdinalIgnoreCase))
-            {
-                return MediaMetadataTags.TenBitWithSpace;
-            } 
-            else if(pixelBitDepth.Equals(MediaMetadataTags.EightBit)
-                || pixelBitDepth.Equals(MediaMetadataTags.EightBitWithSpace))
-            {
-                return MediaMetadataTags.EightBitWithSpace; 
-            }
-
-            throw new ArgumentException("String passed in does not correspond to a pixel format");
         }
     }
 }

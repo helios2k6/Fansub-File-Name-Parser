@@ -22,34 +22,21 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser.Metadata;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Threading.Tasks;
-using UnitTests.Models;
-
-namespace Tests
+namespace FansubFileNameParser.Metadata
 {
-    [TestClass]
-    public sealed class MediaMetadataParseTests
+    /// <summary>
+    /// Represents the video mode used, such as "1080p," "720p," "480p," etc...
+    /// </summary>
+    [Serializable]
+    public enum VideoMode
     {
-        [TestMethod]
-        public void ParseAllTags()
-        {
-            var model = TestModel.CreateMediaDataTestModel();
-
-            Parallel.ForEach(model, kvp =>
-            {
-                string tags = kvp.Key;
-                MediaMetadata metadata = kvp.Value;
-
-                MediaMetadata experimental;
-
-                if (MediaMetadataParser.TryParseMediaMetadata(tags, out experimental))
-                {
-                    Assert.AreEqual<MediaMetadata>(metadata, experimental);
-                }
-            });
-        }
+        Unknown = 0,
+        FourEightyInterlaced = 1 << 0,
+        FourEightyProgressive = 1 << 1,
+        FiveSeventySixInterlaced = 1 << 2,
+        SevenTwentyProgressive = 1 << 3,
+        TenEightyInterlaced = 1 << 4,
+        TenEightyProgressive = 1 << 5,
     }
 }

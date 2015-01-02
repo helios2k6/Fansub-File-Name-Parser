@@ -22,34 +22,20 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser.Metadata;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Threading.Tasks;
-using UnitTests.Models;
 
-namespace Tests
+namespace FansubFileNameParser.Metadata
 {
-    [TestClass]
-    public sealed class MediaMetadataParseTests
+    /// <summary>
+    /// Represents the video codec used to encode the media
+    /// </summary>
+    [Serializable]
+    public enum VideoCodec
     {
-        [TestMethod]
-        public void ParseAllTags()
-        {
-            var model = TestModel.CreateMediaDataTestModel();
-
-            Parallel.ForEach(model, kvp =>
-            {
-                string tags = kvp.Key;
-                MediaMetadata metadata = kvp.Value;
-
-                MediaMetadata experimental;
-
-                if (MediaMetadataParser.TryParseMediaMetadata(tags, out experimental))
-                {
-                    Assert.AreEqual<MediaMetadata>(metadata, experimental);
-                }
-            });
-        }
+        Unknown = 0,
+        H264 = 1 << 0,
+        XVID = 1 << 1,
+        VC1 = 1 << 2,
+        VP8 = 1 << 3,
     }
 }

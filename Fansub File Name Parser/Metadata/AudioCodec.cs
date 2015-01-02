@@ -22,34 +22,22 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser.Metadata;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Threading.Tasks;
-using UnitTests.Models;
 
-namespace Tests
+namespace FansubFileNameParser.Metadata
 {
-    [TestClass]
-    public sealed class MediaMetadataParseTests
+    /// <summary>
+    /// Represents the audio codec used to encode the audio stream of a media file
+    /// </summary>
+    [Serializable]
+    public enum AudioCodec
     {
-        [TestMethod]
-        public void ParseAllTags()
-        {
-            var model = TestModel.CreateMediaDataTestModel();
-
-            Parallel.ForEach(model, kvp =>
-            {
-                string tags = kvp.Key;
-                MediaMetadata metadata = kvp.Value;
-
-                MediaMetadata experimental;
-
-                if (MediaMetadataParser.TryParseMediaMetadata(tags, out experimental))
-                {
-                    Assert.AreEqual<MediaMetadata>(metadata, experimental);
-                }
-            });
-        }
+        Unknown = 0,
+        AAC = 1 << 0,
+        AC3 = 1 << 1,
+        DTS = 1 << 2,
+        FLAC = 1 << 3,
+        MP3 = 1 << 4,
+        OGG = 1 << 5,
     }
 }

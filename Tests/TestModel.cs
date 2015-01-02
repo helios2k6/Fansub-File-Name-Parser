@@ -75,25 +75,23 @@ namespace UnitTests.Models
         }
 
         private static IEnumerable<KeyValuePair<string, MediaMetadata>> CreateMapping(
-            string audioTag,
-            string pixelBitDepthTag,
-            string videoCodecTag,
-            string videoMediaTag,
-            string videoModeTag,
-            string crc32,
-            string resolutionAsString,
-            int width,
-            int height)
+            KeyValuePair<string, AudioCodec> audioTag,
+            KeyValuePair<string, PixelBitDepth> pixelBitDepthTag,
+            KeyValuePair<string, VideoCodec> videoCodecTag,
+            KeyValuePair<string, VideoMedia> videoMediaTag,
+            KeyValuePair<string, VideoMode> videoModeTag,
+            KeyValuePair<string, Resolution> resolutionTag,
+            string crc32)
         {
             var list = new List<string>
             {
-                audioTag,
-                pixelBitDepthTag,
-                videoCodecTag,
-                videoMediaTag,
-                videoModeTag,
+                audioTag.Key,
+                pixelBitDepthTag.Key,
+                videoCodecTag.Key,
+                videoMediaTag.Key,
+                videoModeTag.Key,
+                resolutionTag.Key,
                 crc32,
-                resolutionAsString,
             };
 
             var dummyFansubGroupTag = "[Dummy]";
@@ -114,31 +112,30 @@ namespace UnitTests.Models
                     int bitAt = (1 << j) & i;
                     if(bitAt > 0)
                     {
-                       
                         builder.Append("[").Append(token).Append("]");
 
                         switch(j)
                         {
                             case 0:
-                                mediaMetadata.AudioCodec = token;
+                                mediaMetadata.AudioCodec = audioTag.Value;
                                 break;
                             case 1:
-                                mediaMetadata.PixelBitDepth = token;
+                                mediaMetadata.PixelBitDepth = pixelBitDepthTag.Value;
                                 break;
                             case 2:
-                                mediaMetadata.VideoCodec = token;
+                                mediaMetadata.VideoCodec = videoCodecTag.Value;
                                 break;
                             case 3:
-                                mediaMetadata.VideoMedia = token;
+                                mediaMetadata.VideoMedia = videoMediaTag.Value;
                                 break;
                             case 4:
-                                mediaMetadata.VideoMode = token;
+                                mediaMetadata.VideoMode = videoModeTag.Value;
                                 break;
                             case 5:
-                                mediaMetadata.CRC32 = token;
+                                mediaMetadata.Resolution = resolutionTag.Value;
                                 break;
                             case 6:
-                                mediaMetadata.Resolution = new Resolution(width, height);
+                                mediaMetadata.CRC32 = token;
                                 break;
                             default:
                                 break;
@@ -152,6 +149,18 @@ namespace UnitTests.Models
             }
         }
 
+        private static IEnumerable<T> ConcatWithDynamicCheck<T>(this IEnumerable<T> @this, IEnumerable<T> other)
+        {
+            List<T> thisList = @this as List<T>;
+            if(thisList == null)
+            {
+                thisList = new List<T>(@this);
+            }
+
+            thisList.AddRange(other);
+            return thisList;
+        }
+
         private static IEnumerable<KeyValuePair<string, MediaMetadata>> InitMediaMetadataTestModel()
         {
             IEnumerable<KeyValuePair<string, MediaMetadata>> kvps = Enumerable.Empty<KeyValuePair<string, MediaMetadata>>();
@@ -160,8 +169,6 @@ namespace UnitTests.Models
             {
                 foreach(var pixelBitDepthTag in Tags.PixelBitDepthTags)
                 {
-                    var translatedPixelBitDepthTag = Tags.TranslatePixelBitDepth(pixelBitDepthTag);
-
                     foreach(var videoCodecTag in Tags.VideoCodecTags)
                     {
                         foreach(var videoMediaTag in Tags.VideoMediaTags)
@@ -181,71 +188,65 @@ namespace UnitTests.Models
 
                                 var map1 = CreateMapping(
                                     audioTag,
-                                    translatedPixelBitDepthTag,
+                                    pixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    crc32,
-                                    res1,
-                                    1920,
-                                    1080);
+                                    new KeyValuePair<string, Resolution>(res1, new Resolution(1920, 1080)),
+                                    crc32);
 
                                 var map2 = CreateMapping(
                                     audioTag,
-                                    translatedPixelBitDepthTag,
+                                    pixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    crc32,
-                                    res2,
-                                    1280,
-                                    720);
+                                     new KeyValuePair<string, Resolution>(res2, new Resolution(1280, 720)),
+                                    crc32);
 
                                 var map3 = CreateMapping(
                                     audioTag,
-                                    translatedPixelBitDepthTag,
+                                    pixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    crc32,
-                                    res3,
-                                    720,
-                                    480);
+                                    new KeyValuePair<string, Resolution>(res3, new Resolution(720, 480)),
+                                    crc32);
 
                                 var map4 = CreateMapping(
                                     audioTag,
-                                    translatedPixelBitDepthTag,
+                                    pixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    crc32,
-                                    res4,
-                                    1920,
-                                    1080);
+                                    new KeyValuePair<string, Resolution>(res4, new Resolution(1920, 1080)),
+                                    crc32);
 
                                 var map5 = CreateMapping(
                                     audioTag,
-                                    translatedPixelBitDepthTag,
+                                    pixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    crc32,
-                                    res5,
-                                    1280,
-                                    720);
+                                    new KeyValuePair<string, Resolution>(res5, new Resolution(1280, 720)),
+                                    crc32);
 
                                 var map6 = CreateMapping(
                                     audioTag,
-                                    translatedPixelBitDepthTag,
+                                    pixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    crc32,
-                                    res6,
-                                    720,
-                                    480);
+                                    new KeyValuePair<string, Resolution>(res6, new Resolution(720, 480)),
+                                    crc32);
 
-                                kvps = kvps.Concat(map1).Concat(map2).Concat(map3).Concat(map4).Concat(map5).Concat(map6);
+                                kvps = kvps
+                                    .ConcatWithDynamicCheck(map1)
+                                    .ConcatWithDynamicCheck(map2)
+                                    .ConcatWithDynamicCheck(map3)
+                                    .ConcatWithDynamicCheck(map4)
+                                    .ConcatWithDynamicCheck(map5)
+                                    .ConcatWithDynamicCheck(map6);
                             }
                         }
                     }

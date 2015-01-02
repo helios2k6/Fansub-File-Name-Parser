@@ -186,4 +186,19 @@
   <data name="Hi10P" xml:space="preserve">
     <value>HI10P</value>
   </data>
+  <data name="VC1" xml:space="preserve">
+    <value>VC1</value>
+  </data>
+  <data name="FourEightIWithSpace" xml:space="preserve">
+    <value>480 I</value>
+  </data>
+  <data name="FourEightyI" xml:space="preserve">
+    <value>480I</value>
+  </data>
+  <data name="TenEightyI" xml:space="preserve">
+    <value>1080I</value>
+  </data>
+  <data name="TenEightyIWithSpace" xml:space="preserve">
+    <value>1080 I</value>
+  </data>
 </root>

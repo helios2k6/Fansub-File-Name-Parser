@@ -22,34 +22,19 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser.Metadata;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Threading.Tasks;
-using UnitTests.Models;
 
-namespace Tests
+namespace FansubFileNameParser.Metadata
 {
-    [TestClass]
-    public sealed class MediaMetadataParseTests
+    /// <summary>
+    /// Represents the medium that was used to get the media data
+    /// </summary>
+    [Serializable]
+    public enum VideoMedia
     {
-        [TestMethod]
-        public void ParseAllTags()
-        {
-            var model = TestModel.CreateMediaDataTestModel();
-
-            Parallel.ForEach(model, kvp =>
-            {
-                string tags = kvp.Key;
-                MediaMetadata metadata = kvp.Value;
-
-                MediaMetadata experimental;
-
-                if (MediaMetadataParser.TryParseMediaMetadata(tags, out experimental))
-                {
-                    Assert.AreEqual<MediaMetadata>(metadata, experimental);
-                }
-            });
-        }
+        Unknown = 0,
+        Bluray = 1 << 0,
+        Broadcast = 1 << 1,
+        DVD = 1 << 2,
     }
 }

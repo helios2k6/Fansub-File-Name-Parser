@@ -22,34 +22,18 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser.Metadata;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Threading.Tasks;
-using UnitTests.Models;
 
-namespace Tests
+namespace FansubFileNameParser.Metadata
 {
-    [TestClass]
-    public sealed class MediaMetadataParseTests
+    /// <summary>
+    /// Represents the pixel bit-depth of a media file
+    /// </summary>
+    [Serializable]
+    public enum PixelBitDepth
     {
-        [TestMethod]
-        public void ParseAllTags()
-        {
-            var model = TestModel.CreateMediaDataTestModel();
-
-            Parallel.ForEach(model, kvp =>
-            {
-                string tags = kvp.Key;
-                MediaMetadata metadata = kvp.Value;
-
-                MediaMetadata experimental;
-
-                if (MediaMetadataParser.TryParseMediaMetadata(tags, out experimental))
-                {
-                    Assert.AreEqual<MediaMetadata>(metadata, experimental);
-                }
-            });
-        }
+        Unknown = 0,
+        EightBits = 1 << 0,
+        TenBits = 1 << 1,
     }
 }

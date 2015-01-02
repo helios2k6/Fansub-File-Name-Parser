@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 
-
 using Sprache;
 using System;
 using System.Collections.Generic;
@@ -58,41 +57,46 @@ namespace FansubFileNameParser.Metadata
             foreach (var tag in tags)
             {
                 //Match against all of the knowns
-                string outputTag;
+                AudioCodec outAudioCodec;
+                if (TryGetAudioCodec(tag, out outAudioCodec))
+                {
+                    metadata.AudioCodec = outAudioCodec;
+                }
+
+                string outCrc32;
+                if (TryGetCRC32Checksum(tag, out outCrc32))
+                {
+                    metadata.CRC32 = outCrc32;
+                }
+
+                PixelBitDepth outPixelBitDepth;
+                if (TryGetPixelBitDepth(tag, out outPixelBitDepth))
+                {
+                    metadata.PixelBitDepth = outPixelBitDepth;
+                }
+
                 Resolution resolution;
-                if (TryGetAudioCodec(tag, out outputTag))
-                {
-                    metadata.AudioCodec = outputTag;
-                }
-
-                if (TryGetCRC32Checksum(tag, out outputTag))
-                {
-                    metadata.CRC32 = outputTag;
-                }
-
-                if (TryGetPixelBitDepth(tag, out outputTag))
-                {
-                    metadata.PixelBitDepth = outputTag;
-                }
-
                 if (TryGetResolution(tag, out resolution))
                 {
                     metadata.Resolution = resolution;
                 }
 
-                if (TryGetVideoCodec(tag, out outputTag))
+                VideoCodec outVideoCodec;
+                if (TryGetVideoCodec(tag, out outVideoCodec))
                 {
-                    metadata.VideoCodec = outputTag;
+                    metadata.VideoCodec = outVideoCodec;
                 }
 
-                if (TryGetVideoMedia(tag, out outputTag))
+                VideoMedia outVideoMedia;
+                if (TryGetVideoMedia(tag, out outVideoMedia))
                 {
-                    metadata.VideoMedia = outputTag;
+                    metadata.VideoMedia = outVideoMedia;
                 }
 
-                if (TryGetVideoMode(tag, out outputTag))
+                VideoMode outVideoMode;
+                if (TryGetVideoMode(tag, out outVideoMode))
                 {
-                    metadata.VideoMode = outputTag;
+                    metadata.VideoMode = outVideoMode;
                 }
             }
 
@@ -101,18 +105,19 @@ namespace FansubFileNameParser.Metadata
         #endregion
 
         #region private methods
-        private static bool TryFilterTag(string tag, IEnumerable<string> tagMatches, out string outputResult)
+        private static bool TryFilterTag<T>(string tag, IEnumerable<KeyValuePair<string, T>> candidateTags, out T outputResult)
         {
-            outputResult = default(string);
+            outputResult = default(T);
 
             var upperCased = tag.ToUpperInvariant();
 
-            foreach (var tagCandidate in tagMatches)
+            foreach (var tagCandidateKvp in candidateTags)
             {
+                var tagCandidate = tagCandidateKvp.Key;
                 var tagCandidateUpperCased = tagCandidate.ToUpperInvariant();
                 if (upperCased.Contains(tagCandidateUpperCased))
                 {
-                    outputResult = tagCandidate;
+                    outputResult = tagCandidateKvp.Value;
                     return true;
                 }
             }
@@ -120,7 +125,7 @@ namespace FansubFileNameParser.Metadata
             return false;
         }
 
-        private static bool TryGetAudioCodec(string tag, out string audioCodec)
+        private static bool TryGetAudioCodec(string tag, out AudioCodec audioCodec)
         {
             return TryFilterTag(tag, Tags.AudioTags, out audioCodec);
         }
@@ -141,15 +146,9 @@ namespace FansubFileNameParser.Metadata
             return false;
         }
 
-        private static bool TryGetPixelBitDepth(string tag, out string pixelBitDepth)
+        private static bool TryGetPixelBitDepth(string tag, out PixelBitDepth pixelBitDepth)
         {
-            if (TryFilterTag(tag, Tags.PixelBitDepthTags, out pixelBitDepth))
-            {
-                pixelBitDepth = Tags.TranslatePixelBitDepth(pixelBitDepth);
-                return true;
-            }
-
-            return false;
+            return TryFilterTag(tag, Tags.PixelBitDepthTags, out pixelBitDepth);
         }
 
         private static bool TryGetResolution(string tag, out Resolution resolution)
@@ -177,17 +176,17 @@ namespace FansubFileNameParser.Metadata
             return false;
         }
 
-        private static bool TryGetVideoCodec(string tag, out string videoCodec)
+        private static bool TryGetVideoCodec(string tag, out VideoCodec videoCodec)
         {
             return TryFilterTag(tag, Tags.VideoCodecTags, out videoCodec);
         }
 
-        private static bool TryGetVideoMedia(string tag, out string videoMedia)
+        private static bool TryGetVideoMedia(string tag, out VideoMedia videoMedia)
         {
             return TryFilterTag(tag, Tags.VideoMediaTags, out videoMedia);
         }
 
-        private static bool TryGetVideoMode(string tag, out string videoMode)
+        private static bool TryGetVideoMode(string tag, out VideoMode videoMode)
         {
             return TryFilterTag(tag, Tags.VideoModeTags, out videoMode);
         }

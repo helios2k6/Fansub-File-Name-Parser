@@ -50,24 +50,24 @@ namespace FansubFileNameParser.Metadata
         /// </summary>
         public MediaMetadata()
         {
-            AudioCodec = string.Empty;
+            AudioCodec = AudioCodec.Unknown;
             CRC32 = string.Empty;
-            PixelBitDepth = string.Empty;
+            PixelBitDepth = PixelBitDepth.Unknown;
             Resolution = new Resolution();
-            VideoCodec = string.Empty;
-            VideoMedia = string.Empty;
-            VideoMode = string.Empty;
+            VideoCodec = VideoCodec.Unknown;
+            VideoMedia = VideoMedia.Unknown;
+            VideoMode = VideoMode.Unknown;
         }
 
         private MediaMetadata(SerializationInfo info, StreamingContext context)
         {
-            AudioCodec = info.GetString(AudioCodecKey);
+            AudioCodec = (AudioCodec)info.GetValue(AudioCodecKey, typeof(AudioCodec));
             CRC32 = info.GetString(CRC32Key);
-            PixelBitDepth = info.GetString(PixelBitDepthKey);
+            PixelBitDepth = (PixelBitDepth)info.GetValue(PixelBitDepthKey, typeof(PixelBitDepth));
             Resolution = (Resolution)info.GetValue(ResolutionKey, typeof(Resolution));
-            VideoCodec = info.GetString(VideoCodecKey);
-            VideoMedia = info.GetString(VideoMediaKey);
-            VideoMode = info.GetString(VideoModeKey);
+            VideoCodec = (VideoCodec)info.GetValue(VideoCodecKey, typeof(VideoCodec));
+            VideoMedia = (VideoMedia)info.GetValue(VideoMediaKey, typeof(VideoMedia));
+            VideoMode = (VideoMode)info.GetValue(VideoModeKey, typeof(VideoMode));
         }
         #endregion
 
@@ -80,7 +80,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The audio codec.
         /// </value>
-        public string AudioCodec { get; set; }
+        public AudioCodec AudioCodec { get; set; }
 
         /// <summary>
         /// Gets or sets the CRC32 Checksum
@@ -98,7 +98,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The pixel bit depth.
         /// </value>
-        public string PixelBitDepth { get; set; }
+        public PixelBitDepth PixelBitDepth { get; set; }
 
         /// <summary>
         /// Gets or sets the resolution.
@@ -118,7 +118,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video codec.
         /// </value>
-        public string VideoCodec { get; set; }
+        public VideoCodec VideoCodec { get; set; }
 
         /// <summary>
         /// Gets or sets the video media. 
@@ -128,7 +128,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video media.
         /// </value>
-        public string VideoMedia { get; set; }
+        public VideoMedia VideoMedia { get; set; }
 
         /// <summary>
         /// Gets or sets the video mode. 
@@ -138,7 +138,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video mode.
         /// </value>
-        public string VideoMode { get; set; }
+        public VideoMode VideoMode { get; set; }
         #endregion
 
         #region public methods
@@ -153,13 +153,13 @@ namespace FansubFileNameParser.Metadata
             var builder = new StringBuilder();
 
             builder.AppendLine("Media Metadata");
-            builder.AppendLine("Audio Codec: " + AudioCodec);
+            builder.AppendLine("Audio Codec: " + Enum.GetName(typeof(AudioCodec), AudioCodec));
             builder.AppendLine("CRC32 Checksum: " + CRC32);
-            builder.AppendLine("Pixel Bit Depth: " + PixelBitDepth);
+            builder.AppendLine("Pixel Bit Depth: " + Enum.GetName(typeof(PixelBitDepth), PixelBitDepth));
             builder.AppendLine("Resolution: " + Resolution);
-            builder.AppendLine("Video Codec: " + VideoCodec);
-            builder.AppendLine("Video Media: " + VideoMedia);
-            builder.AppendLine("Video Mode: " + VideoMode);
+            builder.AppendLine("Video Codec: " + Enum.GetName(typeof(VideoCodec), VideoCodec));
+            builder.AppendLine("Video Media: " + Enum.GetName(typeof(VideoMedia), VideoMedia));
+            builder.AppendLine("Video Mode: " + Enum.GetName(typeof(VideoMode), VideoMode));
 
             return builder.ToString();
         }

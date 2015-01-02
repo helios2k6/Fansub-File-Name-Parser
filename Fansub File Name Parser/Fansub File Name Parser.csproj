@@ -47,6 +47,7 @@
     <Compile Include="BaseGrammars.cs" />
     <Compile Include="FansubFile.cs" />
     <Compile Include="FansubFileParsers.cs" />
+    <Compile Include="Metadata\AudioCodec.cs" />
     <Compile Include="Metadata\MediaMetadata.cs" />
     <Compile Include="Metadata\MediaMetadataParser.cs" />
     <Compile Include="MediaMetadataTags.Designer.cs">
@@ -54,8 +55,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MediaMetadataTags.resx</DependentUpon>
     </Compile>
+    <Compile Include="Metadata\PixelBitDepth.cs" />
     <Compile Include="Metadata\Resolution.cs" />
     <Compile Include="Metadata\Tags.cs" />
+    <Compile Include="Metadata\VideoCodec.cs" />
+    <Compile Include="Metadata\VideoMedia.cs" />
+    <Compile Include="Metadata\VideoMode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
