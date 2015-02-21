@@ -152,15 +152,14 @@ namespace FansubFileNameParser.Metadata
         public override string ToString()
         {
             var builder = new StringBuilder();
-
             builder.AppendLine("Media Metadata");
-            builder.AppendLine("Audio Codec: " + Enum.GetName(typeof(AudioCodec), AudioCodec));
+            builder.AppendLine("Audio Codec: " + GetToStringForMaybeOfEnum(AudioCodec));
             builder.AppendLine("CRC32 Checksum: " + CRC32);
-            builder.AppendLine("Pixel Bit Depth: " + Enum.GetName(typeof(PixelBitDepth), PixelBitDepth));
+            builder.AppendLine("Pixel Bit Depth: " + GetToStringForMaybeOfEnum(PixelBitDepth));
             builder.AppendLine("Resolution: " + Resolution);
-            builder.AppendLine("Video Codec: " + Enum.GetName(typeof(VideoCodec), VideoCodec));
-            builder.AppendLine("Video Media: " + Enum.GetName(typeof(VideoMedia), VideoMedia));
-            builder.AppendLine("Video Mode: " + Enum.GetName(typeof(VideoMode), VideoMode));
+            builder.AppendLine("Video Codec: " + GetToStringForMaybeOfEnum(VideoCodec));
+            builder.AppendLine("Video Media: " + GetToStringForMaybeOfEnum(VideoMedia));
+            builder.AppendLine("Video Mode: " + GetToStringForMaybeOfEnum(VideoMode));
 
             return builder.ToString();
         }
@@ -240,6 +239,11 @@ namespace FansubFileNameParser.Metadata
         #endregion
 
         #region private method
+        private static string GetToStringForMaybeOfEnum<T>(Maybe<T> maybe) where T : struct
+        {
+            return maybe.SelectOrElse(t => Enum.GetName(typeof(T), t), () => Maybe<T>.Nothing.ToString());
+        }
+
         private static Maybe<T> GetValueNullableMaybe<T>(SerializationInfo info, string key) where T : struct
         {
             return ((T?)info.GetValue(key, typeof(T?))).ToMaybe();
