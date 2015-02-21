@@ -153,6 +153,27 @@ namespace FansubFileNameParser
 
         #region public factory methods
         /// <summary>
+        /// Tries the parse fansub file.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <param name="fansubFile">The fansub file.</param>
+        /// <returns>True if the parse was successful. False otherwise.</returns>
+        public static bool TryParseFansubFile(string fileName, out FansubFile fansubFile)
+        {
+            fansubFile = default(FansubFile);
+
+            try
+            {
+                fansubFile = ParseFansubFile(fileName);
+                return true;
+            }
+            catch(Exception)
+            {
+            }
+
+            return false;
+        }
+        /// <summary>
         /// Parse a file name that corresponds to one of the common fansub naming formats. 
         /// 
         /// These naming formats are entirely idiosyncratic, so there's no formal grammar available.
