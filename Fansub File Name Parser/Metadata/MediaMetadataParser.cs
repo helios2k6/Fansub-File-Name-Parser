@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using Functional.Maybe;
 using Sprache;
 using System;
 using System.Collections.Generic;
@@ -66,43 +67,43 @@ namespace FansubFileNameParser.Metadata
                 AudioCodec outAudioCodec;
                 if (TryGetAudioCodec(tag, out outAudioCodec))
                 {
-                    metadata.AudioCodec = outAudioCodec;
+                    metadata.AudioCodec = outAudioCodec.ToMaybe();
                 }
 
                 string outCrc32;
                 if (TryGetCRC32Checksum(tag, out outCrc32))
                 {
-                    metadata.CRC32 = outCrc32;
+                    metadata.CRC32 = outCrc32.ToMaybe();
                 }
 
                 PixelBitDepth outPixelBitDepth;
                 if (TryGetPixelBitDepth(tag, out outPixelBitDepth))
                 {
-                    metadata.PixelBitDepth = outPixelBitDepth;
+                    metadata.PixelBitDepth = outPixelBitDepth.ToMaybe();
                 }
 
                 Resolution resolution;
                 if (TryGetResolution(tag, out resolution))
                 {
-                    metadata.Resolution = resolution;
+                    metadata.Resolution = resolution.ToMaybe();
                 }
 
                 VideoCodec outVideoCodec;
                 if (TryGetVideoCodec(tag, out outVideoCodec))
                 {
-                    metadata.VideoCodec = outVideoCodec;
+                    metadata.VideoCodec = outVideoCodec.ToMaybe();
                 }
 
                 VideoMedia outVideoMedia;
                 if (TryGetVideoMedia(tag, out outVideoMedia))
                 {
-                    metadata.VideoMedia = outVideoMedia;
+                    metadata.VideoMedia = outVideoMedia.ToMaybe();
                 }
 
                 VideoMode outVideoMode;
                 if (TryGetVideoMode(tag, out outVideoMode))
                 {
-                    metadata.VideoMode = outVideoMode;
+                    metadata.VideoMode = outVideoMode.ToMaybe();
                 }
             }
 

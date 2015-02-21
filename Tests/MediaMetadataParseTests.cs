@@ -25,6 +25,8 @@
 using FansubFileNameParser.Metadata;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using UnitTests.Models;
 
@@ -36,9 +38,7 @@ namespace Tests
         [TestMethod]
         public void ParseAllTags()
         {
-            var model = TestModel.CreateMediaDataTestModel();
-
-            Parallel.ForEach(model, kvp =>
+            Parallel.ForEach(TestModel.CreateMediaDataTestModel(), kvp =>
             {
                 string tags = kvp.Key;
                 MediaMetadata metadata = kvp.Value;
@@ -50,6 +50,30 @@ namespace Tests
                     Assert.AreEqual<MediaMetadata>(metadata, experimental);
                 }
             });
+        }
+
+        [TestMethod]
+        public void SerializeAndDeserialize()
+        {
+            Parallel.ForEach(TestModel.CreateMediaDataTestModel(), kvp =>
+            {
+                TestSerializationAndDeserialization(kvp.Value);
+            });
+        }
+
+        private static void TestSerializationAndDeserialization(MediaMetadata originalObject)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(memoryStream, originalObject);
+
+                memoryStream.Seek(0, SeekOrigin.Begin);
+
+                var deserializedObject = (MediaMetadata)formatter.Deserialize(memoryStream);
+
+                Assert.AreEqual<MediaMetadata>(originalObject, deserializedObject);
+            }
         }
     }
 }

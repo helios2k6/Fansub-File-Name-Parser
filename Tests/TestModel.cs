@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using Functional.Maybe;
 using FansubFileNameParser;
 using FansubFileNameParser.Metadata;
 using System;
@@ -117,25 +118,25 @@ namespace UnitTests.Models
                         switch(j)
                         {
                             case 0:
-                                mediaMetadata.AudioCodec = audioTag.Value;
+                                mediaMetadata.AudioCodec = audioTag.Value.ToMaybe();
                                 break;
                             case 1:
-                                mediaMetadata.PixelBitDepth = pixelBitDepthTag.Value;
+                                mediaMetadata.PixelBitDepth = pixelBitDepthTag.Value.ToMaybe();
                                 break;
                             case 2:
-                                mediaMetadata.VideoCodec = videoCodecTag.Value;
+                                mediaMetadata.VideoCodec = videoCodecTag.Value.ToMaybe();
                                 break;
                             case 3:
-                                mediaMetadata.VideoMedia = videoMediaTag.Value;
+                                mediaMetadata.VideoMedia = videoMediaTag.Value.ToMaybe();
                                 break;
                             case 4:
-                                mediaMetadata.VideoMode = videoModeTag.Value;
+                                mediaMetadata.VideoMode = videoModeTag.Value.ToMaybe();
                                 break;
                             case 5:
-                                mediaMetadata.Resolution = resolutionTag.Value;
+                                mediaMetadata.Resolution = resolutionTag.Value.ToMaybe();
                                 break;
                             case 6:
-                                mediaMetadata.CRC32 = token;
+                                mediaMetadata.CRC32 = token.ToMaybe();
                                 break;
                             default:
                                 break;

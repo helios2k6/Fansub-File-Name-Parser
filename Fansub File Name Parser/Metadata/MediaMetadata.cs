@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using Functional.Maybe;
 using System;
 using System.Runtime.Serialization;
 using System.Text;
@@ -50,24 +51,24 @@ namespace FansubFileNameParser.Metadata
         /// </summary>
         public MediaMetadata()
         {
-            AudioCodec = AudioCodec.Unknown;
-            CRC32 = string.Empty;
-            PixelBitDepth = PixelBitDepth.Unknown;
-            Resolution = new Resolution();
-            VideoCodec = VideoCodec.Unknown;
-            VideoMedia = VideoMedia.Unknown;
-            VideoMode = VideoMode.Unknown;
+            AudioCodec = Maybe<AudioCodec>.Nothing;
+            CRC32 = Maybe<string>.Nothing;
+            PixelBitDepth = Maybe<PixelBitDepth>.Nothing;
+            Resolution = Maybe<Resolution>.Nothing;
+            VideoCodec = Maybe<VideoCodec>.Nothing;
+            VideoMedia = Maybe<VideoMedia>.Nothing;
+            VideoMode = Maybe<VideoMode>.Nothing;
         }
 
         private MediaMetadata(SerializationInfo info, StreamingContext context)
         {
-            AudioCodec = (AudioCodec)info.GetValue(AudioCodecKey, typeof(AudioCodec));
-            CRC32 = info.GetString(CRC32Key);
-            PixelBitDepth = (PixelBitDepth)info.GetValue(PixelBitDepthKey, typeof(PixelBitDepth));
-            Resolution = (Resolution)info.GetValue(ResolutionKey, typeof(Resolution));
-            VideoCodec = (VideoCodec)info.GetValue(VideoCodecKey, typeof(VideoCodec));
-            VideoMedia = (VideoMedia)info.GetValue(VideoMediaKey, typeof(VideoMedia));
-            VideoMode = (VideoMode)info.GetValue(VideoModeKey, typeof(VideoMode));
+            AudioCodec = GetValueNullableMaybe<AudioCodec>(info, AudioCodecKey);
+            CRC32 = info.GetString(CRC32Key).ToMaybe();
+            PixelBitDepth = GetValueNullableMaybe<PixelBitDepth>(info, PixelBitDepthKey);
+            Resolution = ((Resolution)info.GetValue(ResolutionKey, typeof(Resolution))).ToMaybe();
+            VideoCodec = GetValueNullableMaybe<VideoCodec>(info, VideoCodecKey);
+            VideoMedia = GetValueNullableMaybe<VideoMedia>(info, VideoMediaKey);
+            VideoMode = GetValueNullableMaybe<VideoMode>(info, VideoModeKey);
         }
         #endregion
 
@@ -80,7 +81,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The audio codec.
         /// </value>
-        public AudioCodec AudioCodec { get; set; }
+        public Maybe<AudioCodec> AudioCodec { get; set; }
 
         /// <summary>
         /// Gets or sets the CRC32 Checksum
@@ -88,7 +89,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The CRC32 Checksum.
         /// </value>
-        public string CRC32 { get; set; }
+        public Maybe<string> CRC32 { get; set; }
 
         /// <summary>
         /// Gets or sets the Pixel bit depth.
@@ -98,7 +99,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The pixel bit depth.
         /// </value>
-        public PixelBitDepth PixelBitDepth { get; set; }
+        public Maybe<PixelBitDepth> PixelBitDepth { get; set; }
 
         /// <summary>
         /// Gets or sets the resolution.
@@ -108,7 +109,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The resolution.
         /// </value>
-        public Resolution Resolution { get; set; }
+        public Maybe<Resolution> Resolution { get; set; }
 
         /// <summary>
         /// Gets or sets the video codec.
@@ -118,7 +119,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video codec.
         /// </value>
-        public VideoCodec VideoCodec { get; set; }
+        public Maybe<VideoCodec> VideoCodec { get; set; }
 
         /// <summary>
         /// Gets or sets the video media. 
@@ -128,7 +129,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video media.
         /// </value>
-        public VideoMedia VideoMedia { get; set; }
+        public Maybe<VideoMedia> VideoMedia { get; set; }
 
         /// <summary>
         /// Gets or sets the video mode. 
@@ -138,7 +139,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video mode.
         /// </value>
-        public VideoMode VideoMode { get; set; }
+        public Maybe<VideoMode> VideoMode { get; set; }
         #endregion
 
         #region public methods
@@ -228,17 +229,22 @@ namespace FansubFileNameParser.Metadata
         /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext" />) for this serialization.</param>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(AudioCodecKey, AudioCodec);
-            info.AddValue(CRC32Key, CRC32);
-            info.AddValue(PixelBitDepthKey, PixelBitDepth);
-            info.AddValue(ResolutionKey, Resolution);
-            info.AddValue(VideoCodecKey, VideoCodec);
-            info.AddValue(VideoMediaKey, VideoMedia);
-            info.AddValue(VideoModeKey, VideoMode);
+            info.AddValue(AudioCodecKey, AudioCodec.ToNullable());
+            info.AddValue(CRC32Key, CRC32.OrElseDefault());
+            info.AddValue(PixelBitDepthKey, PixelBitDepth.ToNullable());
+            info.AddValue(ResolutionKey, Resolution.OrElseDefault());
+            info.AddValue(VideoCodecKey, VideoCodec.ToNullable());
+            info.AddValue(VideoMediaKey, VideoMedia.ToNullable());
+            info.AddValue(VideoModeKey, VideoMode.ToNullable());
         }
         #endregion
 
         #region private method
+        private static Maybe<T> GetValueNullableMaybe<T>(SerializationInfo info, string key) where T : struct
+        {
+            return ((T?)info.GetValue(key, typeof(T?))).ToMaybe();
+        }
+
         private bool EqualsPreamble(object other)
         {
             if (ReferenceEquals(null, other)) return false;
