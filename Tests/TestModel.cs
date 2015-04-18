@@ -34,6 +34,7 @@ namespace UnitTests.Models
 {
     public static class TestModel
     {
+        #region private fields
         private static readonly IDictionary<string, FansubFile> InputToFansubFileMap = new Dictionary<string, FansubFile>
         {
             {"[Aho-Taku] Sakurasou no Pet na Kanojo - 18 [720p-Hi10P][1D8F695D].mkv", new FansubFile("Aho-Taku", "Sakurasou no Pet na Kanojo", 18, ".mkv")},
@@ -51,12 +52,14 @@ namespace UnitTests.Models
             {"[RaX]Strawberry_Panic_-_01_[No_Dub]_(x264_ogg)_[F4EAA441].mkv", new FansubFile("RaX", "Strawberry Panic", 1, ".mkv")},
             {"(B-A)Devilman_Lady_-_01_(2E088B82).mkv", new FansubFile("B-A", "Devilman Lady", 1, ".mkv")},
             {"[Anime-Koi] GJ-bu - 06v2 [h264-720p][DAC4ACFA].mkv", new FansubFile("Anime-Koi", "GJ-bu", 6, ".mkv")},
-            {"[Lunar] Bleach - 05 v2 [F2C9454F].avi", new FansubFile("Lunar", "Bleach", 5, ".avi")}
+            {"[Lunar] Bleach - 05 v2 [F2C9454F].avi", new FansubFile("Lunar", "Bleach", 5, ".avi")},
         };
 
         private static readonly Lazy<IEnumerable<KeyValuePair<string, MediaMetadata>>> InputToMediaMetadataMap =
             new Lazy<IEnumerable<KeyValuePair<string, MediaMetadata>>>(InitMediaMetadataTestModel);
+        #endregion
 
+        #region public methods
         /// <summary>
         /// Creates a new test model.
         /// </summary>
@@ -67,14 +70,16 @@ namespace UnitTests.Models
         }
 
         /// <summary>
-        /// Creates the media data test model.
+        /// Creates the media metadata test model.
         /// </summary>
-        /// <returns></returns>
-        public static IEnumerable<KeyValuePair<string, MediaMetadata>> CreateMediaDataTestModel()
+        /// <returns>An IEnumerable of key-value pairs of names to media metadata objects</returns>
+        public static IEnumerable<KeyValuePair<string, MediaMetadata>> CreateMediaMetadataTestModel()
         {
             return InputToMediaMetadataMap.Value;
         }
+        #endregion
 
+        #region private methods
         private static IEnumerable<KeyValuePair<string, MediaMetadata>> CreateMapping(
             KeyValuePair<string, AudioCodec> audioTag,
             KeyValuePair<string, PixelBitDepth> pixelBitDepthTag,
@@ -99,11 +104,11 @@ namespace UnitTests.Models
             var dummyFansubAnimeName = "Dummy Fansub - 01";
             var dummyFileExtension = ".dummy";
 
-            for(int i = 0; i < 127; i++)
+            for (int i = 0; i < 127; i++)
             {
                 var builder = new StringBuilder();
                 var mediaMetadata = new MediaMetadata();
-                
+
                 builder.Append(dummyFansubGroupTag).Append(dummyFansubAnimeName);
 
                 for (int j = 0; j < 7; j++)
@@ -111,11 +116,11 @@ namespace UnitTests.Models
                     var token = list[j];
 
                     int bitAt = (1 << j) & i;
-                    if(bitAt > 0)
+                    if (bitAt > 0)
                     {
                         builder.Append("[").Append(token).Append("]");
 
-                        switch(j)
+                        switch (j)
                         {
                             case 0:
                                 mediaMetadata.AudioCodec = audioTag.Value.ToMaybe();
@@ -143,7 +148,7 @@ namespace UnitTests.Models
                         }
                     }
                 }
-                
+
                 builder.Append(dummyFileExtension);
 
                 yield return new KeyValuePair<string, MediaMetadata>(builder.ToString(), mediaMetadata);
@@ -153,7 +158,7 @@ namespace UnitTests.Models
         private static IEnumerable<T> ConcatWithDynamicCheck<T>(this IEnumerable<T> @this, IEnumerable<T> other)
         {
             List<T> thisList = @this as List<T>;
-            if(thisList == null)
+            if (thisList == null)
             {
                 thisList = new List<T>(@this);
             }
@@ -166,15 +171,15 @@ namespace UnitTests.Models
         {
             IEnumerable<KeyValuePair<string, MediaMetadata>> kvps = Enumerable.Empty<KeyValuePair<string, MediaMetadata>>();
 
-            foreach(var audioTag in Tags.AudioTags)
+            foreach (var audioTag in Tags.AudioTags)
             {
-                foreach(var pixelBitDepthTag in Tags.PixelBitDepthTags)
+                foreach (var pixelBitDepthTag in Tags.PixelBitDepthTags)
                 {
-                    foreach(var videoCodecTag in Tags.VideoCodecTags)
+                    foreach (var videoCodecTag in Tags.VideoCodecTags)
                     {
-                        foreach(var videoMediaTag in Tags.VideoMediaTags)
+                        foreach (var videoMediaTag in Tags.VideoMediaTags)
                         {
-                            foreach(var videoModeTag in Tags.VideoModeTags)
+                            foreach (var videoModeTag in Tags.VideoModeTags)
                             {
                                 //Generate crc32
                                 var crc32 = "01234567";
@@ -256,5 +261,6 @@ namespace UnitTests.Models
 
             return kvps;
         }
+        #endregion
     }
 }

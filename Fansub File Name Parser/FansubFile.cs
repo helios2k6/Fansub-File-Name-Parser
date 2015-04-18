@@ -32,7 +32,9 @@ using System.Threading.Tasks;
 namespace FansubFileNameParser
 {
     /// <summary>
-    /// Represents a media file that was produced by a Fansub group
+    /// Represents a media file that was produced by a Fansub group.
+    /// 
+    /// Warning: This class is OBSOLETE! Use <see cref="FansubFileNameParser.Entity.IFansubEntity"/>
     /// </summary>
     [Serializable]
     public sealed class FansubFile : IEquatable<FansubFile>, ISerializable

@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\FansubFileNameParser.xml</DocumentationFile>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +36,10 @@
   <ItemGroup>
     <Reference Include="Functional.Maybe">
       <HintPath>..\packages\Functional.Maybe.1.0.3\lib\Functional.Maybe.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Sprache, Version=2.0.0.45, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -51,8 +56,14 @@
   <ItemGroup>
     <Compile Include="Assembly.cs" />
     <Compile Include="BaseGrammars.cs" />
+    <Compile Include="Entity\FansubEntityBase.cs" />
+    <Compile Include="Entity\FansubFileEntityBase.cs" />
+    <Compile Include="Entity\FansubEpisodeEntity.cs" />
+    <Compile Include="Entity\IFansubEntity.cs" />
+    <Compile Include="Entity\IFansubEntityVisitor.cs" />
     <Compile Include="FansubFile.cs" />
     <Compile Include="FansubFileParsers.cs" />
+    <Compile Include="MaybeExtensions.cs" />
     <Compile Include="Metadata\AudioCodec.cs" />
     <Compile Include="Metadata\MediaMetadata.cs" />
     <Compile Include="Metadata\MediaMetadataParser.cs" />

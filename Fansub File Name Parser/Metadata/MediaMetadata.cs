@@ -23,6 +23,7 @@
  */
 
 using Functional.Maybe;
+using Newtonsoft.Json;
 using System;
 using System.Runtime.Serialization;
 using System.Text;
@@ -33,6 +34,7 @@ namespace FansubFileNameParser.Metadata
     /// Represents the media metadata that is encoded into a fansub file name
     /// </summary>
     [Serializable]
+    [JsonObject(MemberSerialization.OptIn)]
     public sealed class MediaMetadata : IEquatable<MediaMetadata>, ISerializable
     {
         #region private fields
@@ -62,13 +64,13 @@ namespace FansubFileNameParser.Metadata
 
         private MediaMetadata(SerializationInfo info, StreamingContext context)
         {
-            AudioCodec = GetValueNullableMaybe<AudioCodec>(info, AudioCodecKey);
+            AudioCodec = MaybeExtensions.GetValueNullableMaybe<AudioCodec>(info, AudioCodecKey);
             CRC32 = info.GetString(CRC32Key).ToMaybe();
-            PixelBitDepth = GetValueNullableMaybe<PixelBitDepth>(info, PixelBitDepthKey);
+            PixelBitDepth = MaybeExtensions.GetValueNullableMaybe<PixelBitDepth>(info, PixelBitDepthKey);
             Resolution = ((Resolution)info.GetValue(ResolutionKey, typeof(Resolution))).ToMaybe();
-            VideoCodec = GetValueNullableMaybe<VideoCodec>(info, VideoCodecKey);
-            VideoMedia = GetValueNullableMaybe<VideoMedia>(info, VideoMediaKey);
-            VideoMode = GetValueNullableMaybe<VideoMode>(info, VideoModeKey);
+            VideoCodec = MaybeExtensions.GetValueNullableMaybe<VideoCodec>(info, VideoCodecKey);
+            VideoMedia = MaybeExtensions.GetValueNullableMaybe<VideoMedia>(info, VideoMediaKey);
+            VideoMode = MaybeExtensions.GetValueNullableMaybe<VideoMode>(info, VideoModeKey);
         }
         #endregion
 
@@ -81,6 +83,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The audio codec.
         /// </value>
+        [JsonProperty(PropertyName = "AudioCodec")]
         public Maybe<AudioCodec> AudioCodec { get; set; }
 
         /// <summary>
@@ -89,6 +92,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The CRC32 Checksum.
         /// </value>
+        [JsonProperty(PropertyName = "CRC32")]
         public Maybe<string> CRC32 { get; set; }
 
         /// <summary>
@@ -99,6 +103,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The pixel bit depth.
         /// </value>
+        [JsonProperty(PropertyName = "PixelBitDepth")]
         public Maybe<PixelBitDepth> PixelBitDepth { get; set; }
 
         /// <summary>
@@ -109,6 +114,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The resolution.
         /// </value>
+        [JsonProperty(PropertyName = "Resolution")]
         public Maybe<Resolution> Resolution { get; set; }
 
         /// <summary>
@@ -119,6 +125,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video codec.
         /// </value>
+        [JsonProperty(PropertyName = "VideoCodec")]
         public Maybe<VideoCodec> VideoCodec { get; set; }
 
         /// <summary>
@@ -129,6 +136,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video media.
         /// </value>
+        [JsonProperty(PropertyName = "VideoMedia")]
         public Maybe<VideoMedia> VideoMedia { get; set; }
 
         /// <summary>
@@ -139,6 +147,7 @@ namespace FansubFileNameParser.Metadata
         /// <value>
         /// The video mode.
         /// </value>
+        [JsonProperty(PropertyName = "VideoMode")]
         public Maybe<VideoMode> VideoMode { get; set; }
         #endregion
 
@@ -153,13 +162,13 @@ namespace FansubFileNameParser.Metadata
         {
             var builder = new StringBuilder();
             builder.AppendLine("Media Metadata");
-            builder.AppendLine("Audio Codec: " + GetToStringForMaybeOfEnum(AudioCodec));
+            builder.AppendLine("Audio Codec: " + MaybeExtensions.GetToStringForMaybeOfEnum(AudioCodec));
             builder.AppendLine("CRC32 Checksum: " + CRC32);
-            builder.AppendLine("Pixel Bit Depth: " + GetToStringForMaybeOfEnum(PixelBitDepth));
+            builder.AppendLine("Pixel Bit Depth: " + MaybeExtensions.GetToStringForMaybeOfEnum(PixelBitDepth));
             builder.AppendLine("Resolution: " + Resolution);
-            builder.AppendLine("Video Codec: " + GetToStringForMaybeOfEnum(VideoCodec));
-            builder.AppendLine("Video Media: " + GetToStringForMaybeOfEnum(VideoMedia));
-            builder.AppendLine("Video Mode: " + GetToStringForMaybeOfEnum(VideoMode));
+            builder.AppendLine("Video Codec: " + MaybeExtensions.GetToStringForMaybeOfEnum(VideoCodec));
+            builder.AppendLine("Video Media: " + MaybeExtensions.GetToStringForMaybeOfEnum(VideoMedia));
+            builder.Append("Video Mode: " + MaybeExtensions.GetToStringForMaybeOfEnum(VideoMode));
 
             return builder.ToString();
         }
@@ -239,16 +248,6 @@ namespace FansubFileNameParser.Metadata
         #endregion
 
         #region private method
-        private static string GetToStringForMaybeOfEnum<T>(Maybe<T> maybe) where T : struct
-        {
-            return maybe.SelectOrElse(t => Enum.GetName(typeof(T), t), () => Maybe<T>.Nothing.ToString());
-        }
-
-        private static Maybe<T> GetValueNullableMaybe<T>(SerializationInfo info, string key) where T : struct
-        {
-            return ((T?)info.GetValue(key, typeof(T?))).ToMaybe();
-        }
-
         private bool EqualsPreamble(object other)
         {
             if (ReferenceEquals(null, other)) return false;
