@@ -34,8 +34,13 @@ namespace FansubFileNameParser.Entity
     /// </summary>
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class FansubEntityBase : IFansubEntity, IEquatable<FansubEntityBase>
+    public abstract class FansubEntityBase : IFansubEntity, IEquatable<FansubEntityBase>, ISerializable
     {
+        #region private static fields
+        private const string GroupKey = "Group";
+        private const string SeriesKey = "Series";
+        #endregion
+
         #region ctor
         /// <summary>
         /// Initializes a new instance of the <see cref="FansubEntityBase"/> class.
@@ -44,6 +49,17 @@ namespace FansubFileNameParser.Entity
         {
             Group = Maybe<string>.Nothing;
             Series = Maybe<string>.Nothing;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FansubEntityBase"/> class.
+        /// </summary>
+        /// <param name="info">The information.</param>
+        /// <param name="context">The context.</param>
+        protected FansubEntityBase(SerializationInfo info, StreamingContext context)
+        {
+            Group = info.GetString(GroupKey).ToMaybe();
+            Series = info.GetString(SeriesKey).ToMaybe();
         }
         #endregion
 
@@ -74,7 +90,7 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("[{0}] {1}", Group, Series);
+            return string.Format("[Group = {0}] [Series = {1}]", Group, Series);
         }
 
         /// <summary>
@@ -124,6 +140,17 @@ namespace FansubFileNameParser.Entity
         /// </summary>
         /// <param name="visitor">The visitor.</param>
         public abstract void Accept(IFansubEntityVisitor visitor);
+
+        /// <summary>
+        /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with the data needed to serialize the target object.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> to populate with data.</param>
+        /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext" />) for this serialization.</param>
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(GroupKey, Group.OrElseDefault());
+            info.AddValue(SeriesKey, Series.OrElseDefault());
+        }
         #endregion
 
         #region private methods

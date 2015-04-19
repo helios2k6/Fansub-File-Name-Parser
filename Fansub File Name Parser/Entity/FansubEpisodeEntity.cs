@@ -36,7 +36,7 @@ namespace FansubFileNameParser.Entity
     /// </summary>
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class FansubEpisodeEntity : FansubFileEntityBase, IEquatable<FansubEpisodeEntity>, ISerializable
+    public sealed class FansubEpisodeEntity : FansubFileEntityBase, IEquatable<FansubEpisodeEntity>
     {
         #region private static fields
         private const string EpisodeNumberKey = "EpisodeNumber";
@@ -57,6 +57,7 @@ namespace FansubFileNameParser.Entity
         /// <param name="info">The information.</param>
         /// <param name="context">The context.</param>
         private FansubEpisodeEntity(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
             EpisodeNumber = MaybeExtensions.GetValueNullableMaybe<int>(info, EpisodeNumberKey);
         }
@@ -74,16 +75,6 @@ namespace FansubFileNameParser.Entity
 
         #region public methods
         /// <summary>
-        /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with the data needed to serialize the target object.
-        /// </summary>
-        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> to populate with data.</param>
-        /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext" />) for this serialization.</param>
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(EpisodeNumberKey, EpisodeNumber.ToNullable());
-        }
-
-        /// <summary>
         /// Accept the specified visitor
         /// </summary>
         /// <param name="visitor">The visitor.</param>
@@ -100,7 +91,7 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("[{0}] {1} ({2}).{3}", Group, Series, EpisodeNumber, Extension);
+            return string.Format("{0} [Episode Number = {1}]", base.ToString(), EpisodeNumber);
         }
 
         /// <summary>
@@ -117,11 +108,7 @@ namespace FansubFileNameParser.Entity
                 return false;
             }
 
-            return FileMetadata.Equals(other.FileMetadata)
-                && EpisodeNumber.Equals(other.EpisodeNumber)
-                && Extension.Equals(other.Extension)
-                && Group.Equals(other.Group)
-                && Series.Equals(other.Series);
+            return base.Equals(other) && EpisodeNumber.Equals(other.EpisodeNumber);
         }
 
         /// <summary>
@@ -144,11 +131,19 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override int GetHashCode()
         {
-            return EpisodeNumber.GetHashCode()
-                ^ FileMetadata.GetHashCode()
-                ^ Extension.GetHashCode()
-                ^ Group.GetHashCode()
-                ^ Series.GetHashCode();
+            return base.GetHashCode() ^ EpisodeNumber.GetHashCode();
+        }
+
+        /// <summary>
+        /// Gets the object data for this class' hierarchy
+        /// </summary>
+        /// <param name="info">The information.</param>
+        /// <param name="context">The context.</param>
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(EpisodeNumberKey, EpisodeNumber.ToNullable());
+
+            base.GetObjectData(info, context);
         }
         #endregion
 

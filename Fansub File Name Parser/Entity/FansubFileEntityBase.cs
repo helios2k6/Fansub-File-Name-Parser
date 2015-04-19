@@ -37,6 +37,11 @@ namespace FansubFileNameParser.Entity
     [JsonObject(MemberSerialization.OptIn)]
     public abstract class FansubFileEntityBase : FansubEntityBase, IEquatable<FansubFileEntityBase>
     {
+        #region private static fields
+        private const string FileMetadataKey = "FileMetadata";
+        private const string ExtensionKey = "Extension";
+        #endregion
+
         #region ctor
         /// <summary>
         /// Initializes a new instance of the <see cref="FansubFileEntityBase"/> class.
@@ -45,6 +50,18 @@ namespace FansubFileNameParser.Entity
         {
             FileMetadata = Maybe<MediaMetadata>.Nothing;
             Extension = Maybe<string>.Nothing;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FansubFileEntityBase"/> class.
+        /// </summary>
+        /// <param name="info">The information.</param>
+        /// <param name="context">The context.</param>
+        protected FansubFileEntityBase(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            FileMetadata = ((MediaMetadata)info.GetValue(ExtensionKey, typeof(MediaMetadata))).ToMaybe();
+            Extension = info.GetString(ExtensionKey).ToMaybe();
         }
         #endregion
 
@@ -75,7 +92,7 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} {1}.{2}", base.ToString(), FileMetadata, Extension);
+            return string.Format("{0} [Metadata = {1}] [Extension = {2}]", base.ToString(), FileMetadata, Extension);
         }
 
         /// <summary>
@@ -120,6 +137,19 @@ namespace FansubFileNameParser.Entity
             return base.GetHashCode()
                 ^ FileMetadata.GetHashCode()
                 ^ Extension.GetHashCode();
+        }
+
+        /// <summary>
+        /// Gets the object data for this class' hierarchy
+        /// </summary>
+        /// <param name="info">The information.</param>
+        /// <param name="context">The context.</param>
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(FileMetadataKey, FileMetadata.OrElseDefault());
+            info.AddValue(ExtensionKey, Extension.OrElseDefault());
+
+            base.GetObjectData(info, context);
         }
         #endregion
 

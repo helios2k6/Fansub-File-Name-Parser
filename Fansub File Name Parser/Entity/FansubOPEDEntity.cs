@@ -34,9 +34,9 @@ namespace FansubFileNameParser.Entity
     /// </summary>
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public sealed class FansubOPEDEntity : FansubFileEntityBase, IEquatable<FansubOPEDEntity>, ISerializable
+    public sealed class FansubOPEDEntity : FansubFileEntityBase, IEquatable<FansubOPEDEntity>
     {
-        #region private enums
+        #region nested enums
         /// <summary>
         /// Designates this as either the OP or the ED
         /// </summary>
@@ -51,11 +51,6 @@ namespace FansubFileNameParser.Entity
             /// Represents the Ending
             /// </summary>
             ED,
-
-            /// <summary>
-            /// Represents an unknown segment, which could be a repeated insert song
-            /// </summary>
-            Unknown,
         }
         #endregion
 
@@ -72,7 +67,7 @@ namespace FansubFileNameParser.Entity
         public FansubOPEDEntity()
         {
             SequenceNumber = Maybe<int>.Nothing;
-            Part = Segment.Unknown;
+            Part = Maybe<Segment>.Nothing;
             NoCredits = false;
         }
 
@@ -82,7 +77,11 @@ namespace FansubFileNameParser.Entity
         /// <param name="info">The information.</param>
         /// <param name="context">The context.</param>
         private FansubOPEDEntity(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
+            SequenceNumber = MaybeExtensions.GetValueNullableMaybe<int>(info, SequenceNumberKey);
+            Part = MaybeExtensions.GetValueNullableMaybe<Segment>(info, PartKey);
+            NoCredits = info.GetBoolean(NoCreditsKey);
         }
         #endregion
 
@@ -101,7 +100,7 @@ namespace FansubFileNameParser.Entity
         /// <value>
         /// The part.
         /// </value>
-        public Segment Part { get; set; }
+        public Maybe<Segment> Part { get; set; }
 
         /// <summary>
         /// Gets or sets whether this OP/ED has no credits
@@ -123,15 +122,6 @@ namespace FansubFileNameParser.Entity
         }
 
         /// <summary>
-        /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with the data needed to serialize the target object.
-        /// </summary>
-        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> to populate with data.</param>
-        /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext" />) for this serialization.</param>
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-        }
-
-        /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
         /// <returns>
@@ -139,7 +129,11 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("");
+            return string.Format("{0} [Sequence Number = {1}] [Part = {2}] [No Credits = {3}]",
+                base.ToString(),
+                SequenceNumber,
+                MaybeExtensions.GetToStringForMaybeOfEnum(Part),
+                NoCredits);
         }
 
         /// <summary>
@@ -156,13 +150,10 @@ namespace FansubFileNameParser.Entity
                 return false;
             }
 
-            return SequenceNumber.Equals(other.SequenceNumber)
-                && NoCredits == other.NoCredits
-                && Part == other.Part
-                && FileMetadata.Equals(other.FileMetadata)
-                && Extension.Equals(other.Extension)
-                && Group.Equals(other.Group)
-                && Series.Equals(other.Series);
+            return base.Equals(other)
+                && SequenceNumber.Equals(other.SequenceNumber)
+                && Part.Equals(other.Part)
+                && NoCredits == other.NoCredits;
         }
 
         /// <summary>
@@ -185,13 +176,24 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override int GetHashCode()
         {
-            return SequenceNumber.GetHashCode()
-                ^ NoCredits.GetHashCode()
+            return base.GetHashCode()
+                ^ SequenceNumber.GetHashCode()
                 ^ Part.GetHashCode()
-                ^ FileMetadata.GetHashCode()
-                ^ Extension.GetHashCode()
-                ^ Group.GetHashCode()
-                ^ Series.GetHashCode();
+                ^ NoCredits.GetHashCode();
+        }
+
+        /// <summary>
+        /// Gets the object data for this class' hierarchy
+        /// </summary>
+        /// <param name="info">The information.</param>
+        /// <param name="context">The context.</param>
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(SequenceNumberKey, SequenceNumber.ToNullable());
+            info.AddValue(PartKey, Part.ToNullable());
+            info.AddValue(NoCreditsKey, NoCredits);
+
+            base.GetObjectData(info, context);
         }
         #endregion
 

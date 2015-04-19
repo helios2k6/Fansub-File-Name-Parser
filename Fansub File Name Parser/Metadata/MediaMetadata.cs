@@ -62,6 +62,11 @@ namespace FansubFileNameParser.Metadata
             VideoMode = Maybe<VideoMode>.Nothing;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MediaMetadata"/> class.
+        /// </summary>
+        /// <param name="info">The information.</param>
+        /// <param name="context">The context.</param>
         private MediaMetadata(SerializationInfo info, StreamingContext context)
         {
             AudioCodec = MaybeExtensions.GetValueNullableMaybe<AudioCodec>(info, AudioCodecKey);
