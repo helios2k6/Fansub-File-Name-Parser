@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser.Metadata;
 using Functional.Maybe;
 using Newtonsoft.Json;
 using System;
@@ -31,42 +30,107 @@ using System.Runtime.Serialization;
 namespace FansubFileNameParser.Entity
 {
     /// <summary>
-    /// The base class for all Fansub Entities that are represented by a single file
+    /// Represents a single OP (Opening) or ED (Ending) of an anime that is represented as a file
     /// </summary>
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class FansubFileEntityBase : FansubEntityBase, IEquatable<FansubFileEntityBase>
+    public sealed class FansubOPEDEntity : FansubFileEntityBase, IEquatable<FansubOPEDEntity>, ISerializable
     {
+        #region private enums
+        /// <summary>
+        /// Designates this as either the OP or the ED
+        /// </summary>
+        public enum Segment 
+        { 
+            /// <summary>
+            /// Represents the Opening
+            /// </summary>
+            OP,
+
+            /// <summary>
+            /// Represents the Ending
+            /// </summary>
+            ED,
+
+            /// <summary>
+            /// Represents an unknown segment, which could be a repeated insert song
+            /// </summary>
+            Unknown,
+        }
+        #endregion
+
+        #region private static fields
+        private const string SequenceNumberKey = "SequenceNumber";
+        private const string PartKey = "Part";
+        private const string NoCreditsKey = "NoCredits";
+        #endregion
+
         #region ctor
         /// <summary>
-        /// Initializes a new instance of the <see cref="FansubFileEntityBase"/> class.
+        /// Initializes a new instance of the <see cref="FansubOPEDEntity"/> class.
         /// </summary>
-        protected FansubFileEntityBase()
+        public FansubOPEDEntity()
         {
-            FileMetadata = Maybe<MediaMetadata>.Nothing;
-            Extension = Maybe<string>.Nothing;
+            SequenceNumber = Maybe<int>.Nothing;
+            Part = Segment.Unknown;
+            NoCredits = false;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FansubOPEDEntity"/> class.
+        /// </summary>
+        /// <param name="info">The information.</param>
+        /// <param name="context">The context.</param>
+        private FansubOPEDEntity(SerializationInfo info, StreamingContext context)
+        {
         }
         #endregion
 
         #region public properties
         /// <summary>
-        /// Gets or sets the file metadata.
+        /// Gets or sets the OP/ED sequence number. The sequence number designates which OP/ED comes first, second, third, etc...
         /// </summary>
         /// <value>
-        /// The file metadata.
+        /// The sequence number
         /// </value>
-        public Maybe<MediaMetadata> FileMetadata { get; set; }
+        public Maybe<int> SequenceNumber { get; set; }
 
         /// <summary>
-        /// Gets or sets the file extension.
+        /// Gets or sets the part. The part designates if this is an OP or an ED
         /// </summary>
         /// <value>
-        /// The the file extension.
+        /// The part.
         /// </value>
-        public Maybe<string> Extension { get; set; }
+        public Segment Part { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this OP/ED has no credits
+        /// </summary>
+        /// <value>
+        /// Whether this OP/ED has no credits
+        /// </value>
+        public bool NoCredits { get; set; }
         #endregion
 
         #region public methods
+        /// <summary>
+        /// Accept the specified visitor
+        /// </summary>
+        /// <param name="visitor">The visitor.</param>
+        public override void Accept(IFansubEntityVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with the data needed to serialize the target object.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> to populate with data.</param>
+        /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext" />) for this serialization.</param>
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+        }
+
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
@@ -75,7 +139,7 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} {1}.{2}", base.ToString(), FileMetadata, Extension);
+            return string.Format("");
         }
 
         /// <summary>
@@ -85,16 +149,20 @@ namespace FansubFileNameParser.Entity
         /// <returns>
         /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
         /// </returns>
-        public bool Equals(FansubFileEntityBase other)
+        public bool Equals(FansubOPEDEntity other)
         {
             if (EqualsPreamble(other) == false)
             {
                 return false;
             }
 
-            return base.Equals(other)
+            return SequenceNumber.Equals(other.SequenceNumber)
+                && NoCredits == other.NoCredits
+                && Part == other.Part
                 && FileMetadata.Equals(other.FileMetadata)
-                && Extension.Equals(other.Extension);
+                && Extension.Equals(other.Extension)
+                && Group.Equals(other.Group)
+                && Series.Equals(other.Series);
         }
 
         /// <summary>
@@ -106,7 +174,7 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override bool Equals(object other)
         {
-            return Equals(other as FansubFileEntityBase);
+            return Equals(other as FansubOPEDEntity);
         }
 
         /// <summary>
@@ -117,9 +185,13 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode()
+            return SequenceNumber.GetHashCode()
+                ^ NoCredits.GetHashCode()
+                ^ Part.GetHashCode()
                 ^ FileMetadata.GetHashCode()
-                ^ Extension.GetHashCode();
+                ^ Extension.GetHashCode()
+                ^ Group.GetHashCode()
+                ^ Series.GetHashCode();
         }
         #endregion
 

@@ -160,17 +160,14 @@ namespace FansubFileNameParser.Metadata
         /// </returns>
         public override string ToString()
         {
-            var builder = new StringBuilder();
-            builder.AppendLine("Media Metadata");
-            builder.AppendLine("Audio Codec: " + MaybeExtensions.GetToStringForMaybeOfEnum(AudioCodec));
-            builder.AppendLine("CRC32 Checksum: " + CRC32);
-            builder.AppendLine("Pixel Bit Depth: " + MaybeExtensions.GetToStringForMaybeOfEnum(PixelBitDepth));
-            builder.AppendLine("Resolution: " + Resolution);
-            builder.AppendLine("Video Codec: " + MaybeExtensions.GetToStringForMaybeOfEnum(VideoCodec));
-            builder.AppendLine("Video Media: " + MaybeExtensions.GetToStringForMaybeOfEnum(VideoMedia));
-            builder.Append("Video Mode: " + MaybeExtensions.GetToStringForMaybeOfEnum(VideoMode));
-
-            return builder.ToString();
+            return string.Format("[{0}][{1}][{2}][{3}][{4}][{5}][{6}]",
+                MaybeExtensions.GetToStringForMaybeOfEnum(AudioCodec),
+                CRC32,
+                MaybeExtensions.GetToStringForMaybeOfEnum(PixelBitDepth),
+                Resolution,
+                MaybeExtensions.GetToStringForMaybeOfEnum(VideoCodec),
+                MaybeExtensions.GetToStringForMaybeOfEnum(VideoMedia),
+                MaybeExtensions.GetToStringForMaybeOfEnum(VideoMode));
         }
 
         /// <summary>

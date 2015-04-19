@@ -34,5 +34,11 @@ namespace FansubFileNameParser.Entity
         /// </summary>
         /// <param name="entity">The entity.</param>
         void Visit(FansubEpisodeEntity entity);
+
+        /// <summary>
+        /// Visits the specified entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        void Visit(FansubOPEDEntity entity);
     }
 }

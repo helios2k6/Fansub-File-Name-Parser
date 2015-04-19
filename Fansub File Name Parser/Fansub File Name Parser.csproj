@@ -59,6 +59,7 @@
     <Compile Include="Entity\FansubEntityBase.cs" />
     <Compile Include="Entity\FansubFileEntityBase.cs" />
     <Compile Include="Entity\FansubEpisodeEntity.cs" />
+    <Compile Include="Entity\FansubOPEDEntity.cs" />
     <Compile Include="Entity\IFansubEntity.cs" />
     <Compile Include="Entity\IFansubEntityVisitor.cs" />
     <Compile Include="FansubFile.cs" />

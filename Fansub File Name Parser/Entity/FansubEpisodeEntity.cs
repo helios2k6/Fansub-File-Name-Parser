@@ -118,7 +118,10 @@ namespace FansubFileNameParser.Entity
             }
 
             return FileMetadata.Equals(other.FileMetadata)
-                && EpisodeNumber.Equals(other.EpisodeNumber);
+                && EpisodeNumber.Equals(other.EpisodeNumber)
+                && Extension.Equals(other.Extension)
+                && Group.Equals(other.Group)
+                && Series.Equals(other.Series);
         }
 
         /// <summary>
