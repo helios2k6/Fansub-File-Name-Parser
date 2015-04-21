@@ -70,6 +70,7 @@ namespace FansubFileNameParser.Entity
         /// <value>
         /// The episode number.
         /// </value>
+        [JsonProperty(PropertyName = "EpisodeNumber")]
         public Maybe<int> EpisodeNumber { get; set; }
         #endregion
 

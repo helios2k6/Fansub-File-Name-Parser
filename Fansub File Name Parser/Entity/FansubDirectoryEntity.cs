@@ -22,35 +22,26 @@
  * THE SOFTWARE.
  */
 
+using System;
+
 namespace FansubFileNameParser.Entity
 {
-    /// <summary>
-    /// Represents an object that can visit any IFansubEntity
-    /// </summary>
-    public interface IFansubEntityVisitor
+    public sealed class FansubDirectoryEntity : FansubEntityBase, IEquatable<FansubDirectoryEntity>
     {
-        /// <summary>
-        /// Visits the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubEpisodeEntity entity);
+        #region private fields
+        #endregion
 
-        /// <summary>
-        /// Visits the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubOPEDEntity entity);
+        #region ctor
+        #endregion
 
-        /// <summary>
-        /// Visits the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubOriginalAnimationEntity entity);
+        #region public properties
+        #endregion
 
-        /// <summary>
-        /// Visits the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubMovieEntity entity);
+        #region public methods
+        #endregion
+
+        #region private methods
+        #endregion
+            
     }
 }

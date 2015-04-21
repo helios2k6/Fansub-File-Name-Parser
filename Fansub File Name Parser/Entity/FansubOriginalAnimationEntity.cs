@@ -22,9 +22,11 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser;
 using Functional.Maybe;
 using Newtonsoft.Json;
 using System;
+using System.Runtime.Serialization;
 
 namespace FansubFileNameParser.Entity
 {
@@ -56,7 +58,32 @@ namespace FansubFileNameParser.Entity
         }
         #endregion
 
+        #region private static fields
+        private const string EpisodeNumberKey = "EpisodeNumber";
+        private const string TypeKey = "Type";
+        #endregion
+
         #region ctor
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FansubOriginalAnimationEntity"/> class.
+        /// </summary>
+        public FansubOriginalAnimationEntity()
+        {
+            EpisodeNumber = Maybe<int>.Nothing;
+            Type = Maybe<ReleaseType>.Nothing;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FansubOriginalAnimationEntity"/> class.
+        /// </summary>
+        /// <param name="info">The information.</param>
+        /// <param name="context">The context.</param>
+        private FansubOriginalAnimationEntity(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            EpisodeNumber = MaybeExtensions.GetValueNullableMaybe<int>(info, EpisodeNumberKey);
+            Type = MaybeExtensions.GetValueNullableMaybe<ReleaseType>(info, TypeKey);
+        }
         #endregion
 
         #region public properties
@@ -66,6 +93,7 @@ namespace FansubFileNameParser.Entity
         /// <value>
         /// The episode number.
         /// </value>
+        [JsonProperty(PropertyName = "EpisodeNumber")]
         public Maybe<int> EpisodeNumber { get; set; }
 
         /// <summary>
@@ -74,15 +102,41 @@ namespace FansubFileNameParser.Entity
         /// <value>
         /// The type of the release.
         /// </value>
+        [JsonProperty(PropertyName = "Type")]
         public Maybe<ReleaseType> Type { get; set; }
         #endregion
 
         #region public methods
-        public override string ToString()
+        /// <summary>
+        /// Accept the specified visitor
+        /// </summary>
+        /// <param name="visitor">The visitor.</param>
+        public override void Accept(IFansubEntityVisitor visitor)
         {
-            throw new System.NotImplementedException();
+            visitor.Visit(this);
         }
 
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return string.Format("{0} [Episode Number = {1}] [Release Type = {2}]", 
+                base.ToString(),
+                EpisodeNumber,
+                Type.ToStringEnum());
+        }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+        /// </returns>
         public bool Equals(FansubOriginalAnimationEntity other)
         {
             if (EqualsPreamble(other) == false)
@@ -95,14 +149,42 @@ namespace FansubFileNameParser.Entity
                 && Type.Equals(other.Type);
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+        /// </summary>
+        /// <param name="other">The <see cref="System.Object" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
         public override bool Equals(object other)
         {
             return Equals(other as FansubOriginalAnimationEntity);
         }
 
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// </returns>
         public override int GetHashCode()
         {
-            throw new System.NotImplementedException();
+            return base.GetHashCode()
+                ^ EpisodeNumber.GetHashCode()
+                ^ Type.GetHashCode();
+        }
+
+        /// <summary>
+        /// Gets the object data for this class' hierarchy
+        /// </summary>
+        /// <param name="info">The information.</param>
+        /// <param name="context">The context.</param>
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(EpisodeNumberKey, EpisodeNumber.ToNullable());
+            info.AddValue(TypeKey, Type.ToNullable());
+
+            base.GetObjectData(info, context);
         }
         #endregion
 

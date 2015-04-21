@@ -166,13 +166,13 @@ namespace FansubFileNameParser.Metadata
         public override string ToString()
         {
             return string.Format("[{0}][{1}][{2}][{3}][{4}][{5}][{6}]",
-                MaybeExtensions.GetToStringForMaybeOfEnum(AudioCodec),
+                AudioCodec.ToStringEnum(),
                 CRC32,
-                MaybeExtensions.GetToStringForMaybeOfEnum(PixelBitDepth),
+                PixelBitDepth.ToStringEnum(),
                 Resolution,
-                MaybeExtensions.GetToStringForMaybeOfEnum(VideoCodec),
-                MaybeExtensions.GetToStringForMaybeOfEnum(VideoMedia),
-                MaybeExtensions.GetToStringForMaybeOfEnum(VideoMode));
+                VideoCodec.ToStringEnum(),
+                VideoMedia.ToStringEnum(),
+                VideoMode.ToStringEnum());
         }
 
         /// <summary>

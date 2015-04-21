@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser.Metadata;
 using Functional.Maybe;
 using Newtonsoft.Json;
 using System;
@@ -30,59 +29,48 @@ using System.Runtime.Serialization;
 
 namespace FansubFileNameParser.Entity
 {
+
     /// <summary>
-    /// The base class for all Fansub Entities that are represented by a single file
+    /// Represents a single anime movie that is represented as a file
     /// </summary>
     [Serializable]
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class FansubFileEntityBase : FansubEntityBase, IEquatable<FansubFileEntityBase>
+    public sealed class FansubMovieEntity : FansubFileEntityBase, IEquatable<FansubMovieEntity>
     {
         #region private static fields
-        private const string FileMetadataKey = "FileMetadata";
-        private const string ExtensionKey = "Extension";
+        private const string MovieNumberKey = "MovieNumber";
         #endregion
 
         #region ctor
         /// <summary>
-        /// Initializes a new instance of the <see cref="FansubFileEntityBase"/> class.
+        /// Initializes a new instance of the <see cref="FansubMovieEntity"/> class.
         /// </summary>
-        protected FansubFileEntityBase()
+        public FansubMovieEntity()
         {
-            FileMetadata = Maybe<MediaMetadata>.Nothing;
-            Extension = Maybe<string>.Nothing;
+            MovieNumber = Maybe<int>.Nothing;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FansubFileEntityBase"/> class.
+        /// Initializes a new instance of the <see cref="FansubMovieEntity"/> class.
         /// </summary>
         /// <param name="info">The information.</param>
         /// <param name="context">The context.</param>
-        protected FansubFileEntityBase(SerializationInfo info, StreamingContext context)
+        private FansubMovieEntity(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            FileMetadata = ((MediaMetadata)info.GetValue(ExtensionKey, typeof(MediaMetadata))).ToMaybe();
-            Extension = info.GetString(ExtensionKey).ToMaybe();
+            MovieNumber = MaybeExtensions.GetValueNullableMaybe<int>(info, MovieNumberKey);
         }
         #endregion
 
         #region public properties
         /// <summary>
-        /// Gets or sets the file metadata.
+        /// Gets or sets the movie number.
         /// </summary>
         /// <value>
-        /// The file metadata.
+        /// The movie number.
         /// </value>
-        [JsonProperty(PropertyName = "FileMetadata")]
-        public Maybe<MediaMetadata> FileMetadata { get; set; }
-
-        /// <summary>
-        /// Gets or sets the file extension.
-        /// </summary>
-        /// <value>
-        /// The the file extension.
-        /// </value>
-        [JsonProperty(PropertyName = "Extension")]
-        public Maybe<string> Extension { get; set; }
+        [JsonProperty(PropertyName = "MovieNumber")]
+        public Maybe<int> MovieNumber { get; set; }
         #endregion
 
         #region public methods
@@ -94,7 +82,7 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} [Metadata = {1}] [Extension = {2}]", base.ToString(), FileMetadata, Extension);
+            return string.Format("{0} [Movie Number = {1}]", base.ToString(), MovieNumber);
         }
 
         /// <summary>
@@ -104,7 +92,7 @@ namespace FansubFileNameParser.Entity
         /// <returns>
         /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
         /// </returns>
-        public bool Equals(FansubFileEntityBase other)
+        public bool Equals(FansubMovieEntity other)
         {
             if (EqualsPreamble(other) == false)
             {
@@ -112,8 +100,7 @@ namespace FansubFileNameParser.Entity
             }
 
             return base.Equals(other)
-                && FileMetadata.Equals(other.FileMetadata)
-                && Extension.Equals(other.Extension);
+                && MovieNumber.Equals(other.MovieNumber);
         }
 
         /// <summary>
@@ -125,7 +112,7 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override bool Equals(object other)
         {
-            return Equals(other as FansubFileEntityBase);
+            return Equals(other as FansubMovieEntity);
         }
 
         /// <summary>
@@ -137,8 +124,16 @@ namespace FansubFileNameParser.Entity
         public override int GetHashCode()
         {
             return base.GetHashCode()
-                ^ FileMetadata.GetHashCode()
-                ^ Extension.GetHashCode();
+                ^ MovieNumber.GetHashCode();
+        }
+
+        /// <summary>
+        /// Accept the specified visitor
+        /// </summary>
+        /// <param name="visitor">The visitor.</param>
+        public override void Accept(IFansubEntityVisitor visitor)
+        {
+            visitor.Visit(this);
         }
 
         /// <summary>
@@ -148,8 +143,7 @@ namespace FansubFileNameParser.Entity
         /// <param name="context">The context.</param>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(FileMetadataKey, FileMetadata.OrElseDefault());
-            info.AddValue(ExtensionKey, Extension.OrElseDefault());
+            info.AddValue(MovieNumberKey, MovieNumber.ToNullable());
 
             base.GetObjectData(info, context);
         }

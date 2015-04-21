@@ -39,7 +39,7 @@ namespace FansubFileNameParser
         /// <typeparam name="T">The Enum</typeparam>
         /// <param name="maybe">The Maybe wrapper</param>
         /// <returns>The string representation of the Enum</returns>
-        public static string GetToStringForMaybeOfEnum<T>(Maybe<T> maybe) where T : struct
+        public static string ToStringEnum<T>(this Maybe<T> maybe) where T : struct
         {
             return maybe.SelectOrElse(t => Enum.GetName(typeof(T), t), () => Maybe<T>.Nothing.ToString());
         }

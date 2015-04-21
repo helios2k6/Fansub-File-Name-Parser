@@ -92,6 +92,7 @@ namespace FansubFileNameParser.Entity
         /// <value>
         /// The sequence number
         /// </value>
+        [JsonProperty(PropertyName = "SequenceNumber")]
         public Maybe<int> SequenceNumber { get; set; }
 
         /// <summary>
@@ -100,6 +101,7 @@ namespace FansubFileNameParser.Entity
         /// <value>
         /// The part.
         /// </value>
+        [JsonProperty(PropertyName = "Part")]
         public Maybe<Segment> Part { get; set; }
 
         /// <summary>
@@ -108,6 +110,7 @@ namespace FansubFileNameParser.Entity
         /// <value>
         /// Whether this OP/ED has no credits
         /// </value>
+        [JsonProperty(PropertyName = "NoCredits")]
         public bool NoCredits { get; set; }
         #endregion
 
@@ -132,7 +135,7 @@ namespace FansubFileNameParser.Entity
             return string.Format("{0} [Sequence Number = {1}] [Part = {2}] [No Credits = {3}]",
                 base.ToString(),
                 SequenceNumber,
-                MaybeExtensions.GetToStringForMaybeOfEnum(Part),
+                Part.ToStringEnum(),
                 NoCredits);
         }
 

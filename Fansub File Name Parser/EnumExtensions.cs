@@ -22,35 +22,23 @@
  * THE SOFTWARE.
  */
 
-namespace FansubFileNameParser.Entity
+using System;
+
+namespace FansubFileNameParser
 {
     /// <summary>
-    /// Represents an object that can visit any IFansubEntity
+    /// Extension methods on the Enum class
     /// </summary>
-    public interface IFansubEntityVisitor
+    public static class EnumExtensions
     {
         /// <summary>
-        /// Visits the specified entity.
+        /// Prints out the name of the Enum, instead of the scalar value backing it
         /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubEpisodeEntity entity);
-
-        /// <summary>
-        /// Visits the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubOPEDEntity entity);
-
-        /// <summary>
-        /// Visits the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubOriginalAnimationEntity entity);
-
-        /// <summary>
-        /// Visits the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubMovieEntity entity);
+        /// <param name="this">This enum</param>
+        /// <returns>A string representing this Enum</returns>
+        public static string ToStringPretty(this Enum @this) 
+        {
+            return Enum.GetName(@this.GetType(), @this);
+        }
     }
 }

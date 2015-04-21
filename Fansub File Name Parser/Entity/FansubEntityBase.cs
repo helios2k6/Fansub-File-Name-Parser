@@ -70,6 +70,7 @@ namespace FansubFileNameParser.Entity
         /// <value>
         /// The fansub group name
         /// </value>
+        [JsonProperty(PropertyName = "Group")]
         public Maybe<string> Group { get; set; }
 
         /// <summary>
@@ -78,6 +79,7 @@ namespace FansubFileNameParser.Entity
         /// <value>
         /// The anime series name
         /// </value>
+        [JsonProperty(PropertyName = "Series")]
         public Maybe<string> Series { get; set; }
         #endregion
 
