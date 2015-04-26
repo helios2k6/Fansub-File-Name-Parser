@@ -52,5 +52,11 @@ namespace FansubFileNameParser.Entity
         /// </summary>
         /// <param name="entity">The entity.</param>
         void Visit(FansubMovieEntity entity);
+
+        /// <summary>
+        /// Visit the specified entity.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        void Visit(Directory.FansubDirectoryEntity entity);
     }
 }
