@@ -82,6 +82,9 @@
     <Compile Include="Metadata\VideoMode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entity\Directory\FansubDirectoryEntity.cs" />
+    <Compile Include="EntityParsers.cs" />
+    <Compile Include="BaseParsers.cs" />
+    <Compile Include="IOptionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
