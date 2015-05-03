@@ -37,9 +37,31 @@ namespace FansubFileNameParser.Entity.Directory
     [JsonObject(MemberSerialization.OptIn)]
     public sealed class FansubDirectoryEntity : FansubEntityBase, IEquatable<FansubDirectoryEntity>
     {
+        #region nested enum
+        /// <summary>
+        /// Denotes the media source's type for this directory
+        /// </summary>
+        public sealed enum MediaType
+        {
+            /// <summary>
+            /// Denotes that the media source is from a DVD
+            /// </summary>
+            DVD,
+            /// <summary>
+            /// Denotes that the media source is from a Bluray
+            /// </summary>
+            BLURAY,
+            /// <summary>
+            /// Denotes that the media source is from a Television broadcast
+            /// </summary>
+            TV,
+        }
+        #endregion
+
         #region private static readonly fields
         private const string VolumeKey = "Volume";
         private const string EpisodeRangeKey = "EpisodeRange";
+        private const string MediaTypeKey = "MediaType";
         #endregion
 
         #region ctor
@@ -53,7 +75,7 @@ namespace FansubFileNameParser.Entity.Directory
         }
 
         private FansubDirectoryEntity(SerializationInfo info, StreamingContext context)
-            : base(info, context) 
+            : base(info, context)
         {
             Volume = MaybeExtensions.GetValueNullableMaybe<int>(info, VolumeKey);
             EpisodeRange = ((Tuple<int, int>)info.GetValue(EpisodeRangeKey, typeof(Tuple<int, int>))).ToMaybe();
@@ -74,6 +96,13 @@ namespace FansubFileNameParser.Entity.Directory
         /// <value>The episode range.</value>
         [JsonProperty(PropertyName = "EpisodeRange")]
         public Maybe<Tuple<int, int>> EpisodeRange { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the media source.
+        /// </summary>
+        /// <value>The media source.</value>
+        [JsonProperty(PropertyName = "MediaSource")]
+        public Maybe<MediaType> MediaSource { get; set; }
         #endregion
 
         #region public methods
@@ -85,10 +114,11 @@ namespace FansubFileNameParser.Entity.Directory
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} [Volume = {1}] [Episode Range = {2}", 
-                base.ToString(), 
-                Volume, 
-                EpisodeRange);
+            return string.Format("{0} [Volume = {1}] [Episode Range = {2}] [Media Source = {3}]",
+                base.ToString(),
+                Volume,
+                EpisodeRange,
+                MediaSource.ToStringEnum());
         }
 
         /// <summary>
@@ -100,7 +130,7 @@ namespace FansubFileNameParser.Entity.Directory
         /// </returns>
         public bool Equals(FansubDirectoryEntity other)
         {
-            if (EqualsPreamble(other) == false) 
+            if (EqualsPreamble(other) == false)
             {
                 return false;
             }
