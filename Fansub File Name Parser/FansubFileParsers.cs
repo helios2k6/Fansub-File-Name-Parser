@@ -73,11 +73,11 @@ namespace FansubFileNameParser
         /// <returns>A string with all of the tags removed</returns>
         private static string RemoveEndTags(string fileName)
         {
-            var tagResult = BaseGrammars.GrindTagsWithBracketsOutOfMajorContent.TryParse(fileName);
+            var tagResult =  BaseParsers.SeparateTagsFromMainContent.TryParse(fileName);
             string resultingString = fileName;
             if (tagResult.WasSuccessful)
             {
-                foreach (var r in tagResult.Value)
+                foreach (var r in tagResult.GetTags())
                 {
                     resultingString = resultingString.Replace(r, string.Empty);
                 }

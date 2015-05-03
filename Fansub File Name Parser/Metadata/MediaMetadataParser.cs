@@ -49,18 +49,16 @@ namespace FansubFileNameParser.Metadata
         /// <returns>True if any media metadata could be parsed. False otherwise</returns>
         public static bool TryParseMediaMetadata(string fileName, out MediaMetadata metadata)
         {
-            metadata = default(MediaMetadata);
-
-            var parseResult = BaseGrammars.GrindTagsWithBracketsOutOfMajorContent.TryParse(fileName);
+            var parseResult = BaseParsers.SeparateTagsFromMainContent.TryParse(fileName);
             if (parseResult.WasSuccessful == false)
             {
+                metadata = default(MediaMetadata);
                 return false;
             }
 
-            var tags = parseResult.Value;
-
             metadata = new MediaMetadata();
 
+            var tags = parseResult.GetTags();
             foreach (var tag in tags)
             {
                 //Match against all of the knowns

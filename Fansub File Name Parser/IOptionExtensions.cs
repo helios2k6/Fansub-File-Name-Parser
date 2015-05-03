@@ -22,41 +22,31 @@
  * THE SOFTWARE.
  */
 
-namespace FansubFileNameParser.Entity
+using Functional.Maybe;
+using Sprache;
+
+namespace FansubFileNameParser
 {
     /// <summary>
-    /// Represents an object that can visit any IFansubEntity
+    /// Extension methods to the <seealso cref="IOption{T}"/> interface
     /// </summary>
-    public interface IFansubEntityVisitor
+    public static class IOptionExtensions
     {
         /// <summary>
-        /// Visits the specified entity.
+        /// Converts an <seealso cref="IOption{T}"/> to a <seealso cref="Maybe{T}"/>
         /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubEpisodeEntity entity);
+        /// <returns>The <seealso cref="Maybe{T}"/> representing the <seealso cref="IOption{T}"/></returns>
+        /// <param name="this">The <seealso cref="IOption{T}"/></param>
+        /// <typeparam name="T">The type wrapped by the <seealso cref="IOption{T}"/></typeparam>
+        public static Maybe<T> ConvertFromIOptionToMaybe<T>(this IOption<T> @this)
+        {
+            if (@this.IsDefined)
+            {
+                return @this.Get().ToMaybe();
+            }
 
-        /// <summary>
-        /// Visits the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubOPEDEntity entity);
-
-        /// <summary>
-        /// Visits the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubOriginalAnimationEntity entity);
-
-        /// <summary>
-        /// Visits the specified entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        void Visit(FansubMovieEntity entity);
-
-        /// <summary>
-        /// Visit the specified entity.
-        /// </summary>
-        /// <param name="entity">Entity.</param>
-        void Visit(Directory.FansubDirectoryEntity entity);
+            return Maybe<T>.Nothing;
+        }
     }
 }
+
