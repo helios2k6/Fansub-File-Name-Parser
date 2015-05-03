@@ -22,10 +22,16 @@
  * THE SOFTWARE.
  */
 
+using Newtonsoft.Json;
 using System;
 
 namespace FansubFileNameParser.Entity
 {
+    /// <summary>
+    /// Represents a folder of anime episodes
+    /// </summary>
+    [Serializable]
+    [JsonObject(MemberSerialization.OptIn)]
     public sealed class FansubDirectoryEntity : FansubEntityBase, IEquatable<FansubDirectoryEntity>
     {
         #region private fields
@@ -38,10 +44,41 @@ namespace FansubFileNameParser.Entity
         #endregion
 
         #region public methods
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool Equals(FansubDirectoryEntity other)
+        {
+            if (EqualsPreamble(other) == false)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public override bool Equals(object other)
+        {
+            return Equals(other as FansubDirectoryEntity);
+        }
+
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
         #endregion
 
         #region private methods
+        private bool EqualsPreamble(object other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (GetType() != other.GetType()) return false;
+
+            return true;
+        }
         #endregion
-            
     }
 }

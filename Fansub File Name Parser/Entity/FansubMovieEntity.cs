@@ -29,7 +29,6 @@ using System.Runtime.Serialization;
 
 namespace FansubFileNameParser.Entity
 {
-
     /// <summary>
     /// Represents a single anime movie that is represented as a file
     /// </summary>
