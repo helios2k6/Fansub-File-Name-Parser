@@ -41,7 +41,7 @@ namespace FansubFileNameParser.Entity.Directory
         /// <summary>
         /// Denotes the media source's type for this directory
         /// </summary>
-        public sealed enum MediaType
+        public enum MediaType
         {
             /// <summary>
             /// Denotes that the media source is from a DVD
