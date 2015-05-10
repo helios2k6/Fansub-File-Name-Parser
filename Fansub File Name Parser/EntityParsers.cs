@@ -37,24 +37,6 @@ namespace FansubFileNameParser
     /// </summary>
     public static class EntityParsers
     {
-        #region private classes and enums
-        private enum DetectedEntity
-        {
-            Directory,
-            File,
-        }
-
-        private sealed class ParseState
-        {
-            public string OriginalInput { get;set; }
-            public Maybe<string> MainContent { get; set; }
-            public DetectedEntity EntityType { get; set; }
-            public Maybe<string> Extension { get; set; }
-            public Maybe<string> Group { get; set; }
-            public IEnumerable<string> Tags { get; set; }
-        }
-        #endregion
-
         #region private static fields
         private static readonly ISet<string> MediaFileExtensions = new HashSet<string>
         {
@@ -68,6 +50,7 @@ namespace FansubFileNameParser
             "WMV",
         };
         #endregion
+        #region public methods
         /// <summary>
         /// Tries to parse the string into an <seealso cref="IFansubEntity"/> given the string
         /// </summary>
@@ -81,63 +64,10 @@ namespace FansubFileNameParser
                 return Maybe<IFansubEntity>.Nothing;
             }
 
-            // Create the initial parse state
-            var parseState = new ParseState 
-            {
-                OriginalInput = input,
-            };
-            
-            DetectEntityType(parseState);
-
-
             return Maybe<IFansubEntity>.Nothing;
         }
-
+        #endregion
         #region private static functions
-        #region stage 1 - determine if directory or file
-        private static void DetectEntityType(ParseState state)
-        {
-            var extension = Path.GetExtension(state.OriginalInput).ToUpperInvariant();
-            if (MediaFileExtensions.Contains(extension))
-            {
-                state.EntityType = DetectedEntity.File;
-            }
-            else
-            {
-                state.EntityType = DetectedEntity.Directory;
-            }
-        }
-        #endregion
-        #region stage 2 - break apart string
-        private static bool TryBreakApartString(ParseState state)
-        {
-            var separatedContentResults = BaseParsers.SeparateTagsFromMainContent.TryParse(state.OriginalInput);
-            if(separatedContentResults.WasSuccessful)
-            {
-                var value = separatedContentResults.Value;
-
-                state.Group = value.Group;
-                state.MainContent = value.Content;
-                state.Tags = value.Tags;
-
-                return true;
-            }
-
-            return false;
-        }
-        #endregion
-        #region stage 3a - process directory
-        private static Maybe<IFansubEntity> TryParseDirectoryEntity(ParseState state)
-        {
-            return Maybe<IFansubEntity>.Nothing;
-        }
-        #endregion
-        #region stage 3b - process single file
-        private static Maybe<IFansubEntity> TryParseFileEntity(ParseState state)
-        {
-            return Maybe<IFansubEntity>.Nothing;
-        }
-        #endregion
         #endregion
     }
 }

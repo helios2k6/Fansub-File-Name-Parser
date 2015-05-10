@@ -27,6 +27,7 @@ using FansubFileNameParser;
 using Functional.Maybe;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
+using FansubFileNameParser.Metadata;
 
 namespace FansubFileNameParser.Entity.Directory
 {
@@ -62,6 +63,7 @@ namespace FansubFileNameParser.Entity.Directory
         private const string VolumeKey = "Volume";
         private const string EpisodeRangeKey = "EpisodeRange";
         private const string MediaTypeKey = "MediaType";
+        private const string MediaMetadataKey = "MediaMetadata";
         #endregion
 
         #region ctor
@@ -79,6 +81,7 @@ namespace FansubFileNameParser.Entity.Directory
         {
             Volume = MaybeExtensions.GetValueNullableMaybe<int>(info, VolumeKey);
             EpisodeRange = ((Tuple<int, int>)info.GetValue(EpisodeRangeKey, typeof(Tuple<int, int>))).ToMaybe();
+            MediaMetadata = ((MediaMetadata)info.GetValue(MediaMetadataKey, typeof(MediaMetadata))).ToMaybe();
         }
         #endregion
 
@@ -103,6 +106,15 @@ namespace FansubFileNameParser.Entity.Directory
         /// <value>The media source.</value>
         [JsonProperty(PropertyName = "MediaSource")]
         public Maybe<MediaType> MediaSource { get; set; }
+
+        /// <summary>
+        /// Gets or sets the media metadata.
+        /// </summary>
+        /// <value>
+        /// The media metadata.
+        /// </value>
+        [JsonProperty(PropertyName = "MediaMetadata")]
+        public Maybe<MediaMetadata> MediaMetadata { get; set; }
         #endregion
 
         #region public methods
@@ -114,11 +126,12 @@ namespace FansubFileNameParser.Entity.Directory
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} [Volume = {1}] [Episode Range = {2}] [Media Source = {3}]",
+            return string.Format("{0} [Volume = {1}] [Episode Range = {2}] [Media Source = {3}] [Media Metadata = {4}]",
                 base.ToString(),
                 Volume,
                 EpisodeRange,
-                MediaSource.ToStringEnum());
+                MediaSource.ToStringEnum(),
+                MediaMetadata);
         }
 
         /// <summary>
@@ -137,7 +150,8 @@ namespace FansubFileNameParser.Entity.Directory
 
             return base.Equals(other)
                 && Volume.Equals(other.Volume)
-                && EpisodeRange.Equals(other.EpisodeRange);
+                && EpisodeRange.Equals(other.EpisodeRange)
+                && MediaMetadata.Equals(other.MediaMetadata);
         }
 
         /// <summary>
@@ -162,7 +176,8 @@ namespace FansubFileNameParser.Entity.Directory
         {
             return base.GetHashCode()
                 ^ Volume.GetHashCode()
-                ^ EpisodeRange.GetHashCode();
+                ^ EpisodeRange.GetHashCode()
+                ^ MediaMetadata.GetHashCode();
         }
 
         /// <summary>
@@ -174,6 +189,7 @@ namespace FansubFileNameParser.Entity.Directory
         {
             info.AddValue(VolumeKey, Volume.ToNullable());
             info.AddValue(EpisodeRangeKey, EpisodeRange.OrElseDefault());
+            info.AddValue(MediaMetadataKey, MediaMetadata.OrElseDefault());
 
             base.GetObjectData(info, context);
         }

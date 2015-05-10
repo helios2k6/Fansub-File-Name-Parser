@@ -60,7 +60,7 @@ namespace FansubFileNameParser.Entity
         protected FansubFileEntityBase(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            FileMetadata = ((MediaMetadata)info.GetValue(ExtensionKey, typeof(MediaMetadata))).ToMaybe();
+            FileMetadata = ((MediaMetadata)info.GetValue(FileMetadataKey, typeof(MediaMetadata))).ToMaybe();
             Extension = info.GetString(ExtensionKey).ToMaybe();
         }
         #endregion
