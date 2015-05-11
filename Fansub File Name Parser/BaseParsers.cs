@@ -36,28 +36,58 @@ namespace FansubFileNameParser
     internal static class BaseParsers
     {
         #region nested classes
+        /// <summary>
+        /// A formalized three-tuple that represents the parse results of the <see cref="BaseParsers.SeparateTagsFromMainContent"/> parser
+        /// </summary>
         internal sealed class SeparatedParseResult : Tuple<Maybe<string>, Maybe<string>, IEnumerable<string>>
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="SeparatedParseResult"/> class.
+            /// </summary>
             public SeparatedParseResult()
                 : base (Maybe<string>.Nothing, Maybe<string>.Nothing, Enumerable.Empty<string>())
             {
             }
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="SeparatedParseResult"/> class.
+            /// </summary>
+            /// <param name="group">The fansub group.</param>
+            /// <param name="content">The main content.</param>
+            /// <param name="tags">The media metadata tags.</param>
             public SeparatedParseResult(Maybe<string> group, Maybe<string> content, IEnumerable<string> tags)
                 : base (group, content, tags)
             {
             }
 
+            /// <summary>
+            /// Gets the fansub group.
+            /// </summary>
+            /// <value>
+            /// The fansub group.
+            /// </value>
             public Maybe<string> Group
             { 
                 get { return Item1; }
             }
 
+            /// <summary>
+            /// Gets the main content.
+            /// </summary>
+            /// <value>
+            /// The main content.
+            /// </value>
             public Maybe<string> Content 
             { 
                 get { return Item2; } 
             }
 
+            /// <summary>
+            /// Gets the media metadata tags.
+            /// </summary>
+            /// <value>
+            /// The media metadata tags.
+            /// </value>
             public IEnumerable<string> Tags 
             {
                 get { return Item3; }

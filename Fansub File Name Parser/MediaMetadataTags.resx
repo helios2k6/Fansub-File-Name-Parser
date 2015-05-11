@@ -201,4 +201,7 @@
   <data name="TenEightyIWithSpace" xml:space="preserve">
     <value>1080 I</value>
   </data>
+  <data name="BLURAY_WITH_DASH" xml:space="preserve">
+    <value>BLU-RAY</value>
+  </data>
 </root>

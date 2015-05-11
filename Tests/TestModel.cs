@@ -29,6 +29,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FansubFileNameParser.Entity;
+using FansubFileNameParser.Entity.Directory;
 
 namespace UnitTests.Models
 {
@@ -57,6 +59,164 @@ namespace UnitTests.Models
 
         private static readonly Lazy<IEnumerable<KeyValuePair<string, MediaMetadata>>> InputToMediaMetadataMap =
             new Lazy<IEnumerable<KeyValuePair<string, MediaMetadata>>>(InitMediaMetadataTestModel);
+
+        private static readonly IDictionary<string, IFansubEntity> DirectoryInputToEntityMap = new Dictionary<string, IFansubEntity>
+        {
+            {"Kokoro Connect (2012) [Doki-Chihiro][1920x1080 Hi10P BD FLAC]", new FansubDirectoryEntity 
+                { 
+                    Group = "Doki-Chihiro".ToMaybe(), 
+                    Series = "Kokoro Connect".ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        VideoCodec = VideoCodec.H264.ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[Vivid] The World God Only Knows - Goddesses Arc [BD 1080p FLAC]", new FansubDirectoryEntity
+                {
+                    Group = "Vivid".ToMaybe(),
+                    Series = "The World God Only Knows - Goddesses Arc".ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[BlurayDesuYo] Amagi Brilliant Park - Vol. 1 (BD 1920x1080 10bit FLAC)", new FansubDirectoryEntity
+                {
+                    Group = "BlurayDesuYo".ToMaybe(),
+                    Series = "Amagi Brilliant Park".ToMaybe(),
+                    Volume = 1.ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[Coalgirls]_Amagi_Brilliant_Park_01-02_(1920x1080_Blu-Ray_FLAC)", new FansubDirectoryEntity
+                {
+                    Group = "Coalgirls".ToMaybe(),
+                    Series = "Amagi Brilliant Park".ToMaybe(),
+                    EpisodeRange = Tuple.Create(1, 2).ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[FFF] Medaka Box Abnormal - Vol.03 [BD][1080p-FLAC]", new FansubDirectoryEntity
+                {
+                    Group = "FFF".ToMaybe(),
+                    Series = "Medaka Box Abnormal".ToMaybe(),
+                    Volume = 3.ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[Tsundere] Fate Kaleid Prisma Illya 2wei - 01-02 [BDRip h264 1920x1080 10bit FLAC]", new FansubDirectoryEntity
+                {
+                    Group = "Tsundere".ToMaybe(),
+                    Series = "Fate Kaleid Prisma Illya 2wei".ToMaybe(),
+                    EpisodeRange = Tuple.Create(1, 2).ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoCodec = VideoCodec.H264.ToMaybe(),
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[Elysium]Spice.and.Wolf.II(BD.1080p.FLAC)", new FansubDirectoryEntity
+                {
+                    Group = "Elysium".ToMaybe(),
+                    Series = "Spiace and Wolf II".ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[Yabai]_Spice_and_Wolf_II_[BD]", new FansubDirectoryEntity
+                {
+                    Group = "Yabai".ToMaybe(),
+                    Series = "Spice and Wolf II".ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[Zurako] Spice and Wolf II (BD 1080p AAC)", new FansubDirectoryEntity
+                {
+                    Group = "Zurako".ToMaybe(),
+                    Series = "Spice and Wolf II".ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.AAC.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[UTW]_Fate_stay_night_Unlimited_Blade_Works_-_00-12_[BD][h264-1080p][FLAC]", new FansubDirectoryEntity
+                {
+                    Group = "UTW".ToMaybe(),
+                    Series = "Fate stay night Unlimited Blade Works".ToMaybe(),
+                    EpisodeRange = Tuple.Create(0, 12).ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoCodec = VideoCodec.H264.ToMaybe(),
+                        VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[Commie] Chihayafuru 2 - Volume 1 [BD 720p AAC]", new FansubDirectoryEntity
+                {
+                    Group = "Commie".ToMaybe(),
+                    Series = "Chihayafuru 2".ToMaybe(),
+                    Volume = 1.ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.SevenTwentyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.AAC.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+            {"[Coalgirls]_Hyouka_(1920x1080_Blu-Ray_FLAC)", new FansubDirectoryEntity
+                {
+                    Group = "Coalgirls".ToMaybe(),
+                    Series = "Hyouka".ToMaybe(),
+                    MediaMetadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
+        };
         #endregion
 
         #region public methods
@@ -87,7 +247,8 @@ namespace UnitTests.Models
             KeyValuePair<string, VideoMedia> videoMediaTag,
             KeyValuePair<string, VideoMode> videoModeTag,
             KeyValuePair<string, Resolution> resolutionTag,
-            string crc32)
+            string crc32
+        )
         {
             var list = new List<string>
             {

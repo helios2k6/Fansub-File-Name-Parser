@@ -38,31 +38,9 @@ namespace FansubFileNameParser.Entity.Directory
     [JsonObject(MemberSerialization.OptIn)]
     public sealed class FansubDirectoryEntity : FansubEntityBase, IEquatable<FansubDirectoryEntity>
     {
-        #region nested enum
-        /// <summary>
-        /// Denotes the media source's type for this directory
-        /// </summary>
-        public enum MediaType
-        {
-            /// <summary>
-            /// Denotes that the media source is from a DVD
-            /// </summary>
-            DVD,
-            /// <summary>
-            /// Denotes that the media source is from a Bluray
-            /// </summary>
-            BLURAY,
-            /// <summary>
-            /// Denotes that the media source is from a Television broadcast
-            /// </summary>
-            TV,
-        }
-        #endregion
-
         #region private static readonly fields
         private const string VolumeKey = "Volume";
         private const string EpisodeRangeKey = "EpisodeRange";
-        private const string MediaTypeKey = "MediaType";
         private const string MediaMetadataKey = "MediaMetadata";
         #endregion
 
@@ -99,13 +77,6 @@ namespace FansubFileNameParser.Entity.Directory
         /// <value>The episode range.</value>
         [JsonProperty(PropertyName = "EpisodeRange")]
         public Maybe<Tuple<int, int>> EpisodeRange { get; set; }
-        
-        /// <summary>
-        /// Gets or sets the media source.
-        /// </summary>
-        /// <value>The media source.</value>
-        [JsonProperty(PropertyName = "MediaSource")]
-        public Maybe<MediaType> MediaSource { get; set; }
 
         /// <summary>
         /// Gets or sets the media metadata.
@@ -126,12 +97,13 @@ namespace FansubFileNameParser.Entity.Directory
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} [Volume = {1}] [Episode Range = {2}] [Media Source = {3}] [Media Metadata = {4}]",
+            return string.Format(
+                "{0} [Volume = {1}] [Episode Range = {2}] [Media Metadata = {3}]",
                 base.ToString(),
                 Volume,
                 EpisodeRange,
-                MediaSource.ToStringEnum(),
-                MediaMetadata);
+                MediaMetadata
+            );
         }
 
         /// <summary>

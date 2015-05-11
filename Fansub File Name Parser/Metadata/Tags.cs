@@ -110,6 +110,7 @@ namespace FansubFileNameParser.Metadata
                     {MediaMetadataTags.BD, VideoMedia.Bluray},
                     {MediaMetadataTags.BDRIP, VideoMedia.Bluray},
                     {MediaMetadataTags.BLURAY, VideoMedia.Bluray},
+                    {MediaMetadataTags.BLURAY_WITH_DASH, VideoMedia.Bluray},
                     {MediaMetadataTags.DVD, VideoMedia.DVD},
                     {MediaMetadataTags.DVDRIP, VideoMedia.DVD},
                     {MediaMetadataTags.TV, VideoMedia.Broadcast},

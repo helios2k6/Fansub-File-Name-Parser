@@ -55,12 +55,15 @@
   <ItemGroup>
     <Compile Include="Assembly.cs" />
     <Compile Include="BaseGrammars.cs" />
+    <Compile Include="Entity\Directory\FansubDirectoryEntityBuilder.cs" />
+    <Compile Include="Entity\EntityBuilderBase.cs" />
     <Compile Include="Entity\FansubEntityBase.cs" />
     <Compile Include="Entity\FansubFileEntityBase.cs" />
     <Compile Include="Entity\FansubEpisodeEntity.cs" />
     <Compile Include="Entity\FansubMovieEntity.cs" />
     <Compile Include="Entity\FansubOPEDEntity.cs" />
     <Compile Include="Entity\FansubOriginalAnimationEntity.cs" />
+    <Compile Include="Entity\IEntityBuilder.cs" />
     <Compile Include="Entity\IFansubEntity.cs" />
     <Compile Include="Entity\IFansubEntityVisitor.cs" />
     <Compile Include="EnumExtensions.cs" />
