@@ -42,6 +42,23 @@ namespace FansubFileNameParser.Metadata
 
         #region public methods
         /// <summary>
+        /// Tries the parse media metadata, but returns a <see cref="Maybe{MediaMetadata}"/> instead of using 
+        /// out params
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <returns>A Maybe wrapping the MediaMetadata object</returns>
+        public static Maybe<MediaMetadata> TryParseMediaMetadataWithMaybe(string fileName)
+        {
+            MediaMetadata metadata;
+            if (TryParseMediaMetadata(fileName, out metadata))
+            {
+                return metadata.ToMaybe();
+            }
+
+            return Maybe<MediaMetadata>.Nothing;
+        }
+
+        /// <summary>
         /// Tries the parse media metadata.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>

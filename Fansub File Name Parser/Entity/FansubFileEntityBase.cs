@@ -38,7 +38,6 @@ namespace FansubFileNameParser.Entity
     public abstract class FansubFileEntityBase : FansubEntityBase, IEquatable<FansubFileEntityBase>
     {
         #region private static fields
-        private const string FileMetadataKey = "FileMetadata";
         private const string ExtensionKey = "Extension";
         #endregion
 
@@ -48,7 +47,6 @@ namespace FansubFileNameParser.Entity
         /// </summary>
         protected FansubFileEntityBase()
         {
-            FileMetadata = Maybe<MediaMetadata>.Nothing;
             Extension = Maybe<string>.Nothing;
         }
 
@@ -60,21 +58,11 @@ namespace FansubFileNameParser.Entity
         protected FansubFileEntityBase(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            FileMetadata = ((MediaMetadata)info.GetValue(FileMetadataKey, typeof(MediaMetadata))).ToMaybe();
             Extension = info.GetString(ExtensionKey).ToMaybe();
         }
         #endregion
 
         #region public properties
-        /// <summary>
-        /// Gets or sets the file metadata.
-        /// </summary>
-        /// <value>
-        /// The file metadata.
-        /// </value>
-        [JsonProperty(PropertyName = "FileMetadata")]
-        public Maybe<MediaMetadata> FileMetadata { get; set; }
-
         /// <summary>
         /// Gets or sets the file extension.
         /// </summary>
@@ -94,7 +82,7 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} [Metadata = {1}] [Extension = {2}]", base.ToString(), FileMetadata, Extension);
+            return string.Format("{0} [Extension = {2}]", base.ToString(), Extension);
         }
 
         /// <summary>
@@ -112,7 +100,6 @@ namespace FansubFileNameParser.Entity
             }
 
             return base.Equals(other)
-                && FileMetadata.Equals(other.FileMetadata)
                 && Extension.Equals(other.Extension);
         }
 
@@ -137,7 +124,6 @@ namespace FansubFileNameParser.Entity
         public override int GetHashCode()
         {
             return base.GetHashCode()
-                ^ FileMetadata.GetHashCode()
                 ^ Extension.GetHashCode();
         }
 
@@ -148,7 +134,6 @@ namespace FansubFileNameParser.Entity
         /// <param name="context">The context.</param>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue(FileMetadataKey, FileMetadata.OrElseDefault());
             info.AddValue(ExtensionKey, Extension.OrElseDefault());
 
             base.GetObjectData(info, context);

@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Metadata;
 using Functional.Maybe;
 using Newtonsoft.Json;
 using System;
@@ -39,6 +40,7 @@ namespace FansubFileNameParser.Entity
         #region private static fields
         private const string GroupKey = "Group";
         private const string SeriesKey = "Series";
+        private const string MediaMetadataKey = "MediaMetadata";
         #endregion
 
         #region ctor
@@ -49,6 +51,7 @@ namespace FansubFileNameParser.Entity
         {
             Group = Maybe<string>.Nothing;
             Series = Maybe<string>.Nothing;
+            Metadata = Maybe<MediaMetadata>.Nothing;
         }
 
         /// <summary>
@@ -60,6 +63,7 @@ namespace FansubFileNameParser.Entity
         {
             Group = info.GetString(GroupKey).ToMaybe();
             Series = info.GetString(SeriesKey).ToMaybe();
+            Metadata = ((MediaMetadata)info.GetValue(MediaMetadataKey, typeof(MediaMetadata))).ToMaybe();
         }
         #endregion
 
@@ -81,6 +85,15 @@ namespace FansubFileNameParser.Entity
         /// </value>
         [JsonProperty(PropertyName = "Series")]
         public Maybe<string> Series { get; set; }
+
+        /// <summary>
+        /// Gets or sets the media metadata.
+        /// </summary>
+        /// <value>
+        /// The media metadata.
+        /// </value>
+        [JsonProperty(PropertyName = "Metadata")]
+        public Maybe<MediaMetadata> Metadata { get; set; }
         #endregion
 
         #region public methods
@@ -92,7 +105,7 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("[Group = {0}] [Series = {1}]", Group, Series);
+            return string.Format("[Group = {0}] [Series = {1}] [Metadata = {2}]", Group, Series, Metadata);
         }
 
         /// <summary>
@@ -110,7 +123,8 @@ namespace FansubFileNameParser.Entity
             }
 
             return Group.Equals(other.Group)
-                && Series.Equals(other.Series);
+                && Series.Equals(other.Series)
+                && Metadata.Equals(other.Metadata);
         }
 
         /// <summary>
@@ -134,7 +148,8 @@ namespace FansubFileNameParser.Entity
         public override int GetHashCode()
         {
             return Group.GetHashCode()
-                ^ Series.GetHashCode();
+                ^ Series.GetHashCode()
+                ^ Metadata.GetHashCode();
         }
 
         /// <summary>
@@ -152,6 +167,7 @@ namespace FansubFileNameParser.Entity
         {
             info.AddValue(GroupKey, Group.OrElseDefault());
             info.AddValue(SeriesKey, Series.OrElseDefault());
+            info.AddValue(MediaMetadataKey, Metadata.OrElseDefault());
         }
         #endregion
 
