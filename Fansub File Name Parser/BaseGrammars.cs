@@ -58,140 +58,78 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses a single open parenthesis character ('(')
         /// </summary>
-        public static readonly Parser<string> OpenParenthesis = Parse.Char('(').Once().Text();
+        private static readonly Parser<char> OpenParenthesis = Parse.Char('(');
         /// <summary>
         /// Parses a single closed parenthesis character (')')
         /// </summary>
-        public static readonly Parser<string> ClosedParenthesis = Parse.Char(')').Once().Text();
+        private static readonly Parser<char> ClosedParenthesis = Parse.Char(')');
         /// <summary>
         /// Parses a single a open square bracket ('[')
         /// </summary>
-        public static readonly Parser<string> OpenSquareBracket = Parse.Char('[').Once().Text();
+        private static readonly Parser<char> OpenSquareBracket = Parse.Char('[');
         /// <summary>
         /// Parses a single closed square bracket (']')
         /// </summary>
-        public static readonly Parser<string> ClosedSquareBracket = Parse.Char(']').Once().Text();
-        #endregion
-        #region identifier parsers
+        private static readonly Parser<char> ClosedSquareBracket = Parse.Char(']');
         /// <summary>
-        /// Parses an identifier until an underscore character is hit
+        /// Parses any open metadata tag deliminator, such as the open parenthesis or open square bracket
         /// </summary>
-        public static readonly Parser<string> IdentifierUntilUnderscore = Parse.Letter.Until(Underscore).Text();
+        public static readonly Parser<char> OpenTagDeliminator = OpenParenthesis.Or(OpenSquareBracket);
         /// <summary>
-        /// Parses an identifier until an underscore or space character is hit
+        /// Parses any closed metadata tag deliminator, such as the closed parenthesis or closed square bracket
         /// </summary>
-        public static readonly Parser<string> IdentifierUntilUnderscoreOrFullWord = IdentifierUntilUnderscore.Or(Identifier);
+        public static readonly Parser<char> ClosedTagDeliminator = ClosedParenthesis.Or(ClosedSquareBracket);
         /// <summary>
-        /// Parses an identifier until a dash character is hit
+        /// Parses a single tag delminator
         /// </summary>
-        public static readonly Parser<string> IdentifierUntilDash = Parse.Letter.Until(Dash).Text();
-        /// <summary>
-        /// Parses an identifier until a dash or space character is hit
-        /// </summary>
-        public static readonly Parser<string> IdentifierUntilDashOrFullWord = IdentifierUntilDash.Or(Identifier);
-        #endregion
-        #region bracket parsers
-        /// <summary>
-        /// Parse the contents of a square bracket tag
-        /// </summary>
-        public static readonly Parser<string> SquareBracketEnclosedText =
-            (from openBracket in OpenSquareBracket
-             from content in Parse.CharExcept(']').Many().Text()
-             from closedBracket in ClosedSquareBracket
-             select content).Token();
-        
-        /// <summary>
-        /// Parse a square bracket tag, returning the contents of the tag including the square brackets
-        /// </summary>
-        public static readonly Parser<string> SquareBracketEnclosedTextWithBracket =
-            (from openBracket in OpenSquareBracket
-             from content in Parse.CharExcept(']').Many().Text()
-             from closedBracket in ClosedSquareBracket
-             select string.Concat(openBracket, content, closedBracket)).Token();
-
-        /// <summary>
-        /// Parses the contents of a parenthesis tag
-        /// </summary>
-        public static readonly Parser<string> ParenthesisEnclosedText =
-            (from openParenthesis in OpenParenthesis
-             from content in Parse.CharExcept(')').Many().Text()
-             from closedParenthesis in ClosedParenthesis
-             select content).Token();
-
-        /// <summary>
-        /// Parses a parenthesis tag, returning the contents of the tag including the parenthesis
-        /// </summary>
-        public static readonly Parser<string> ParenthesisEnclosedTextWithParenthesis =
-            (from openParenthesis in OpenParenthesis
-             from content in Parse.CharExcept(')').Many().Text()
-             from closedParenthesis in ClosedParenthesis
-             select string.Concat(openParenthesis, content, closedParenthesis)).Token();
+        private static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
         #endregion
         #region line parsers
         /// <summary>
         /// Parses a line of text until a dash character is hit
         /// </summary>
-        public static readonly Parser<string> LineUntilDash = Parse.AnyChar.Until(Dash).Text();
+        private static readonly Parser<string> LineUntilDash = Parse.AnyChar.Until(Dash).Text();
         /// <summary>
         /// Parses a line of text until a dash character or a full line if there wasn't a dash character
         /// </summary>
-        public static readonly Parser<string> LineUntilDashOrFullLine = LineUntilDash.Or(Line);
+        private static readonly Parser<string> LineUntilDashOrFullLine = LineUntilDash.Or(Line);
         /// <summary>
-        /// Parses a line of text until an underscore character is hit
+        /// Parses a line of text until a tag delmiinator is encountered
         /// </summary>
-        public static readonly Parser<string> LineUntilUnderscore = Parse.AnyChar.Until(Underscore).Text();
+        public static readonly Parser<string> LineUntilTagDeliminator = Parse.AnyChar.Until(TagDeliminator).Text();
+        #endregion
+        #region bracket parsers
         /// <summary>
-        /// Parses a line of text until an underscore character is hit or the full line if there wasn't an underscore character
+        /// Parses a single metadata tag
         /// </summary>
-        public static readonly Parser<string> LineUntilUnderscoreOrFullLine = LineUntilUnderscore.Or(Line);
+        public static readonly Parser<string> TagEnclosedText =
+            (from openTag in OpenTagDeliminator
+             from content in LineUntilTagDeliminator
+             from closedBracket in ClosedTagDeliminator
+             select content).Token();
+
         /// <summary>
-        /// Parses a line of text until an open square bracket is hit
+        /// Parses a single metadata tag, but includes the metadata tag deliminator
         /// </summary>
-        public static readonly Parser<string> LineUntilOpenSquareBracket = Parse.AnyChar.Until(OpenSquareBracket).Text();
-        /// <summary>
-        /// Parses a line of text until an open parenthesis is hit
-        /// </summary>
-        public static readonly Parser<string> LineUntilOpenParenthesis = Parse.AnyChar.Until(OpenParenthesis).Text();
-        /// <summary>
-        /// Parses a line of text until a square bracket or an open parenthesis is hit
-        /// </summary>
-        public static readonly Parser<string> LineUntilSquareBracketOrParenthesis = LineUntilOpenSquareBracket.Or(LineUntilOpenParenthesis).Text();
-        /// <summary>
-        /// Parses a line of text until a numerical digit is hit
-        /// </summary>
-        public static readonly Parser<string> LineUntilDigit = Parse.AnyChar.Until(Parse.Number).Text();
-        /// <summary>
-        /// Parses a line until a numerical digit is hit or the entire line if no digit was hit
-        /// </summary>
-        public static readonly Parser<string> LineUntilDigitOrFullLine = LineUntilDigit.Or(Line);
+        public static readonly Parser<string> TagEnclosedTextWithDeliminator =
+            (from openTag in OpenTagDeliminator
+             from content in LineUntilTagDeliminator
+             from closedBracket in ClosedTagDeliminator
+             select string.Concat(openTag, content, closedBracket)).Token();
+
         #endregion
         #region lexers
-        #region lexers by identifiers
-        /// <summary>
-        /// Parses a stream of identifiers that are separated by an underscore
-        /// </summary>
-        public static readonly Parser<IEnumerable<string>> IdentifiersSeparatedByUnderscore = IdentifierUntilUnderscoreOrFullWord.Many();
-        /// <summary>
-        /// Parses a stream of identifiers that are separated by a dash
-        /// </summary>
-        public static readonly Parser<IEnumerable<string>> IdentifiersSeparatedByDash = IdentifierUntilDashOrFullWord.Many();
-        #endregion
         #region lexers by line
-        /// <summary>
-        /// Parses a stream of lines separated by an underscore
-        /// </summary>
-        public static readonly Parser<IEnumerable<string>> LinesSeparatedByUnderscore = LineUntilUnderscoreOrFullLine.Many();
         /// <summary>
         /// Parses a stream of lines separated by a dash
         /// </summary>
         public static readonly Parser<IEnumerable<string>> LinesSeparatedByDash = LineUntilDashOrFullLine.Many();
         #endregion
-        #region lexers by brackets
+        #region lexers by tag
         /// <summary>
-        /// Parses a stream of square bracket tags or parenthesis tags
+        /// Parses multiple metadata tags
         /// </summary>
-        public static readonly Parser<IEnumerable<string>> TagLexerWithBrackets =
-            SquareBracketEnclosedTextWithBracket.Or(ParenthesisEnclosedTextWithParenthesis).Many();
+        public static readonly Parser<IEnumerable<string>> MultipleTagEnclosedText = TagEnclosedText.Many();
         #endregion
         #endregion
     }

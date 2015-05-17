@@ -82,7 +82,7 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} [Extension = {2}]", base.ToString(), Extension);
+            return string.Format("{0} [Extension = {1}]", base.ToString(), Extension);
         }
 
         /// <summary>

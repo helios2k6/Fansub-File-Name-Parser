@@ -45,7 +45,7 @@ namespace FansubFileNameParser
             /// Initializes a new instance of the <see cref="SeparatedParseResult"/> class.
             /// </summary>
             public SeparatedParseResult()
-                : base (Maybe<string>.Nothing, Maybe<string>.Nothing, Enumerable.Empty<string>())
+                : base(Maybe<string>.Nothing, Maybe<string>.Nothing, Enumerable.Empty<string>())
             {
             }
 
@@ -56,7 +56,7 @@ namespace FansubFileNameParser
             /// <param name="content">The main content.</param>
             /// <param name="tags">The media metadata tags.</param>
             public SeparatedParseResult(Maybe<string> group, Maybe<string> content, IEnumerable<string> tags)
-                : base (group, content, tags)
+                : base(group, content, tags)
             {
             }
 
@@ -67,7 +67,7 @@ namespace FansubFileNameParser
             /// The fansub group.
             /// </value>
             public Maybe<string> Group
-            { 
+            {
                 get { return Item1; }
             }
 
@@ -77,9 +77,9 @@ namespace FansubFileNameParser
             /// <value>
             /// The main content.
             /// </value>
-            public Maybe<string> Content 
-            { 
-                get { return Item2; } 
+            public Maybe<string> Content
+            {
+                get { return Item2; }
             }
 
             /// <summary>
@@ -88,7 +88,7 @@ namespace FansubFileNameParser
             /// <value>
             /// The media metadata tags.
             /// </value>
-            public IEnumerable<string> Tags 
+            public IEnumerable<string> Tags
             {
                 get { return Item3; }
             }
@@ -97,21 +97,48 @@ namespace FansubFileNameParser
 
         #region parsers
         /// <summary>
+        /// Parses and captures all of the metadata tags (square or parenthesis) that appear in the string. This
+        /// includes tags that might appear at the beginning, the middle, or the end of the string.
+        /// </summary>
+        public static Parser<IEnumerable<string>> AllTags =
+            from forwardContent in BaseGrammars.LineUntilTagDeliminator.Optional()
+            from frontTags in BaseGrammars.MultipleTagEnclosedText.Optional()
+            from centerContent in BaseGrammars.LineUntilTagDeliminator.Optional()
+            from centerTags in BaseGrammars.MultipleTagEnclosedText.Optional()
+            from endContent in BaseGrammars.LineUntilTagDeliminator.Optional()
+            from endingTags in BaseGrammars.MultipleTagEnclosedText.Optional()
+            select OptionalConcatOrEmpty(frontTags, centerTags, endingTags);
+
+        /// <summary>
         /// Separates the content within the name of a fansub file or directory by separating the input into three 
         /// sections:
         /// [fansub group] [content] [tags]
         /// </summary>
         public static Parser<SeparatedParseResult> SeparateTagsFromMainContent =
-            from fansubGroup in BaseGrammars.SquareBracketEnclosedText.Or(BaseGrammars.ParenthesisEnclosedText).Optional()
+            from fansubGroup in BaseGrammars.TagEnclosedText.Optional()
             from content in Parse.CharExcept(c => c == '[' || c == '(', "Brackets").Many().Text().Optional()
-            from tags in BaseGrammars.TagLexerWithBrackets
+            from tags in BaseGrammars.MultipleTagEnclosedText
             select new SeparatedParseResult(
                 fansubGroup.ConvertFromIOptionToMaybe(),
                 content.ConvertFromIOptionToMaybe(),
-                tags);
+                tags
+            );
         #endregion
-
-        #region extension methods
+        #region private methods
+        private static IEnumerable<string> OptionalConcatOrEmpty(params IOption<IEnumerable<string>>[] optionalStrings)
+        {
+            var runningEnumerable = Enumerable.Empty<string>();
+            foreach (var optionalString in optionalStrings)
+            {
+                if (optionalString.IsDefined)
+                {
+                    runningEnumerable = runningEnumerable.Concat(optionalString.Get());
+                }
+            }
+            return runningEnumerable;
+        }
+        #endregion
+        #region public extension methods
         /// <summary>
         /// Gets the Tags portion that was parsed out of the <see cref="SeparateTagsFromMainContent"/> parser call. This
         /// is mainly used for legacy components that were using the old (deleted) BaseGrammar parser

@@ -50,9 +50,9 @@ namespace FansubFileNameParser
         /// </summary>
         public static readonly Parser<FansubFile> NormalizedFileNameParser =
             from seriesName in Parse.CharExcept('(').AtLeastOnce().Text().Token()
-            from openParenthesis in BaseGrammars.OpenParenthesis
+            from openParenthesis in BaseGrammars.OpenTagDeliminator
             from episodeNumber in Parse.Number
-            from closedParenthesis in BaseGrammars.ClosedParenthesis
+            from closedParenthesis in BaseGrammars.ClosedTagDeliminator
             from extension in FileExtensionParser
             select new FansubFile(string.Empty, seriesName.Trim(), int.Parse(episodeNumber, CultureInfo.InvariantCulture), extension);
         #endregion
@@ -92,16 +92,10 @@ namespace FansubFileNameParser
         /// <returns>A string with the front fansub tag chopped off</returns>
         private static string RemoveFansubTag(string fileName)
         {
-            var squareBracketResult = BaseGrammars.SquareBracketEnclosedTextWithBracket.TryParse(fileName);
-            if (squareBracketResult.WasSuccessful)
+            var bracketResult = BaseGrammars.TagEnclosedTextWithDeliminator.TryParse(fileName);
+            if (bracketResult.WasSuccessful)
             {
-                return fileName.Replace(squareBracketResult.Value, string.Empty);
-            }
-
-            var parenthesisResult = BaseGrammars.ParenthesisEnclosedTextWithParenthesis.TryParse(fileName);
-            if (parenthesisResult.WasSuccessful)
-            {
-                return fileName.Replace(parenthesisResult.Value, string.Empty);
+                return fileName.Replace(bracketResult.Value, string.Empty);
             }
 
             return fileName;
@@ -212,16 +206,10 @@ namespace FansubFileNameParser
         /// <returns>The fansub group name</returns>
         private static string GetFansubGroup(string fileName)
         {
-            var squareBracketResult = BaseGrammars.SquareBracketEnclosedText.TryParse(fileName);
-            if (squareBracketResult.WasSuccessful)
+            var result = BaseGrammars.TagEnclosedText.TryParse(fileName);
+            if (result.WasSuccessful)
             {
-                return squareBracketResult.Value;
-            }
-
-            var parenthesisResult = BaseGrammars.ParenthesisEnclosedText.TryParse(fileName);
-            if (parenthesisResult.WasSuccessful)
-            {
-                return parenthesisResult.Value;
+                return result.Value;
             }
 
             return string.Empty;
