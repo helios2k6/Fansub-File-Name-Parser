@@ -34,13 +34,28 @@ namespace UnitTests.Model.Grammars
     [TestClass]
     public class BaseGrammarsTests
     {
-        private static void ParseWithMapHelper(IDictionary<string, string> inputOutputMap, Parser<string> parser)
+        private static void ParseWithMapHelper<T>(IDictionary<string, T> inputOutputMap, Parser<T> parser)
         {
             foreach (var t in inputOutputMap)
             {
                 var result = parser.TryParse(t.Key);
                 Assert.IsTrue(result.WasSuccessful);
                 Assert.AreEqual(t.Value, result.Value);
+            }
+        }
+
+        private static void ParseWithMapHelper<T>(IDictionary<string, T> inputOutputMap, Parser<IEnumerable<T>> parser)
+        {
+            foreach (var t in inputOutputMap)
+            {
+                var result = parser.TryParse(t.Key);
+                Assert.IsTrue(result.WasSuccessful);
+                var builder = new StringBuilder();
+                foreach (var s in result.Value)
+                {
+                    builder.Append(s);
+                }
+                Assert.AreEqual(t.Value, builder.ToString());
             }
         }
         #region basic parser tests
@@ -55,7 +70,7 @@ namespace UnitTests.Model.Grammars
                 {"--", "--"}
             };
 
-            ParseWithMapHelper(inputOutputMap, BaseGrammars.Dash);
+            ParseWithMapHelper(inputOutputMap, BaseGrammars.DashAtLeastOnce);
         }
         #endregion
 
@@ -89,9 +104,77 @@ namespace UnitTests.Model.Grammars
             Assert.IsTrue(parseResult2.WasSuccessful);
             Assert.AreEqual(inputString, parseResult2.Value);
         }
+
+        [TestMethod]
+        public void OpenTagDeliminatorParser()
+        {
+            var inputOutputMap = new Dictionary<string, char>
+            {
+                // Open parenthesis
+                {"(", '('},
+                {"(A)", '('},
+                {"((", '('},
+                
+                // Open square bracket
+                {"[", '['},
+                {"[A]", '['},
+                {"[[", '['},
+            };
+
+            ParseWithMapHelper(inputOutputMap, BaseGrammars.OpenTagDeliminator);
+        }
+
+        [TestMethod]
+        public void ClosedTagDeliminatorParser()
+        {
+            var inputOutputMap = new Dictionary<string, char>
+            {
+                // Closed parenthesis
+                {")", ')'},
+                {")A)", ')'},
+                {"))", ')'},
+                
+                // Closed square bracket
+                {"]", ']'},
+                {"]A]", ']'},
+                {"]]", ']'},
+            };
+
+            ParseWithMapHelper(inputOutputMap, BaseGrammars.ClosedTagDeliminator);
+        }
+
+        [TestMethod]
+        public void AnyTagDeliminatorParser()
+        {
+            var inputOutputMap = new Dictionary<string, char>
+            {
+                // Open parenthesis
+                {"(", '('},
+                {"(A)", '('},
+                {"((", '('},
+                
+                // Open square bracket
+                {"[", '['},
+                {"[A]", '['},
+                {"[[", '['},
+
+                // Closed parenthesis
+                {")", ')'},
+                {")A)", ')'},
+                {"))", ')'},
+                
+                // Closed square bracket
+                {"]", ']'},
+                {"]A]", ']'},
+                {"]]", ']'},
+            };
+
+            ParseWithMapHelper(inputOutputMap, BaseGrammars.TagDeliminator);
+        }
         #endregion
         #region line parser tests
-        public void LineUntilSquareBracketOrParenthesis()
+        [TestMethod]
+        public void LineUntilTagDeliminator()
         {
             var inputOutputMap = new Dictionary<string, string>
             {
@@ -123,17 +206,7 @@ namespace UnitTests.Model.Grammars
                 {"hello-world", "helloworld"}
             };
 
-            foreach (var t in inputOutputMap)
-            {
-                var result = BaseGrammars.LinesSeparatedByDash.TryParse(t.Key);
-                Assert.IsTrue(result.WasSuccessful);
-                var builder = new StringBuilder();
-                foreach (var s in result.Value)
-                {
-                    builder.Append(s);
-                }
-                Assert.AreEqual(t.Value, builder.ToString());
-            }
+            ParseWithMapHelper(inputOutputMap, BaseGrammars.LinesSeparatedByDash);
         }
         #endregion
         #endregion

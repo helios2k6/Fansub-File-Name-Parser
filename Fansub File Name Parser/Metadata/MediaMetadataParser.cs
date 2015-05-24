@@ -33,7 +33,7 @@ namespace FansubFileNameParser.Metadata
     /// <summary>
     /// Parses media metadata from the file name tags
     /// </summary>
-    public static class MediaMetadataParser
+    internal static class MediaMetadataParser
     {
         #region private fields
         private static readonly Regex CRC32Regex = new Regex(@"([A-F]|\d){8}");

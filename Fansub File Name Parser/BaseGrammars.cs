@@ -50,7 +50,7 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses a single dash ('-') character
         /// </summary>
-        public static readonly Parser<string> Dash = Parse.Char('-').AtLeastOnce().Text();
+        public static readonly Parser<string> DashAtLeastOnce = Parse.Char('-').AtLeastOnce().Text();
         /// <summary>
         /// Parses a single open parenthesis character ('(')
         /// </summary>
@@ -78,13 +78,13 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses a single tag delminator
         /// </summary>
-        private static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
+        public static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
         #endregion
         #region line parsers
         /// <summary>
         /// Parses a line of text until a dash character is hit
         /// </summary>
-        private static readonly Parser<string> LineUntilDash = Parse.AnyChar.Until(Dash).Text();
+        private static readonly Parser<string> LineUntilDash = Parse.AnyChar.Until(DashAtLeastOnce).Text();
         /// <summary>
         /// Parses a line of text until a dash character or a full line if there wasn't a dash character
         /// </summary>
@@ -94,7 +94,7 @@ namespace FansubFileNameParser
         /// </summary>
         public static readonly Parser<string> LineUntilTagDeliminator = Parse.AnyChar.Until(TagDeliminator).Text();
         #endregion
-        #region bracket parsers
+        #region tag parsers
         /// <summary>
         /// Parses a single metadata tag
         /// </summary>

@@ -246,8 +246,7 @@ namespace UnitTests.Models
             KeyValuePair<string, VideoCodec> videoCodecTag,
             KeyValuePair<string, VideoMedia> videoMediaTag,
             KeyValuePair<string, VideoMode> videoModeTag,
-            KeyValuePair<string, Resolution> resolutionTag,
-            string crc32
+            KeyValuePair<string, Resolution> resolutionTag
         )
         {
             var list = new List<string>
@@ -258,30 +257,22 @@ namespace UnitTests.Models
                 videoMediaTag.Key,
                 videoModeTag.Key,
                 resolutionTag.Key,
-                crc32,
+                "01234567",
             };
 
-            var dummyFansubGroupTag = "[Dummy]";
-            var dummyFansubAnimeName = "Dummy Fansub - 01";
-            var dummyFileExtension = ".dummy";
-
+            // This is just the entire permutation of all entries in the set of possible keys: (2 ^ 7) including the empty set
             for (int i = 0; i < 127; i++)
             {
-                var builder = new List<string>();
+                var tagList = new List<string>();
                 var mediaMetadata = new MediaMetadata();
-
-                builder.Add(dummyFansubGroupTag);
-                builder.Add(dummyFansubAnimeName);
 
                 for (int j = 0; j < 7; j++)
                 {
                     var token = list[j];
-
                     int bitAt = (1 << j) & i;
-                    if (bitAt > 0)
+                    if (bitAt > 0) // Remember this bitmask trick from the Algorithms Design Manual?
                     {
-                        builder.Add("[").Append(token).Append("]");
-
+                        tagList.Add("[" + token + "]");
                         switch (j)
                         {
                             case 0:
@@ -306,14 +297,12 @@ namespace UnitTests.Models
                                 mediaMetadata.CRC32 = token.ToMaybe();
                                 break;
                             default:
-                                break;
+                                throw new InvalidOperationException("Invalid MediaMetadata model generation index");
                         }
                     }
                 }
 
-                builder.Append(dummyFileExtension);
-
-                yield return new KeyValuePair<string, MediaMetadata>(builder.ToString(), mediaMetadata);
+                yield return new KeyValuePair<IEnumerable<string>, MediaMetadata>(tagList, mediaMetadata);
             }
         }
 
@@ -331,8 +320,7 @@ namespace UnitTests.Models
 
         private static IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>> InitMediaMetadataTestModel()
         {
-            IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>> kvps = Enumerable.Empty<KeyValuePair<string, MediaMetadata>>();
-
+            var mapList = new List<IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>>>();
             foreach (var audioTag in Tags.AudioTags)
             {
                 foreach (var pixelBitDepthTag in Tags.PixelBitDepthTags)
@@ -343,9 +331,6 @@ namespace UnitTests.Models
                         {
                             foreach (var videoModeTag in Tags.VideoModeTags)
                             {
-                                //Generate crc32
-                                var crc32 = "01234567";
-
                                 //Generate resolution
                                 var res1 = "1920x1080";
                                 var res2 = "1280x720";
@@ -360,17 +345,17 @@ namespace UnitTests.Models
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    new KeyValuePair<string, Resolution>(res1, new Resolution(1920, 1080)),
-                                    crc32);
-
+                                    new KeyValuePair<string, Resolution>(res1, new Resolution(1920, 1080))
+                                );
+                                
                                 var map2 = CreateMapping(
                                     audioTag,
                                     pixelBitDepthTag,
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                     new KeyValuePair<string, Resolution>(res2, new Resolution(1280, 720)),
-                                    crc32);
+                                    new KeyValuePair<string, Resolution>(res2, new Resolution(1280, 720))
+                               );
 
                                 var map3 = CreateMapping(
                                     audioTag,
@@ -378,8 +363,8 @@ namespace UnitTests.Models
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    new KeyValuePair<string, Resolution>(res3, new Resolution(720, 480)),
-                                    crc32);
+                                    new KeyValuePair<string, Resolution>(res3, new Resolution(720, 480))
+                                );
 
                                 var map4 = CreateMapping(
                                     audioTag,
@@ -387,8 +372,8 @@ namespace UnitTests.Models
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    new KeyValuePair<string, Resolution>(res4, new Resolution(1920, 1080)),
-                                    crc32);
+                                    new KeyValuePair<string, Resolution>(res4, new Resolution(1920, 1080))
+                                );
 
                                 var map5 = CreateMapping(
                                     audioTag,
@@ -396,8 +381,8 @@ namespace UnitTests.Models
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    new KeyValuePair<string, Resolution>(res5, new Resolution(1280, 720)),
-                                    crc32);
+                                    new KeyValuePair<string, Resolution>(res5, new Resolution(1280, 720))
+                                );
 
                                 var map6 = CreateMapping(
                                     audioTag,
@@ -405,23 +390,19 @@ namespace UnitTests.Models
                                     videoCodecTag,
                                     videoMediaTag,
                                     videoModeTag,
-                                    new KeyValuePair<string, Resolution>(res6, new Resolution(720, 480)),
-                                    crc32);
+                                    new KeyValuePair<string, Resolution>(res6, new Resolution(720, 480))
+                                );
 
-                                kvps = kvps
-                                    .ConcatWithDynamicCheck(map1)
-                                    .ConcatWithDynamicCheck(map2)
-                                    .ConcatWithDynamicCheck(map3)
-                                    .ConcatWithDynamicCheck(map4)
-                                    .ConcatWithDynamicCheck(map5)
-                                    .ConcatWithDynamicCheck(map6);
+                                mapList.AddRange(new[] { map1, map2, map3, map4, map5, map6 });
                             }
                         }
                     }
                 }
             }
 
-            return kvps;
+            return from map in mapList
+                   from kvp in map
+                   select kvp;
         }
         #endregion
     }

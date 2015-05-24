@@ -48,7 +48,6 @@ namespace ParserTester
         {
             Console.WriteLine(string.Format("Parse result for: {0}", entry));
             ProcessFansubFile(entry);
-            ProcessMediaMetadata(entry);
         }
 
         private static void ProcessFansubFile(string entry)
@@ -61,19 +60,6 @@ namespace ParserTester
             else
             {
                 Console.WriteLine("Could not parse fansub file");
-            }
-        }
-
-        private static void ProcessMediaMetadata(string entry)
-        {
-            MediaMetadata metadata;
-            if (MediaMetadataParser.TryParseMediaMetadata(entry, out metadata))
-            {
-                Console.WriteLine(metadata);
-            }
-            else
-            {
-                Console.WriteLine("Could not parse metadata");
             }
         }
         #endregion

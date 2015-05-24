@@ -22,9 +22,11 @@
  * THE SOFTWARE.
  */
 
+using Functional.Maybe;
 using FansubFileNameParser.Metadata;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
@@ -40,14 +42,13 @@ namespace Tests
         {
             Parallel.ForEach(TestModel.CreateMediaMetadataTestModel(), kvp =>
             {
-                string tags = kvp.Key;
-                MediaMetadata metadata = kvp.Value;
+                var inputTags = kvp.Key;
+                var expectedMetadata = kvp.Value;
+                var experimentalMetadataMaybe = MediaMetadataParser.TryParseMediaMetadata(inputTags);
 
-                MediaMetadata experimental;
-
-                if (MediaMetadataParser.TryParseMediaMetadata(tags, out experimental))
+                if (experimentalMetadataMaybe.HasValue)
                 {
-                    Assert.AreEqual<MediaMetadata>(metadata, experimental);
+                    Assert.AreEqual<MediaMetadata>(expectedMetadata, experimentalMetadataMaybe.Value);
                 }
             });
         }

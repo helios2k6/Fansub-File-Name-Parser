@@ -44,7 +44,7 @@ namespace FansubFileNameParser.Metadata
         private readonly string ResolutionKey = "Resolution";
         private readonly string VideoCodecKey = "Video Codec";
         private readonly string VideoMediaKey = "Video Media";
-        private readonly string VideoModeKey = "Video Meode";
+        private readonly string VideoModeKey = "Video Mode";
         #endregion
 
         #region ctor
