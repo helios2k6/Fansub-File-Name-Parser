@@ -48,10 +48,6 @@ namespace FansubFileNameParser
         /// </summary>
         public static readonly Parser<string> Identifier = Parse.Letter.AtLeastOnce().Text().Token();
         /// <summary>
-        /// Parses a single underscore ('_') character
-        /// </summary>
-        public static readonly Parser<string> Underscore = Parse.Char('_').AtLeastOnce().Text();
-        /// <summary>
         /// Parses a single dash ('-') character
         /// </summary>
         public static readonly Parser<string> Dash = Parse.Char('-').AtLeastOnce().Text();

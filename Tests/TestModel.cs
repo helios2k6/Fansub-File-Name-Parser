@@ -57,8 +57,8 @@ namespace UnitTests.Models
             {"[Lunar] Bleach - 05 v2 [F2C9454F].avi", new FansubFile("Lunar", "Bleach", 5, ".avi")},
         };
 
-        private static readonly Lazy<IEnumerable<KeyValuePair<string, MediaMetadata>>> InputToMediaMetadataMap =
-            new Lazy<IEnumerable<KeyValuePair<string, MediaMetadata>>>(InitMediaMetadataTestModel);
+        private static readonly Lazy<IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>>> InputToMediaMetadataMap =
+            new Lazy<IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>>>(InitMediaMetadataTestModel);
 
         private static readonly IDictionary<string, IFansubEntity> DirectoryInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
@@ -233,14 +233,14 @@ namespace UnitTests.Models
         /// Creates the media metadata test model.
         /// </summary>
         /// <returns>An IEnumerable of key-value pairs of names to media metadata objects</returns>
-        public static IEnumerable<KeyValuePair<string, MediaMetadata>> CreateMediaMetadataTestModel()
+        public static IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>> CreateMediaMetadataTestModel()
         {
             return InputToMediaMetadataMap.Value;
         }
         #endregion
 
         #region private methods
-        private static IEnumerable<KeyValuePair<string, MediaMetadata>> CreateMapping(
+        private static IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>> CreateMapping(
             KeyValuePair<string, AudioCodec> audioTag,
             KeyValuePair<string, PixelBitDepth> pixelBitDepthTag,
             KeyValuePair<string, VideoCodec> videoCodecTag,
@@ -267,10 +267,11 @@ namespace UnitTests.Models
 
             for (int i = 0; i < 127; i++)
             {
-                var builder = new StringBuilder();
+                var builder = new List<string>();
                 var mediaMetadata = new MediaMetadata();
 
-                builder.Append(dummyFansubGroupTag).Append(dummyFansubAnimeName);
+                builder.Add(dummyFansubGroupTag);
+                builder.Add(dummyFansubAnimeName);
 
                 for (int j = 0; j < 7; j++)
                 {
@@ -279,7 +280,7 @@ namespace UnitTests.Models
                     int bitAt = (1 << j) & i;
                     if (bitAt > 0)
                     {
-                        builder.Append("[").Append(token).Append("]");
+                        builder.Add("[").Append(token).Append("]");
 
                         switch (j)
                         {
@@ -328,9 +329,9 @@ namespace UnitTests.Models
             return thisList;
         }
 
-        private static IEnumerable<KeyValuePair<string, MediaMetadata>> InitMediaMetadataTestModel()
+        private static IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>> InitMediaMetadataTestModel()
         {
-            IEnumerable<KeyValuePair<string, MediaMetadata>> kvps = Enumerable.Empty<KeyValuePair<string, MediaMetadata>>();
+            IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>> kvps = Enumerable.Empty<KeyValuePair<string, MediaMetadata>>();
 
             foreach (var audioTag in Tags.AudioTags)
             {

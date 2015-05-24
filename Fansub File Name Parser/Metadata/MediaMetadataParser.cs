@@ -42,40 +42,21 @@ namespace FansubFileNameParser.Metadata
 
         #region public methods
         /// <summary>
-        /// Tries the parse media metadata, but returns a <see cref="Maybe{MediaMetadata}"/> instead of using 
-        /// out params
+        /// Tries the parse media metadata from the set of tags sent in
         /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <returns>A Maybe wrapping the MediaMetadata object</returns>
-        public static Maybe<MediaMetadata> TryParseMediaMetadataWithMaybe(string fileName)
+        /// <param name="tags">The tags.</param>
+        /// <returns></returns>
+        public static Maybe<MediaMetadata> TryParseMediaMetadata(IEnumerable<string> tags)
         {
-            MediaMetadata metadata;
-            if (TryParseMediaMetadata(fileName, out metadata))
-            {
-                return metadata.ToMaybe();
-            }
-
-            return Maybe<MediaMetadata>.Nothing;
+            return TryParseImpl(tags);
         }
+        #endregion
 
-        /// <summary>
-        /// Tries the parse media metadata.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <param name="metadata">The metadata.</param>
-        /// <returns>True if any media metadata could be parsed. False otherwise</returns>
-        public static bool TryParseMediaMetadata(string fileName, out MediaMetadata metadata)
+        #region private methods
+        private static Maybe<MediaMetadata> TryParseImpl(IEnumerable<string> tags)
         {
-            var parseResult = BaseParsers.SeparateTagsFromMainContent.TryParse(fileName);
-            if (parseResult.WasSuccessful == false)
-            {
-                metadata = default(MediaMetadata);
-                return false;
-            }
-
-            metadata = new MediaMetadata();
-
-            var tags = parseResult.GetTags();
+            bool anythingTagged = false;
+            var metadata = new MediaMetadata();
             foreach (var tag in tags)
             {
                 //Match against all of the knowns
@@ -83,50 +64,55 @@ namespace FansubFileNameParser.Metadata
                 if (TryGetAudioCodec(tag, out outAudioCodec))
                 {
                     metadata.AudioCodec = outAudioCodec.ToMaybe();
+                    anythingTagged = true;
                 }
 
                 string outCrc32;
                 if (TryGetCRC32Checksum(tag, out outCrc32))
                 {
                     metadata.CRC32 = outCrc32.ToMaybe();
+                    anythingTagged = true;
                 }
 
                 PixelBitDepth outPixelBitDepth;
                 if (TryGetPixelBitDepth(tag, out outPixelBitDepth))
                 {
                     metadata.PixelBitDepth = outPixelBitDepth.ToMaybe();
+                    anythingTagged = true;
                 }
 
                 Resolution resolution;
                 if (TryGetResolution(tag, out resolution))
                 {
                     metadata.Resolution = resolution.ToMaybe();
+                    anythingTagged = true;
                 }
 
                 VideoCodec outVideoCodec;
                 if (TryGetVideoCodec(tag, out outVideoCodec))
                 {
                     metadata.VideoCodec = outVideoCodec.ToMaybe();
+                    anythingTagged = true;
                 }
 
                 VideoMedia outVideoMedia;
                 if (TryGetVideoMedia(tag, out outVideoMedia))
                 {
                     metadata.VideoMedia = outVideoMedia.ToMaybe();
+                    anythingTagged = true;
                 }
 
                 VideoMode outVideoMode;
                 if (TryGetVideoMode(tag, out outVideoMode))
                 {
                     metadata.VideoMode = outVideoMode.ToMaybe();
+                    anythingTagged = true;
                 }
             }
 
-            return true;
+            return anythingTagged ? metadata.ToMaybe() : Maybe<MediaMetadata>.Nothing;
         }
-        #endregion
 
-        #region private methods
         private static bool TryFilterTag<T>(string tag, IEnumerable<KeyValuePair<string, T>> candidateTags, out T outputResult)
         {
             outputResult = default(T);

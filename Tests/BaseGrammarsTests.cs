@@ -46,19 +46,6 @@ namespace UnitTests.Model.Grammars
         #region basic parser tests
         #region single character parser tests
         [TestMethod]
-        public void UnderscoreParser()
-        {
-            var inputOutputMap = new Dictionary<string, string>
-            {
-                {"_", "_"},
-                {"_A_", "_"},
-                {"__", "__"}
-            };
-
-            ParseWithMapHelper(inputOutputMap, BaseGrammars.Underscore);
-        }
-
-        [TestMethod]
         public void DashParser()
         {
             var inputOutputMap = new Dictionary<string, string>

@@ -39,10 +39,12 @@ namespace FansubFileNameParser.Entity
         private static readonly ISet<string> MediaFileExtensions = new HashSet<string>
         {
             "AVI",
-            "M2TS",
             "MKV",
             "MP4",
+            "M2TS",
+            "OGM",
             "TS",
+            "WEBM",
             "WMV",
         };
         #endregion
@@ -56,7 +58,13 @@ namespace FansubFileNameParser.Entity
         public static Maybe<IFansubEntity> TryParse(string inputString)
         {
             var preprocessedString = PreprocessString(inputString);
-            var mediaMetadata = MediaMetadataParser.TryParseMediaMetadataWithMaybe(preprocessedString);
+            var tagsParseResult = BaseParsers.AllTags.TryParse(preprocessedString);
+
+            if (tagsParseResult.WasSuccessful)
+            {
+                var mediaMetadata = MediaMetadataParser.TryParseMediaMetadata(tagsParseResult.Value);
+
+            }
 
             return Maybe<IFansubEntity>.Nothing;
         }
