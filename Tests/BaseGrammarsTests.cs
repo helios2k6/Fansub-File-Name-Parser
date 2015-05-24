@@ -58,8 +58,7 @@ namespace UnitTests.Model.Grammars
                 Assert.AreEqual(t.Value, builder.ToString());
             }
         }
-        #region basic parser tests
-        #region single character parser tests
+
         [TestMethod]
         public void DashParser()
         {
@@ -72,7 +71,6 @@ namespace UnitTests.Model.Grammars
 
             ParseWithMapHelper(inputOutputMap, BaseGrammars.DashAtLeastOnce);
         }
-        #endregion
 
         [TestMethod]
         public void LineParser()
@@ -171,8 +169,7 @@ namespace UnitTests.Model.Grammars
 
             ParseWithMapHelper(inputOutputMap, BaseGrammars.TagDeliminator);
         }
-        #endregion
-        #region line parser tests
+
         [TestMethod]
         public void LineUntilTagDeliminator()
         {
@@ -190,9 +187,7 @@ namespace UnitTests.Model.Grammars
 
             ParseWithMapHelper(inputOutputMap, BaseGrammars.LineUntilTagDeliminator);
         }
-        #endregion
-        #region lexer tests
-        #region lexer by line tests
+
         [TestMethod]
         public void LinesSeparatedByDash()
         {
@@ -208,7 +203,5 @@ namespace UnitTests.Model.Grammars
 
             ParseWithMapHelper(inputOutputMap, BaseGrammars.LinesSeparatedByDash);
         }
-        #endregion
-        #endregion
     }
 }
