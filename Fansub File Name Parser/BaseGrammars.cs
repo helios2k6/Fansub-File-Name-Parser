@@ -92,7 +92,7 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses a line of text until a tag delmiinator is encountered
         /// </summary>
-        public static readonly Parser<string> LineUntilTagDeliminator = Parse.AnyChar.Until(TagDeliminator).Text();
+        public static readonly Parser<string> LineUntilTagDeliminator = Parse.AnyChar.Except(TagDeliminator).Many().Text();
         #endregion
         #region tag parsers
         /// <summary>
@@ -101,7 +101,7 @@ namespace FansubFileNameParser
         public static readonly Parser<string> TagEnclosedText =
             (from openTag in OpenTagDeliminator
              from content in LineUntilTagDeliminator
-             from closedBracket in ClosedTagDeliminator
+             from closedTag in ClosedTagDeliminator
              select content).Token();
 
         /// <summary>

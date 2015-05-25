@@ -28,6 +28,7 @@ using FansubFileNameParser;
 using Sprache;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace UnitTests.Model.Grammars
 {
@@ -56,6 +57,16 @@ namespace UnitTests.Model.Grammars
                     builder.Append(s);
                 }
                 Assert.AreEqual(t.Value, builder.ToString());
+            }
+        }
+
+        private static void ParseWithMapHelperEnumerableInput<T>(IDictionary<string, IEnumerable<T>> inputOutputMap, Parser<IEnumerable<T>> parser)
+        {
+            foreach (var kvp in inputOutputMap)
+            {
+                var result = parser.TryParse(kvp.Key);
+                Assert.IsTrue(result.WasSuccessful);
+                Assert.IsTrue(Enumerable.SequenceEqual<T>(kvp.Value, result.Value));
             }
         }
 
@@ -168,6 +179,48 @@ namespace UnitTests.Model.Grammars
             };
 
             ParseWithMapHelper(inputOutputMap, BaseGrammars.TagDeliminator);
+        }
+
+        [TestMethod]
+        public void TagEnclosedText()
+        {
+            var inputMap = new Dictionary<string, string>
+            {
+                {"[test]", "test"},
+                {"(test)", "test"},
+                {"[test multiword]", "test multiword"},
+                {"(test multiword)", "test multiword"},
+            };
+
+            ParseWithMapHelper(inputMap, BaseGrammars.TagEnclosedText);
+        }
+
+        [TestMethod]
+        public void TagEnclosedTextWithDeliminator()
+        {
+            var inputMap = new Dictionary<string, string>
+            {
+                {"[test]", "[test]"},
+                {"(test)", "(test)"},
+                {"[test multiword]", "[test multiword]"},
+                {"(test multiword)", "(test multiword)"},
+            };
+
+            ParseWithMapHelper(inputMap, BaseGrammars.TagEnclosedTextWithDeliminator);
+        }
+
+        [TestMethod]
+        public void MultipleTagEnclsoedText()
+        {
+            var inputMap = new Dictionary<string, IEnumerable<string>>
+            {
+                {"[test][multiple][tags]", new[] {"test", "multiple", "tags"}},
+                {"[test multiple][tags]", new[] {"test multiple", "tags"}},
+                {"(test)(multiple)(tags)", new[] {"test", "multiple", "tags"}},
+                {"(test multiple)(tags)", new[] {"test multiple", "tags"}},
+            };
+
+            ParseWithMapHelperEnumerableInput<string>(inputMap, BaseGrammars.MultipleTagEnclosedText);
         }
 
         [TestMethod]
