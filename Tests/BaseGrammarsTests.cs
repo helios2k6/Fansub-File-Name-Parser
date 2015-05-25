@@ -22,54 +22,19 @@
  * THE SOFTWARE.
  */
 
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FansubFileNameParser;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sprache;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using System.Text;
+using UnitTests;
 
 namespace UnitTests.Model.Grammars
 {
     [TestClass]
     public class BaseGrammarsTests
     {
-        private static void ParseWithMapHelper<T>(IDictionary<string, T> inputOutputMap, Parser<T> parser)
-        {
-            foreach (var t in inputOutputMap)
-            {
-                var result = parser.TryParse(t.Key);
-                Assert.IsTrue(result.WasSuccessful);
-                Assert.AreEqual(t.Value, result.Value);
-            }
-        }
-
-        private static void ParseWithMapHelper<T>(IDictionary<string, T> inputOutputMap, Parser<IEnumerable<T>> parser)
-        {
-            foreach (var t in inputOutputMap)
-            {
-                var result = parser.TryParse(t.Key);
-                Assert.IsTrue(result.WasSuccessful);
-                var builder = new StringBuilder();
-                foreach (var s in result.Value)
-                {
-                    builder.Append(s);
-                }
-                Assert.AreEqual(t.Value, builder.ToString());
-            }
-        }
-
-        private static void ParseWithMapHelperEnumerableInput<T>(IDictionary<string, IEnumerable<T>> inputOutputMap, Parser<IEnumerable<T>> parser)
-        {
-            foreach (var kvp in inputOutputMap)
-            {
-                var result = parser.TryParse(kvp.Key);
-                Assert.IsTrue(result.WasSuccessful);
-                Assert.IsTrue(Enumerable.SequenceEqual<T>(kvp.Value, result.Value));
-            }
-        }
-
         [TestMethod]
         public void DashParser()
         {
@@ -80,7 +45,7 @@ namespace UnitTests.Model.Grammars
                 {"--", "--"}
             };
 
-            ParseWithMapHelper(inputOutputMap, BaseGrammars.DashAtLeastOnce);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.DashAtLeastOnce);
         }
 
         [TestMethod]
@@ -95,7 +60,7 @@ namespace UnitTests.Model.Grammars
                 {" hello world ", " hello world "}
             };
 
-            ParseWithMapHelper(inputOutputMap, BaseGrammars.Line);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.Line);
         }
 
         [TestMethod]
@@ -130,7 +95,7 @@ namespace UnitTests.Model.Grammars
                 {"[[", '['},
             };
 
-            ParseWithMapHelper(inputOutputMap, BaseGrammars.OpenTagDeliminator);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.OpenTagDeliminator);
         }
 
         [TestMethod]
@@ -149,7 +114,7 @@ namespace UnitTests.Model.Grammars
                 {"]]", ']'},
             };
 
-            ParseWithMapHelper(inputOutputMap, BaseGrammars.ClosedTagDeliminator);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.ClosedTagDeliminator);
         }
 
         [TestMethod]
@@ -178,7 +143,7 @@ namespace UnitTests.Model.Grammars
                 {"]]", ']'},
             };
 
-            ParseWithMapHelper(inputOutputMap, BaseGrammars.TagDeliminator);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.TagDeliminator);
         }
 
         [TestMethod]
@@ -192,7 +157,7 @@ namespace UnitTests.Model.Grammars
                 {"(test multiword)", "test multiword"},
             };
 
-            ParseWithMapHelper(inputMap, BaseGrammars.TagEnclosedText);
+            TestUtils.TestParser(inputMap, BaseGrammars.TagEnclosedText);
         }
 
         [TestMethod]
@@ -206,7 +171,7 @@ namespace UnitTests.Model.Grammars
                 {"(test multiword)", "(test multiword)"},
             };
 
-            ParseWithMapHelper(inputMap, BaseGrammars.TagEnclosedTextWithDeliminator);
+            TestUtils.TestParser(inputMap, BaseGrammars.TagEnclosedTextWithDeliminator);
         }
 
         [TestMethod]
@@ -220,7 +185,7 @@ namespace UnitTests.Model.Grammars
                 {"(test multiple)(tags)", new[] {"test multiple", "tags"}},
             };
 
-            ParseWithMapHelperEnumerableInput<string>(inputMap, BaseGrammars.MultipleTagEnclosedText);
+            TestUtils.TestMultiTokenParse(inputMap, BaseGrammars.MultipleTagEnclosedText);
         }
 
         [TestMethod]
@@ -238,23 +203,23 @@ namespace UnitTests.Model.Grammars
                 {"hello world[", "hello world"}
             };
 
-            ParseWithMapHelper(inputOutputMap, BaseGrammars.LineUntilTagDeliminator);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUntilTagDeliminator);
         }
 
         [TestMethod]
         public void LinesSeparatedByDash()
         {
-            var inputOutputMap = new Dictionary<string, string>
+            var inputOutputMap = new Dictionary<string, IEnumerable<string>>
             {
-                {"-hello world", "hello world"},
-                {" hello - world", " hello  world"},
-                {"hello world", "hello world"},
-                {"hello world-", "hello world"},
-                {"-hello-world", "helloworld"},
-                {"hello-world", "helloworld"}
+                {"-hello world", new[] {"", "hello world"}},
+                {" hello - world", new[] {" hello ", " world"}},
+                {"hello world", new[] {"hello world"}},
+                {"hello world-", new[] {"hello world"}},
+                {"-hello-world", new[] {"", "hello", "world"}},
+                {"hello-world", new[] {"hello", "world"}}
             };
 
-            ParseWithMapHelper(inputOutputMap, BaseGrammars.LinesSeparatedByDash);
+            TestUtils.TestMultiTokenParse(inputOutputMap, BaseGrammars.LinesSeparatedByDash);
         }
     }
 }
