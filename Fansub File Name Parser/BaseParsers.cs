@@ -39,7 +39,7 @@ namespace FansubFileNameParser
         /// <summary>
         /// A formalized three-tuple that represents the parse results of the <see cref="BaseParsers.SeparateTagsFromMainContent"/> parser
         /// </summary>
-        internal sealed class SeparatedParseResult : Tuple<Maybe<string>, Maybe<string>, IEnumerable<string>>
+        internal sealed class SeparatedParseResult : Tuple<Maybe<string>, Maybe<string>, IEnumerable<string>>, IEquatable<SeparatedParseResult>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="SeparatedParseResult"/> class.
@@ -92,6 +92,70 @@ namespace FansubFileNameParser
             {
                 get { return Item3; }
             }
+
+            /// <summary>
+            /// Returns a <see cref="System.String" /> that represents this instance.
+            /// </summary>
+            /// <returns>
+            /// A <see cref="System.String" /> that represents this instance.
+            /// </returns>
+            public override string ToString()
+            {
+                return string.Format("{0} {1} {2}", Group, Content, Tags);
+            }
+
+            /// <summary>
+            /// Indicates whether the current object is equal to another object of the same type.
+            /// </summary>
+            /// <param name="other">An object to compare with this object.</param>
+            /// <returns>
+            /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+            /// </returns>
+            public bool Equals(SeparatedParseResult other)
+            {
+                if (EqualsPreamble(other) == false)
+                {
+                    return false;
+                }
+
+                return Group.Equals(other.Group)
+                    && Content.Equals(other.Content)
+                    && Enumerable.SequenceEqual(Tags, other.Tags);
+            }
+
+            /// <summary>
+            /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+            /// </summary>
+            /// <param name="other">The <see cref="System.Object" /> to compare with this instance.</param>
+            /// <returns>
+            ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+            /// </returns>
+            public override bool Equals(object other)
+            {
+                return Equals(other as SeparatedParseResult);
+            }
+
+            /// <summary>
+            /// Returns a hash code for this instance.
+            /// </summary>
+            /// <returns>
+            /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+            /// </returns>
+            public override int GetHashCode()
+            {
+                return Group.GetHashCode()
+                    ^ Content.GetHashCode()
+                    ^ Tags.Sum(t => t.GetHashCode());
+            }
+
+            private bool EqualsPreamble(object other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                if (GetType() != other.GetType()) return false;
+
+                return true;
+            }
         }
         #endregion
 
@@ -116,7 +180,7 @@ namespace FansubFileNameParser
         /// </summary>
         public static Parser<SeparatedParseResult> SeparateTagsFromMainContent =
             from fansubGroup in BaseGrammars.TagEnclosedText.Optional()
-            from content in Parse.CharExcept(c => c == '[' || c == '(', "Brackets").Many().Text().Optional()
+            from content in BaseGrammars.LineUntilTagDeliminator.Optional()
             from tags in BaseGrammars.MultipleTagEnclosedText
             select new SeparatedParseResult(
                 fansubGroup.ConvertFromIOptionToMaybe(),
