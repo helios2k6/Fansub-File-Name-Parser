@@ -25,6 +25,8 @@
 using FansubFileNameParser;
 using Functional.Maybe;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sprache;
+using System;
 using System.Collections.Generic;
 
 namespace UnitTests.Model.Parsers
@@ -57,7 +59,7 @@ namespace UnitTests.Model.Parsers
                     "Kokoro Connect (2012) [Doki-Chihiro][1920x1080 Hi10P BD FLAC]", 
                     new BaseParsers.SeparatedParseResult(
                         Maybe<string>.Nothing, 
-                        "Kokoro Connect ".ToMaybe(), 
+                        "Kokoro Connect".ToMaybe(), 
                         new[] {"2012", "Doki-Chihiro", "1920x1080 Hi10P BD FLAC"}
                     )
                 },
@@ -65,7 +67,7 @@ namespace UnitTests.Model.Parsers
                     "[Doki] Akame ga Kill! - Vol 1 (1920x1080 Hi10P BD FLAC)", 
                     new BaseParsers.SeparatedParseResult(
                         "Doki".ToMaybe(), 
-                        " Akame ga Kill! - Vol 1 ".ToMaybe(), 
+                        "Akame ga Kill! - Vol 1".ToMaybe(), 
                         new[] {"1920x1080 Hi10P BD FLAC"}
                     )
                 },
@@ -73,7 +75,7 @@ namespace UnitTests.Model.Parsers
                     "[Doki] GJ-bu - 01v2 (1920x1080 Hi10P BD FLAC) [AB38621D].mkv", 
                     new BaseParsers.SeparatedParseResult(
                         "Doki".ToMaybe(), 
-                        " GJ-bu - 01v2 ".ToMaybe(), 
+                        "GJ-bu - 01v2".ToMaybe(), 
                         new[] {"1920x1080 Hi10P BD FLAC", "AB38621D"}
                     )
                 },

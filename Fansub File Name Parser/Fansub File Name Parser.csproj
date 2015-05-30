@@ -37,7 +37,7 @@
     <Reference Include="Functional.Maybe">
       <HintPath>..\packages\Functional.Maybe.1.0.3\lib\Functional.Maybe.dll</HintPath>
     </Reference>
-    <Reference Include="Sprache, Version=2.0.0.45, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Sprache, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\thirdparty\Sprache.dll</HintPath>
     </Reference>

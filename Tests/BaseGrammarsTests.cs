@@ -54,10 +54,10 @@ namespace UnitTests.Model.Grammars
             var inputOutputMap = new Dictionary<string, string>
             {
                 {"hello", "hello"},
-                {" hello ", " hello "},
+                {" hello ", "hello"},
                 {"hello world", "hello world"},
-                {"hello world ", "hello world "},
-                {" hello world ", " hello world "}
+                {"hello world ", "hello world"},
+                {" hello world ", "hello world"}
             };
 
             TestUtils.TestParser(inputOutputMap, BaseGrammars.Line);
@@ -155,6 +155,7 @@ namespace UnitTests.Model.Grammars
                 {"(test)", "test"},
                 {"[test multiword]", "test multiword"},
                 {"(test multiword)", "test multiword"},
+
             };
 
             TestUtils.TestParser(inputMap, BaseGrammars.TagEnclosedText);
@@ -183,6 +184,10 @@ namespace UnitTests.Model.Grammars
                 {"[test multiple][tags]", new[] {"test multiple", "tags"}},
                 {"(test)(multiple)(tags)", new[] {"test", "multiple", "tags"}},
                 {"(test multiple)(tags)", new[] {"test multiple", "tags"}},
+                {"[test] [multiple] [tags] ", new[] {"test", "multiple", "tags"}},
+                {" [test multiple] [tags] ", new[] {"test multiple", "tags"}},
+                {" (test) (multiple) (tags) ", new[] {"test", "multiple", "tags"}},
+                {" (test multiple) (tags) ", new[] {"test multiple", "tags"}},
             };
 
             TestUtils.TestMultiTokenParse(inputMap, BaseGrammars.MultipleTagEnclosedText);
@@ -212,7 +217,7 @@ namespace UnitTests.Model.Grammars
             var inputOutputMap = new Dictionary<string, IEnumerable<string>>
             {
                 {"-hello world", new[] {"", "hello world"}},
-                {" hello - world", new[] {" hello ", " world"}},
+                {" hello - world", new[] {"hello", "world"}},
                 {"hello world", new[] {"hello world"}},
                 {"hello world-", new[] {"hello world"}},
                 {"-hello-world", new[] {"", "hello", "world"}},

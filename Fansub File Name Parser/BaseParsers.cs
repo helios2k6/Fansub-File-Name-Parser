@@ -179,9 +179,9 @@ namespace FansubFileNameParser
         /// [fansub group] [content] [tags]
         /// </summary>
         public static Parser<SeparatedParseResult> SeparateTagsFromMainContent =
-            from fansubGroup in BaseGrammars.TagEnclosedText.Optional()
-            from content in BaseGrammars.LineUntilTagDeliminator.Optional()
-            from tags in BaseGrammars.MultipleTagEnclosedText
+            from fansubGroup in BaseGrammars.TagEnclosedText.Token().Optional()
+            from content in BaseGrammars.LineUntilTagDeliminator.Token().Optional()
+            from tags in BaseGrammars.MultipleTagEnclosedText.Token()
             select new SeparatedParseResult(
                 fansubGroup.ConvertFromIOptionToMaybe(),
                 content.ConvertFromIOptionToMaybe(),

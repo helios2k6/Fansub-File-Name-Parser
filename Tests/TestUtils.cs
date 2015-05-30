@@ -48,7 +48,7 @@ namespace UnitTests
             {
                 var result = parser.TryParse(inputToExpectedOutput.Key);
                 Assert.IsTrue(result.WasSuccessful);
-                Assert.AreEqual(inputToExpectedOutput.Value, result.Value);
+                Assert.AreEqual<T>(inputToExpectedOutput.Value, result.Value);
             }
         }
 

@@ -38,95 +38,103 @@ namespace FansubFileNameParser
     /// </summary>
     internal static class BaseGrammars
     {
-        #region basic parsers
-        /// <summary>
-        /// Parses an entire line of text, including special characters
-        /// </summary>
-        public static readonly Parser<string> Line = Parse.AnyChar.AtLeastOnce().Text();
         /// <summary>
         /// Parses a whole word, which is a contiguous set of letters with at least 1 letter in it
         /// </summary>
-        public static readonly Parser<string> Identifier = Parse.Letter.AtLeastOnce().Text().Token();
+        public static readonly Parser<string> Identifier = Parse.Letter.AtLeastOnce().Text();
+
         /// <summary>
         /// Parses a single dash ('-') character
         /// </summary>
         public static readonly Parser<string> DashAtLeastOnce = Parse.Char('-').AtLeastOnce().Text();
+
         /// <summary>
         /// Parses a single open parenthesis character ('(')
         /// </summary>
         private static readonly Parser<char> OpenParenthesis = Parse.Char('(');
+
         /// <summary>
         /// Parses a single closed parenthesis character (')')
         /// </summary>
         private static readonly Parser<char> ClosedParenthesis = Parse.Char(')');
+
         /// <summary>
         /// Parses a single a open square bracket ('[')
         /// </summary>
         private static readonly Parser<char> OpenSquareBracket = Parse.Char('[');
+
         /// <summary>
         /// Parses a single closed square bracket (']')
         /// </summary>
         private static readonly Parser<char> ClosedSquareBracket = Parse.Char(']');
+
         /// <summary>
         /// Parses any open metadata tag deliminator, such as the open parenthesis or open square bracket
         /// </summary>
         public static readonly Parser<char> OpenTagDeliminator = OpenParenthesis.Or(OpenSquareBracket);
+
         /// <summary>
         /// Parses any closed metadata tag deliminator, such as the closed parenthesis or closed square bracket
         /// </summary>
         public static readonly Parser<char> ClosedTagDeliminator = ClosedParenthesis.Or(ClosedSquareBracket);
+
         /// <summary>
         /// Parses a single tag delminator
         /// </summary>
         public static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
-        #endregion
-        #region line parsers
+
+        /// <summary>
+        /// Parses an entire line of text, including special characters
+        /// </summary>
+        public static readonly Parser<string> Line =
+            from line in Parse.AnyChar.AtLeastOnce().Text()
+            select line.Trim();
+
         /// <summary>
         /// Parses a line of text until a dash character is hit
         /// </summary>
-        private static readonly Parser<string> LineUntilDash = Parse.AnyChar.Until(DashAtLeastOnce).Text();
+        private static readonly Parser<string> LineUntilDash =
+            from line in Parse.AnyChar.Until(DashAtLeastOnce).Text()
+            select line.Trim();
+
         /// <summary>
         /// Parses a line of text until a dash character or a full line if there wasn't a dash character
         /// </summary>
         private static readonly Parser<string> LineUntilDashOrFullLine = LineUntilDash.Or(Line);
+
         /// <summary>
         /// Parses a line of text until a tag delmiinator is encountered
         /// </summary>
-        public static readonly Parser<string> LineUntilTagDeliminator = Parse.AnyChar.Except(TagDeliminator).Many().Text();
-        #endregion
-        #region tag parsers
+        public static readonly Parser<string> LineUntilTagDeliminator =
+            from line in Parse.AnyChar.Except(TagDeliminator).Many().Text()
+            select line.Trim();
+
         /// <summary>
         /// Parses a single metadata tag
         /// </summary>
         public static readonly Parser<string> TagEnclosedText =
-            (from openTag in OpenTagDeliminator
-             from content in LineUntilTagDeliminator
-             from closedTag in ClosedTagDeliminator
-             select content).Token();
+            from openTag in OpenTagDeliminator
+            from content in LineUntilTagDeliminator
+            from closedTag in ClosedTagDeliminator
+            select content;
 
         /// <summary>
         /// Parses a single metadata tag, but includes the metadata tag deliminator
         /// </summary>
         public static readonly Parser<string> TagEnclosedTextWithDeliminator =
-            (from openTag in OpenTagDeliminator
-             from content in LineUntilTagDeliminator
-             from closedBracket in ClosedTagDeliminator
-             select string.Concat(openTag, content, closedBracket)).Token();
+            from openTag in OpenTagDeliminator
+            from content in LineUntilTagDeliminator
+            from closedBracket in ClosedTagDeliminator
+            select string.Concat(openTag, content, closedBracket);
 
-        #endregion
-        #region lexers
-        #region lexers by line
         /// <summary>
         /// Parses a stream of lines separated by a dash
         /// </summary>
         public static readonly Parser<IEnumerable<string>> LinesSeparatedByDash = LineUntilDashOrFullLine.Many();
-        #endregion
-        #region lexers by tag
+
         /// <summary>
         /// Parses multiple metadata tags
         /// </summary>
-        public static readonly Parser<IEnumerable<string>> MultipleTagEnclosedText = TagEnclosedText.Many();
-        #endregion
-        #endregion
+        public static readonly Parser<IEnumerable<string>> MultipleTagEnclosedText = TagEnclosedText.Token().Many();
     }
 }
