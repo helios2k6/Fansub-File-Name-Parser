@@ -24,6 +24,9 @@
 
 using Functional.Maybe;
 using Sprache;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace FansubFileNameParser
 {
@@ -46,6 +49,31 @@ namespace FansubFileNameParser
             }
 
             return Maybe<T>.Nothing;
+        }
+
+        /// <summary>
+        /// Concatenates IOption{string} results
+        /// </summary>
+        /// <param name="this">The starting IOption{string}.</param>
+        /// <param name="optionalStrings">The other IOption{string} objects</param>
+        /// <returns>A string of all of the concatenated strings, or an empty string</returns>
+        public static string Concat(this IOption<string> @this, params IOption<string>[] optionalStrings)
+        {
+            var builder = new StringBuilder();
+            if (@this.IsDefined)
+            {
+                builder.Append(@this.Get());
+            }
+
+            foreach (var s in optionalStrings)
+            {
+                if (s.IsDefined)
+                {
+                    builder.Append(" ").Append(s.Get());
+                }
+            }
+
+            return builder.ToString();
         }
     }
 }

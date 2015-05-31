@@ -27,6 +27,8 @@ using Functional.Maybe;
 using Sprache;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace FansubFileNameParser.Entity
 {
@@ -48,7 +50,6 @@ namespace FansubFileNameParser.Entity
             "WMV",
         };
         #endregion
-
         #region public methods
         /// <summary>
         /// Tries the parse.
@@ -58,14 +59,6 @@ namespace FansubFileNameParser.Entity
         public static Maybe<IFansubEntity> TryParse(string inputString)
         {
             var preprocessedString = PreprocessString(inputString);
-            var tagsParseResult = BaseParsers.AllTags.TryParse(preprocessedString);
-
-            if (tagsParseResult.WasSuccessful)
-            {
-                var mediaMetadata = MediaMetadataParser.TryParseMediaMetadata(tagsParseResult.Value);
-
-            }
-
             return Maybe<IFansubEntity>.Nothing;
         }
         #endregion
@@ -116,12 +109,27 @@ namespace FansubFileNameParser.Entity
                  * The characters after the last dot do not correspond to a file extension. 
                  * Remove all of the dots
                  */
-
                 return inputString.Replace('.', ' ');
             }
-
         }
         #endregion
+        private static bool IsDirectory(string preprocessedString)
+        {
+            return Path.GetExtension(preprocessedString).Equals(
+                string.Empty, 
+                StringComparison.InvariantCultureIgnoreCase
+            );
+        }
+
+        private static bool IsMediaFile(string preprocessedString)
+        {
+            return MediaFileExtensions.Contains(Path.GetExtension(preprocessedString));
+        }
+
+        private static Maybe<EntityParsers.OPEDParseResult> TryParseOPED(string preprocessedString)
+        {
+            return Maybe<EntityParsers.OPEDParseResult>.Nothing;
+        }
         #endregion
     }
 }
