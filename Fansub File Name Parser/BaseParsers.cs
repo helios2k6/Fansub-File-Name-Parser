@@ -158,18 +158,17 @@ namespace FansubFileNameParser
             }
         }
         #endregion
-
         #region parsers
         /// <summary>
         /// Parses and captures all of the metadata tags (square or parenthesis) that appear in the string. This
         /// includes tags that might appear at the beginning, the middle, or the end of the string.
         /// </summary>
         public static Parser<IEnumerable<string>> AllTags =
-            from forwardContent in BaseGrammars.LineUntilTagDeliminator.Optional()
+            from forwardContent in BaseGrammars.LineExceptTagDeliminator.Optional()
             from frontTags in BaseGrammars.MultipleTagEnclosedText.Optional()
-            from centerContent in BaseGrammars.LineUntilTagDeliminator.Optional()
+            from centerContent in BaseGrammars.LineExceptTagDeliminator.Optional()
             from centerTags in BaseGrammars.MultipleTagEnclosedText.Optional()
-            from endContent in BaseGrammars.LineUntilTagDeliminator.Optional()
+            from endContent in BaseGrammars.LineExceptTagDeliminator.Optional()
             from endingTags in BaseGrammars.MultipleTagEnclosedText.Optional()
             select OptionalConcatOrEmpty(frontTags, centerTags, endingTags);
 
@@ -180,7 +179,7 @@ namespace FansubFileNameParser
         /// </summary>
         public static Parser<SeparatedParseResult> SeparateTagsFromMainContent =
             from fansubGroup in BaseGrammars.TagEnclosedText.Token().Optional()
-            from content in BaseGrammars.LineUntilTagDeliminator.Token().Optional()
+            from content in BaseGrammars.LineExceptTagDeliminator.Token().Optional()
             from tags in BaseGrammars.MultipleTagEnclosedText.Token()
             select new SeparatedParseResult(
                 fansubGroup.ConvertFromIOptionToMaybe(),

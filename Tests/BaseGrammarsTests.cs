@@ -208,7 +208,7 @@ namespace UnitTests.Model.Grammars
                 {"hello world[", "hello world"}
             };
 
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUntilTagDeliminator);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineExceptTagDeliminator);
         }
 
         [TestMethod]

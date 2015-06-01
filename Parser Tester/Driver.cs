@@ -22,10 +22,6 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser;
-using FansubFileNameParser.Metadata;
-using System;
-using System.Linq;
 
 namespace ParserTester
 {
@@ -34,33 +30,6 @@ namespace ParserTester
         #region public methods
         public static void Main(string[] args)
         {
-            Console.WriteLine("Parser Tester v1.0");
-            
-            foreach(var arg in args)
-            {
-                ProcessEntry(arg);
-            }
-        }
-        #endregion
-
-        #region private methods
-        private static void ProcessEntry(string entry)
-        {
-            Console.WriteLine(string.Format("Parse result for: {0}", entry));
-            ProcessFansubFile(entry);
-        }
-
-        private static void ProcessFansubFile(string entry)
-        {
-            FansubFile file;
-            if (FansubFileParsers.TryParseFansubFile(entry, out file))
-            {
-                Console.WriteLine(file.ToString());
-            } 
-            else
-            {
-                Console.WriteLine("Could not parse fansub file");
-            }
         }
         #endregion
     }

@@ -24,6 +24,7 @@
 
 using Functional.Maybe;
 using Sprache;
+using System;
 using System.Linq;
 
 namespace FansubFileNameParser.Entity
@@ -37,7 +38,7 @@ namespace FansubFileNameParser.Entity
         /// <summary>
         /// The result of an OP/ED Parser
         /// </summary>
-        public sealed class OPEDParseResult
+        public sealed class OPEDParseResult : IEquatable<OPEDParseResult>
         {
             /// <summary>
             /// Gets or sets the creditless prefix.
@@ -60,6 +61,71 @@ namespace FansubFileNameParser.Entity
             /// The sequence number.
             /// </value>
             public Maybe<int> SequenceNumber { get; set; }
+
+            /// <summary>
+            /// Returns a <see cref="System.String" /> that represents this instance.
+            /// </summary>
+            /// <returns>
+            /// A <see cref="System.String" /> that represents this instance.
+            /// </returns>
+            public override string ToString()
+            {
+                return string.Format("[{0}] [{1}] [{2}]", CreditlessPrefix, OPEDToken, SequenceNumber);
+            }
+
+            /// <summary>
+            /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+            /// </summary>
+            /// <param name="other">The <see cref="System.Object" /> to compare with this instance.</param>
+            /// <returns>
+            ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+            /// </returns>
+            public override bool Equals(object other)
+            {
+                return Equals(other as OPEDParseResult);
+            }
+
+            /// <summary>
+            /// Indicates whether the current object is equal to another object of the same type.
+            /// </summary>
+            /// <param name="other">An object to compare with this object.</param>
+            /// <returns>
+            /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
+            /// </returns>
+            public bool Equals(OPEDParseResult other)
+            {
+                if (EqualsPreamble(other) == false)
+                {
+                    return false;
+                }
+
+                return CreditlessPrefix.Equals(other.CreditlessPrefix)
+                    && OPEDToken.Equals(other.OPEDToken)
+                    && SequenceNumber.Equals(other.SequenceNumber);
+            }
+
+            /// <summary>
+            /// Returns a hash code for this instance.
+            /// </summary>
+            /// <returns>
+            /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+            /// </returns>
+            public override int GetHashCode()
+            {
+                return CreditlessPrefix.GetHashCode()
+                    ^ OPEDToken.GetHashCode()
+                    ^ SequenceNumber.GetHashCode();
+            }
+
+            private bool EqualsPreamble(object other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                if (GetType() != other.GetType()) return false;
+
+                return true;
+            }
+
         }
         #endregion
         #region OP / ED Parsers
@@ -86,13 +152,14 @@ namespace FansubFileNameParser.Entity
 
         private static readonly Parser<string> NonDashCredit = Parse.IgnoreCase("NON-CREDIT").Text();
 
-        private static readonly Parser<string> NonCreditPrefix = Creditless.Or(NonCredit).Or(NonDashCredit);
+        private static readonly Parser<string> CreditlessToken = Creditless.Or(NonCredit).Or(NonDashCredit);
         #endregion
         #region Composite Parsers
         private static readonly Parser<OPEDParseResult> AnyOpeningToken =
-            from creditPrefix in NonCreditPrefix.Optional()
+            from creditPrefix in CreditlessToken.Optional()
+            from spaceBetweenPrefixAndOP in Parse.WhiteSpace.Many().Optional()
             from openingToken in OpeningToken
-            from possibleSpace in Parse.WhiteSpace.Many().Optional()
+            from spaceBetweenOPAndNumber in Parse.WhiteSpace.Many().Optional()
             from sequenceNumber in ExtraParsers.Int.Optional()
             select new OPEDParseResult
             {
@@ -102,9 +169,10 @@ namespace FansubFileNameParser.Entity
             };
 
         private static readonly Parser<OPEDParseResult> AnyEndingToken =
-            from creditPrefix in NonCreditPrefix.Optional()
+            from creditPrefix in CreditlessToken.Optional()
+            from spaceBetweenPrefixAndED in Parse.WhiteSpace.Many().Optional()
             from endingToken in EndingToken
-            from possibleSpace in Parse.WhiteSpace.Many().Optional()
+            from spaceBetweenEDAndNumber in Parse.WhiteSpace.Many().Optional()
             from sequenceNumber in ExtraParsers.Int.Optional()
             select new OPEDParseResult
             {
@@ -117,7 +185,7 @@ namespace FansubFileNameParser.Entity
         /// Parses the OP embedded in any amount of text
         /// </summary>
         public static readonly Parser<OPEDParseResult> ParseOpeningFromLine =
-            from contentBefore in Parse.AnyChar.Many().Except(AnyOpeningToken).Optional()
+            from contentBefore in Parse.AnyChar.Except(AnyOpeningToken).Many().Optional()
             from openingToken in AnyOpeningToken
             select openingToken;
 

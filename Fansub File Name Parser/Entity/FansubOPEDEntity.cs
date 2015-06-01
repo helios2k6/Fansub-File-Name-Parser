@@ -40,8 +40,8 @@ namespace FansubFileNameParser.Entity
         /// <summary>
         /// Designates this as either the OP or the ED
         /// </summary>
-        public enum Segment 
-        { 
+        public enum Segment
+        {
             /// <summary>
             /// Represents the Opening
             /// </summary>

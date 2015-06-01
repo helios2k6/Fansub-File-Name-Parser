@@ -23,6 +23,7 @@
  */
 
 using System;
+
 namespace FansubFileNameParser.Metadata
 {
     /// <summary>

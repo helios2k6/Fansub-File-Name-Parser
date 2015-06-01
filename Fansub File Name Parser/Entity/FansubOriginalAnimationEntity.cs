@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser;
 using Functional.Maybe;
 using Newtonsoft.Json;
 using System;

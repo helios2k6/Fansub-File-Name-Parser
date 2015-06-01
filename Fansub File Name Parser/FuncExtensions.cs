@@ -41,6 +41,8 @@ namespace FansubFileNameParser
         /// <returns>A function that has been memoized</returns>
         public static Func<TArg, TResult> Memoize<TArg, TResult>(this Func<TArg, TResult> @this)
         {
+            if (@this == null) throw new ArgumentNullException("@this");
+
             var cache = new ConcurrentDictionary<TArg, TResult>();
             return arg => cache.GetOrAdd(arg, @this);
         }

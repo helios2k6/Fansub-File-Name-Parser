@@ -66,8 +66,6 @@
     <Compile Include="Entity\IFansubEntity.cs" />
     <Compile Include="Entity\IFansubEntityVisitor.cs" />
     <Compile Include="EnumExtensions.cs" />
-    <Compile Include="FansubFile.cs" />
-    <Compile Include="FansubFileParsers.cs" />
     <Compile Include="MaybeExtensions.cs" />
     <Compile Include="Metadata\AudioCodec.cs" />
     <Compile Include="Metadata\MediaMetadata.cs" />

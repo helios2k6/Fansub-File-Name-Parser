@@ -24,8 +24,7 @@
 
 using Functional.Maybe;
 using Sprache;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Text;
 
 namespace FansubFileNameParser
@@ -43,6 +42,8 @@ namespace FansubFileNameParser
         /// <typeparam name="T">The type wrapped by the <seealso cref="IOption{T}"/></typeparam>
         public static Maybe<T> ConvertFromIOptionToMaybe<T>(this IOption<T> @this)
         {
+            if (@this == null) throw new ArgumentNullException("@this");
+
             if (@this.IsDefined)
             {
                 return @this.Get().ToMaybe();
@@ -59,6 +60,9 @@ namespace FansubFileNameParser
         /// <returns>A string of all of the concatenated strings, or an empty string</returns>
         public static string Concat(this IOption<string> @this, params IOption<string>[] optionalStrings)
         {
+            if (@this == null) throw new ArgumentNullException("@this");
+            if (optionalStrings == null) throw new ArgumentNullException("optionalStrings");
+
             var builder = new StringBuilder();
             if (@this.IsDefined)
             {

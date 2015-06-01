@@ -22,12 +22,11 @@
  * THE SOFTWARE.
  */
 
-using System;
-using FansubFileNameParser;
+using FansubFileNameParser.Metadata;
 using Functional.Maybe;
 using Newtonsoft.Json;
+using System;
 using System.Runtime.Serialization;
-using FansubFileNameParser.Metadata;
 
 namespace FansubFileNameParser.Entity.Directory
 {

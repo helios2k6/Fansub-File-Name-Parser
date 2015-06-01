@@ -22,13 +22,10 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser.Metadata;
 using Functional.Maybe;
-using Sprache;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace FansubFileNameParser.Entity
 {
@@ -116,7 +113,7 @@ namespace FansubFileNameParser.Entity
         private static bool IsDirectory(string preprocessedString)
         {
             return Path.GetExtension(preprocessedString).Equals(
-                string.Empty, 
+                string.Empty,
                 StringComparison.InvariantCultureIgnoreCase
             );
         }
