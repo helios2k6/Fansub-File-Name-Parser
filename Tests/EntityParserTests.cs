@@ -52,7 +52,7 @@ namespace UnitTests
                     }
                 },
                 {
-                    "[Coalgirls]_Rinne_no_Lagrange_NCOP_(1920x1080_Blu-Ray_FLAC)_[5C7D6075].mkv",
+                    "[Coalgirls] Rinne no Lagrange NCOP (1920x1080 Blu-Ray FLAC) [5C7D6075].mkv",
                     new EntityParsers.OPEDParseResult
                     {
                         CreditlessPrefix = "NC".ToMaybe(),
@@ -61,7 +61,7 @@ namespace UnitTests
                     }
                 },
                 {
-                    "[Coalgirls]_Nekomonogatari_OP_(1920x1080_Blu-ray_FLAC)_[7F7E706B].mkv",
+                    "[Coalgirls] Nekomonogatari OP (1920x1080 Blu-ray FLAC) [7F7E706B].mkv",
                     new EntityParsers.OPEDParseResult
                     {
                         CreditlessPrefix = Maybe<string>.Nothing,
@@ -89,10 +89,10 @@ namespace UnitTests
             var inputMap = new Dictionary<string, EntityParsers.OPEDParseResult>
             {
                 {
-                    "Utawarerumono_Creditless_ED_[1080p,BluRay,x264]_-_THORA.mkv", 
+                    "Utawarerumono Creditless ED [1080p,BluRay,x264] - THORA.mkv", 
                     new EntityParsers.OPEDParseResult
                     {
-                        CreditlessPrefix = Maybe<string>.Nothing,
+                        CreditlessPrefix = "Creditless".ToMaybe(),
                         OPEDToken = "ED".ToMaybe(),
                         SequenceNumber = Maybe<int>.Nothing,
                     }
@@ -116,7 +116,7 @@ namespace UnitTests
                     }
                 },
                 {
-                    "[Coalgirls]_Strike_Witches_2_ED9_(1920x1080_Blu-Ray_FLAC)_[DE39EDD9].mkv",
+                    "[Coalgirls] Strike Witches 2 ED9 (1920x1080 Blu-Ray FLAC) [DE39EDD9].mkv",
                     new EntityParsers.OPEDParseResult
                     {
                         CreditlessPrefix = Maybe<string>.Nothing,
@@ -125,7 +125,7 @@ namespace UnitTests
                     }
                 },
                 {
-                    "[Coalgirls]_Strike_Witches_2_NCED9_(1920x1080_Blu-Ray_FLAC)_[DE39EDD9].mkv",
+                    "[Coalgirls] Strike Witches 2 NCED9 (1920x1080 Blu-Ray FLAC) [DE39EDD9].mkv",
                     new EntityParsers.OPEDParseResult
                     {
                         CreditlessPrefix = "NC".ToMaybe(),

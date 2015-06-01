@@ -131,28 +131,26 @@ namespace FansubFileNameParser.Entity
         #region OP / ED Parsers
         private static readonly Parser<string> OP = Parse.IgnoreCase("OP").Text();
 
-        private static readonly Parser<string> NCOP = Parse.IgnoreCase("NCOP").Text();
-
         private static readonly Parser<string> Opening = Parse.IgnoreCase("OPENING").Text();
 
-        private static readonly Parser<string> OpeningToken = OP.Or(NCOP).Or(Opening);
+        private static readonly Parser<string> OpeningToken = OP.Or(Opening);
 
         private static readonly Parser<string> ED = Parse.IgnoreCase("ED").Text();
 
-        private static readonly Parser<string> NCED = Parse.IgnoreCase("NCED").Text();
-
         private static readonly Parser<string> Ending = Parse.IgnoreCase("ENDING").Text();
 
-        private static readonly Parser<string> EndingToken = ED.Or(NCED).Or(Ending).Text();
+        private static readonly Parser<string> EndingToken = ED.Or(Ending).Text();
         #endregion
         #region Creditless Parsers
+        private static readonly Parser<string> NC = Parse.IgnoreCase("NC").Text();
+
         private static readonly Parser<string> Creditless = Parse.IgnoreCase("CREDITLESS").Text();
 
         private static readonly Parser<string> NonCredit = Parse.IgnoreCase("NONCREDIT").Text();
 
         private static readonly Parser<string> NonDashCredit = Parse.IgnoreCase("NON-CREDIT").Text();
 
-        private static readonly Parser<string> CreditlessToken = Creditless.Or(NonCredit).Or(NonDashCredit);
+        private static readonly Parser<string> CreditlessToken = NC.Or(Creditless).Or(NonCredit).Or(NonDashCredit);
         #endregion
         #region Composite Parsers
         private static readonly Parser<OPEDParseResult> AnyOpeningToken =
@@ -193,7 +191,7 @@ namespace FansubFileNameParser.Entity
         /// Parses the ED embedded in any amount of text 
         /// </summary>
         public static readonly Parser<OPEDParseResult> ParseEndingFromLine =
-            from contentBefore in Parse.AnyChar.Many().Except(AnyOpeningToken).Optional()
+            from contentBefore in Parse.AnyChar.Except(AnyEndingToken).Many().Optional()
             from endingToken in AnyEndingToken
             select endingToken;
         #endregion
