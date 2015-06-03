@@ -22,7 +22,9 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Metadata;
 using Functional.Maybe;
+using Sprache;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,6 +36,19 @@ namespace FansubFileNameParser.Entity
     /// </summary>
     public static class EntityFactory
     {
+        #region private classes
+        private class CommonParseState
+        {
+            public Maybe<string> Group { get; set; }
+            public Maybe<string> Series { get; set; }
+            public Maybe<MediaMetadata> Metadata { get; set; }
+        }
+
+        private sealed class FileParseState : CommonParseState
+        {
+            public Maybe<string> FileExtension { get; set; }
+        }
+        #endregion
         #region private static fields
         private static readonly ISet<string> MediaFileExtensions = new HashSet<string>
         {
@@ -56,7 +71,21 @@ namespace FansubFileNameParser.Entity
         public static Maybe<IFansubEntity> TryParse(string inputString)
         {
             var preprocessedString = PreprocessString(inputString);
-            return Maybe<IFansubEntity>.Nothing;
+            var commonParseState = TryParseCommonState(preprocessedString);
+
+            var directoryParseResult = from commonState in commonParseState
+                                       from directoryParse in TryParseDirectory(preprocessedString, commonState)
+                                       select directoryParse;
+
+            var fileParseResult = from commonState in commonParseState
+                                  from fileParseState in TryParseFileState(preprocessedString, commonState)
+                                  select TryParseOPED(preprocessedString, fileParseState)
+                                    .Or(TryParseOVAONA(preprocessedString, fileParseState))
+                                    .Or(TryParseEpisode(preprocessedString, fileParseState))
+                                    .Or(TryParseMovie(preprocessedString, fileParseState));
+
+
+            return directoryParseResult.HasValue ? directoryParseResult : fileParseResult;
         }
         #endregion
         #region private methods
@@ -110,12 +139,10 @@ namespace FansubFileNameParser.Entity
             }
         }
         #endregion
+        #region processing methods
         private static bool IsDirectory(string preprocessedString)
         {
-            return Path.GetExtension(preprocessedString).Equals(
-                string.Empty,
-                StringComparison.InvariantCultureIgnoreCase
-            );
+            return Path.GetExtension(preprocessedString).Equals(string.Empty, StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsMediaFile(string preprocessedString)
@@ -123,10 +150,75 @@ namespace FansubFileNameParser.Entity
             return MediaFileExtensions.Contains(Path.GetExtension(preprocessedString));
         }
 
-        private static Maybe<EntityParsers.OPEDParseResult> TryParseOPED(string preprocessedString)
+        private static Maybe<CommonParseState> TryParseCommonState(string preprocessedString)
         {
-            return Maybe<EntityParsers.OPEDParseResult>.Nothing;
+            return Maybe<CommonParseState>.Nothing;
         }
+
+        private static Maybe<FileParseState> TryParseFileState(string preprocessedString, CommonParseState state)
+        {
+            if (IsMediaFile(preprocessedString) == false)
+            {
+                return Maybe<FileParseState>.Nothing;
+            }
+
+            return Maybe<FileParseState>.Nothing;
+        }
+
+        private static void SetCommonProperties(FansubEntityBase @base, CommonParseState state)
+        {
+            @base.Group = state.Group;
+            @base.Series = state.Series;
+            @base.Metadata = state.Metadata;
+        }
+
+        private static void SetCommonFileProperties(FansubFileEntityBase @base, FileParseState state)
+        {
+            SetCommonProperties(@base, state);
+            @base.Extension = state.FileExtension;
+        }
+
+        private static Maybe<IFansubEntity> TryParseDirectory(string preprocessedString, CommonParseState state)
+        {
+            if (IsDirectory(preprocessedString) == false)
+            {
+                return Maybe<IFansubEntity>.Nothing;
+            }
+
+            return Maybe<IFansubEntity>.Nothing;
+        }
+
+        private static Maybe<IFansubEntity> TryParseOPED(string preprocessedString, FileParseState state)
+        {
+            var result = new FansubOPEDEntity();
+            var opParseResult = EntityParsers.ParseOpeningFromLine.TryParse(preprocessedString);
+            if (opParseResult.WasSuccessful)
+            {
+            }
+
+            var edParseResult = EntityParsers.ParseEndingFromLine.TryParse(preprocessedString);
+            if (edParseResult.WasSuccessful)
+            {
+            }
+
+            return Maybe<IFansubEntity>.Nothing;
+        }
+
+        private static Maybe<IFansubEntity> TryParseOVAONA(string preprocessedString, FileParseState state)
+        {
+            return Maybe<IFansubEntity>.Nothing;
+        }
+
+        private static Maybe<IFansubEntity> TryParseEpisode(string preprocessedString, FileParseState state)
+        {
+            return Maybe<IFansubEntity>.Nothing;
+        }
+
+        private static Maybe<IFansubEntity> TryParseMovie(string preprocessedString, FileParseState state)
+        {
+            return Maybe<IFansubEntity>.Nothing;
+        }
+        #endregion
         #endregion
     }
 }

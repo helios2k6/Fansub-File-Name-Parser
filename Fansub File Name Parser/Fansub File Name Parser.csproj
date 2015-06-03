@@ -34,8 +34,9 @@
     <DocumentationFile>bin\Release\FansubFileNameParser.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Functional.Maybe">
-      <HintPath>..\packages\Functional.Maybe.1.0.3\lib\Functional.Maybe.dll</HintPath>
+    <Reference Include="Functional.Maybe, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\thirdparty\Functional.Maybe.dll</HintPath>
     </Reference>
     <Reference Include="Sprache, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -81,7 +82,6 @@
     <Compile Include="Metadata\VideoCodec.cs" />
     <Compile Include="Metadata\VideoMedia.cs" />
     <Compile Include="Metadata\VideoMode.cs" />
-    <Compile Include="FuncExtensions.cs" />
     <Compile Include="ExtraParsers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entity\Directory\FansubDirectoryEntity.cs" />
