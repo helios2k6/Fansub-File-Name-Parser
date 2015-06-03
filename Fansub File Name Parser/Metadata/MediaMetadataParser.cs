@@ -54,15 +54,19 @@ namespace FansubFileNameParser.Metadata
         private static Maybe<MediaMetadata> TryParseImpl(IEnumerable<string> tags)
         {
             bool anythingTagged = false;
+            var unusedTags = new List<string>();
             var metadata = new MediaMetadata();
             foreach (var tag in tags)
             {
+                var anythingTaggedThisRound = false;
+
                 //Match against all of the knowns
                 AudioCodec outAudioCodec;
                 if (TryGetAudioCodec(tag, out outAudioCodec))
                 {
                     metadata.AudioCodec = outAudioCodec.ToMaybe();
                     anythingTagged = true;
+                    anythingTaggedThisRound = true;
                 }
 
                 string outCrc32;
@@ -70,6 +74,7 @@ namespace FansubFileNameParser.Metadata
                 {
                     metadata.CRC32 = outCrc32.ToMaybe();
                     anythingTagged = true;
+                    anythingTaggedThisRound = true;
                 }
 
                 PixelBitDepth outPixelBitDepth;
@@ -77,6 +82,7 @@ namespace FansubFileNameParser.Metadata
                 {
                     metadata.PixelBitDepth = outPixelBitDepth.ToMaybe();
                     anythingTagged = true;
+                    anythingTaggedThisRound = true;
                 }
 
                 Resolution resolution;
@@ -84,6 +90,7 @@ namespace FansubFileNameParser.Metadata
                 {
                     metadata.Resolution = resolution.ToMaybe();
                     anythingTagged = true;
+                    anythingTaggedThisRound = true;
                 }
 
                 VideoCodec outVideoCodec;
@@ -91,6 +98,7 @@ namespace FansubFileNameParser.Metadata
                 {
                     metadata.VideoCodec = outVideoCodec.ToMaybe();
                     anythingTagged = true;
+                    anythingTaggedThisRound = true;
                 }
 
                 VideoMedia outVideoMedia;
@@ -98,6 +106,7 @@ namespace FansubFileNameParser.Metadata
                 {
                     metadata.VideoMedia = outVideoMedia.ToMaybe();
                     anythingTagged = true;
+                    anythingTaggedThisRound = true;
                 }
 
                 VideoMode outVideoMode;
@@ -105,9 +114,16 @@ namespace FansubFileNameParser.Metadata
                 {
                     metadata.VideoMode = outVideoMode.ToMaybe();
                     anythingTagged = true;
+                    anythingTaggedThisRound = true;
+                }
+
+                if (anythingTaggedThisRound == false)
+                {
+                    unusedTags.Add(tag);
                 }
             }
 
+            metadata.UnusedTags = ((IEnumerable<string>)unusedTags).ToMaybe();
             return anythingTagged ? metadata.ToMaybe() : Maybe<MediaMetadata>.Nothing;
         }
 

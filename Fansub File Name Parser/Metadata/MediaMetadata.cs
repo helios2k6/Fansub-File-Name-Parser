@@ -25,6 +25,7 @@
 using Functional.Maybe;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace FansubFileNameParser.Metadata
@@ -44,6 +45,7 @@ namespace FansubFileNameParser.Metadata
         private readonly string VideoCodecKey = "Video Codec";
         private readonly string VideoMediaKey = "Video Media";
         private readonly string VideoModeKey = "Video Mode";
+        private readonly string UnusedTagsKey = "Unused Tags";
         #endregion
 
         #region ctor
@@ -59,6 +61,7 @@ namespace FansubFileNameParser.Metadata
             VideoCodec = Maybe<VideoCodec>.Nothing;
             VideoMedia = Maybe<VideoMedia>.Nothing;
             VideoMode = Maybe<VideoMode>.Nothing;
+            UnusedTags = Maybe<IEnumerable<string>>.Nothing;
         }
 
         /// <summary>
@@ -75,6 +78,7 @@ namespace FansubFileNameParser.Metadata
             VideoCodec = MaybeExtensions.GetValueNullableMaybe<VideoCodec>(info, VideoCodecKey);
             VideoMedia = MaybeExtensions.GetValueNullableMaybe<VideoMedia>(info, VideoMediaKey);
             VideoMode = MaybeExtensions.GetValueNullableMaybe<VideoMode>(info, VideoModeKey);
+            UnusedTags = ((IEnumerable<string>)info.GetValue(UnusedTagsKey, typeof(IEnumerable<string>))).ToMaybe();
         }
         #endregion
 
@@ -153,6 +157,9 @@ namespace FansubFileNameParser.Metadata
         /// </value>
         [JsonProperty(PropertyName = "VideoMode")]
         public Maybe<VideoMode> VideoMode { get; set; }
+
+        [JsonProperty(PropertyName = "UnusedTags")]
+        public Maybe<IEnumerable<string>> UnusedTags { get; set; }
         #endregion
 
         #region public methods
@@ -164,14 +171,15 @@ namespace FansubFileNameParser.Metadata
         /// </returns>
         public override string ToString()
         {
-            return string.Format("[{0}][{1}][{2}][{3}][{4}][{5}][{6}]",
+            return string.Format("[{0}][{1}][{2}][{3}][{4}][{5}][{6}][{7}]",
                 AudioCodec.ToStringEnum(),
                 CRC32,
                 PixelBitDepth.ToStringEnum(),
                 Resolution,
                 VideoCodec.ToStringEnum(),
                 VideoMedia.ToStringEnum(),
-                VideoMode.ToStringEnum());
+                VideoMode.ToStringEnum(),
+                UnusedTags.Select(e => e.ToStringEx()));
         }
 
         /// <summary>
@@ -205,7 +213,8 @@ namespace FansubFileNameParser.Metadata
                 ^ Resolution.GetHashCode()
                 ^ VideoCodec.GetHashCode()
                 ^ VideoMedia.GetHashCode()
-                ^ VideoMode.GetHashCode();
+                ^ VideoMode.GetHashCode()
+                ^ UnusedTags.SelectOrElse(t => t.GetHashCodeEx(), () => 0);
         }
 
         /// <summary>
@@ -228,7 +237,8 @@ namespace FansubFileNameParser.Metadata
                 && Equals(Resolution, other.Resolution)
                 && Equals(VideoCodec, other.VideoCodec)
                 && Equals(VideoMedia, other.VideoMedia)
-                && Equals(VideoMode, other.VideoMode);
+                && Equals(VideoMode, other.VideoMode)
+                && IEnumerableExtensions.EqualsMaybeEx(UnusedTags, other.UnusedTags);
         }
 
         /// <summary>
@@ -245,6 +255,7 @@ namespace FansubFileNameParser.Metadata
             info.AddValue(VideoCodecKey, VideoCodec.ToNullable());
             info.AddValue(VideoMediaKey, VideoMedia.ToNullable());
             info.AddValue(VideoModeKey, VideoMode.ToNullable());
+            info.AddValue(UnusedTagsKey, UnusedTags.OrElseDefault());
         }
         #endregion
 

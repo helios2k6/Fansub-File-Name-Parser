@@ -191,9 +191,13 @@ namespace FansubFileNameParser.Entity
         private static Maybe<IFansubEntity> TryParseOPED(string preprocessedString, FileParseState state)
         {
             var result = new FansubOPEDEntity();
+            SetCommonFileProperties(result, state);
+
             var opParseResult = EntityParsers.ParseOpeningFromLine.TryParse(preprocessedString);
             if (opParseResult.WasSuccessful)
             {
+                var opValue = opParseResult.Value;
+                result.NoCredits = opValue.CreditlessPrefix.HasValue;
             }
 
             var edParseResult = EntityParsers.ParseEndingFromLine.TryParse(preprocessedString);
