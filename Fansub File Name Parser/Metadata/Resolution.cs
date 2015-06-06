@@ -38,8 +38,8 @@ namespace FansubFileNameParser.Metadata
         private readonly int _width;
         private readonly int _height;
 
-        private static readonly string WidthKey = "Width";
-        private static readonly string HeightKey = "Height";
+        private const string WidthKey = "Width";
+        private const string HeightKey = "Height";
         #endregion
 
         #region ctor

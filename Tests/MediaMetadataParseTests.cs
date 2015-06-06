@@ -28,6 +28,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using UnitTests.Models;
@@ -40,7 +41,7 @@ namespace Tests
         [TestMethod]
         public void ParseAllTags()
         {
-            Parallel.ForEach(TestModel.CreateMediaMetadataTestModel(), kvp =>
+            Parallel.ForEach(TestModel.CreateMediaMetadataTestModel().Take(2000), kvp =>
             {
                 var inputTags = kvp.Key;
                 var expectedMetadata = kvp.Value;
@@ -56,7 +57,7 @@ namespace Tests
         [TestMethod]
         public void SerializeAndDeserialize()
         {
-            Parallel.ForEach(TestModel.CreateMediaMetadataTestModel(), kvp =>
+            Parallel.ForEach(TestModel.CreateMediaMetadataTestModel().Take(2000), kvp =>
             {
                 TestSerializationAndDeserialization(kvp.Value);
             });

@@ -164,11 +164,11 @@ namespace FansubFileNameParser
         /// includes tags that might appear at the beginning, the middle, or the end of the string.
         /// </summary>
         public static Parser<IEnumerable<string>> AllTags =
-            from forwardContent in BaseGrammars.LineExceptTagDeliminator.Optional()
+            from forwardContent in BaseGrammars.LineUpToTagDeliminator.Optional()
             from frontTags in BaseGrammars.MultipleTagEnclosedText.Optional()
-            from centerContent in BaseGrammars.LineExceptTagDeliminator.Optional()
+            from centerContent in BaseGrammars.LineUpToTagDeliminator.Optional()
             from centerTags in BaseGrammars.MultipleTagEnclosedText.Optional()
-            from endContent in BaseGrammars.LineExceptTagDeliminator.Optional()
+            from endContent in BaseGrammars.LineUpToTagDeliminator.Optional()
             from endingTags in BaseGrammars.MultipleTagEnclosedText.Optional()
             select OptionalConcatOrEmpty(frontTags, centerTags, endingTags);
 
@@ -179,7 +179,7 @@ namespace FansubFileNameParser
         /// </summary>
         public static Parser<SeparatedParseResult> SeparateTagsFromMainContent =
             from fansubGroup in BaseGrammars.TagEnclosedText.Token().Optional()
-            from content in BaseGrammars.LineExceptTagDeliminator.Token().Optional()
+            from content in BaseGrammars.LineUpToTagDeliminator.Token().Optional()
             from tags in BaseGrammars.MultipleTagEnclosedText.Token()
             select new SeparatedParseResult(
                 fansubGroup.ConvertFromIOptionToMaybe(),

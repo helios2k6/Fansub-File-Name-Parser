@@ -26,6 +26,7 @@ using Functional.Maybe;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace FansubFileNameParser.Metadata
@@ -37,15 +38,19 @@ namespace FansubFileNameParser.Metadata
     [JsonObject(MemberSerialization.OptIn)]
     public sealed class MediaMetadata : IEquatable<MediaMetadata>, ISerializable
     {
+        #region private const fields
+        private const string AudioCodecKey = "Audio Codec";
+        private const string CRC32Key = "CRC 32";
+        private const string PixelBitDepthKey = "Pixel Bit Depth";
+        private const string ResolutionKey = "Resolution";
+        private const string VideoCodecKey = "Video Codec";
+        private const string VideoMediaKey = "Video Media";
+        private const string VideoModeKey = "Video Mode";
+        private const string UnusedTagsKey = "Unused Tags";
+        #endregion
+
         #region private fields
-        private readonly string AudioCodecKey = "Audio Codec";
-        private readonly string CRC32Key = "CRC 32";
-        private readonly string PixelBitDepthKey = "Pixel Bit Depth";
-        private readonly string ResolutionKey = "Resolution";
-        private readonly string VideoCodecKey = "Video Codec";
-        private readonly string VideoMediaKey = "Video Media";
-        private readonly string VideoModeKey = "Video Mode";
-        private readonly string UnusedTagsKey = "Unused Tags";
+        private IEnumerable<string> _unusedFields;
         #endregion
 
         #region ctor
@@ -61,7 +66,7 @@ namespace FansubFileNameParser.Metadata
             VideoCodec = Maybe<VideoCodec>.Nothing;
             VideoMedia = Maybe<VideoMedia>.Nothing;
             VideoMode = Maybe<VideoMode>.Nothing;
-            UnusedTags = Maybe<IEnumerable<string>>.Nothing;
+            UnusedTags = Enumerable.Empty<string>();
         }
 
         /// <summary>
@@ -78,7 +83,7 @@ namespace FansubFileNameParser.Metadata
             VideoCodec = MaybeExtensions.GetValueNullableMaybe<VideoCodec>(info, VideoCodecKey);
             VideoMedia = MaybeExtensions.GetValueNullableMaybe<VideoMedia>(info, VideoMediaKey);
             VideoMode = MaybeExtensions.GetValueNullableMaybe<VideoMode>(info, VideoModeKey);
-            UnusedTags = ((IEnumerable<string>)info.GetValue(UnusedTagsKey, typeof(IEnumerable<string>))).ToMaybe();
+            UnusedTags = (IEnumerable<string>)info.GetValue(UnusedTagsKey, typeof(IEnumerable<string>));
         }
         #endregion
 
@@ -158,8 +163,25 @@ namespace FansubFileNameParser.Metadata
         [JsonProperty(PropertyName = "VideoMode")]
         public Maybe<VideoMode> VideoMode { get; set; }
 
+        /// <summary>
+        /// Gets or sets the tags that could not be parsed. Never returns null
+        /// </summary>
+        /// <value>
+        /// The unused tags.
+        /// </value>
         [JsonProperty(PropertyName = "UnusedTags")]
-        public Maybe<IEnumerable<string>> UnusedTags { get; set; }
+        public IEnumerable<string> UnusedTags 
+        { 
+            get { return _unusedFields ?? Enumerable.Empty<string>(); }
+            set 
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("Value is not allowed to be null");
+                }
+                _unusedFields = value; 
+            } 
+        }
         #endregion
 
         #region public methods
@@ -214,7 +236,7 @@ namespace FansubFileNameParser.Metadata
                 ^ VideoCodec.GetHashCode()
                 ^ VideoMedia.GetHashCode()
                 ^ VideoMode.GetHashCode()
-                ^ UnusedTags.SelectOrElse(t => t.GetHashCodeEx(), () => 0);
+                ^ UnusedTags.GetHashCodeEx();
         }
 
         /// <summary>
@@ -238,7 +260,7 @@ namespace FansubFileNameParser.Metadata
                 && Equals(VideoCodec, other.VideoCodec)
                 && Equals(VideoMedia, other.VideoMedia)
                 && Equals(VideoMode, other.VideoMode)
-                && IEnumerableExtensions.EqualsMaybeEx(UnusedTags, other.UnusedTags);
+                && Enumerable.SequenceEqual(UnusedTags, other.UnusedTags);
         }
 
         /// <summary>
@@ -255,7 +277,7 @@ namespace FansubFileNameParser.Metadata
             info.AddValue(VideoCodecKey, VideoCodec.ToNullable());
             info.AddValue(VideoMediaKey, VideoMedia.ToNullable());
             info.AddValue(VideoModeKey, VideoMode.ToNullable());
-            info.AddValue(UnusedTagsKey, UnusedTags.OrElseDefault());
+            info.AddValue(UnusedTagsKey, UnusedTags);
         }
         #endregion
 

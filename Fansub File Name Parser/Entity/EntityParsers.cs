@@ -25,7 +25,6 @@
 using Functional.Maybe;
 using Sprache;
 using System;
-using System.Linq;
 
 namespace FansubFileNameParser.Entity
 {
@@ -128,7 +127,10 @@ namespace FansubFileNameParser.Entity
 
         }
         #endregion
-        #region OP / ED Parsers
+        #region Directory
+        #endregion
+        #region OP / ED
+        #region Parsers
         private static readonly Parser<string> OP = Parse.IgnoreCase("OP").Text();
 
         private static readonly Parser<string> Opening = Parse.IgnoreCase("OPENING").Text();
@@ -194,6 +196,7 @@ namespace FansubFileNameParser.Entity
             from contentBefore in Parse.AnyChar.Except(AnyEndingToken).Many().Optional()
             from endingToken in AnyEndingToken
             select endingToken;
+        #endregion
         #endregion
     }
 }

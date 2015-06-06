@@ -152,6 +152,12 @@ namespace FansubFileNameParser.Entity
 
         private static Maybe<CommonParseState> TryParseCommonState(string preprocessedString)
         {
+            var commonParseState = new CommonParseState();
+            var tags = BaseParsers.AllTags.TryParse(preprocessedString);
+            if (tags.WasSuccessful)
+            {
+                commonParseState.Metadata = MediaMetadataParser.TryParseMediaMetadata(tags.Value);
+            }
             return Maybe<CommonParseState>.Nothing;
         }
 
@@ -188,24 +194,45 @@ namespace FansubFileNameParser.Entity
             return Maybe<IFansubEntity>.Nothing;
         }
 
-        private static Maybe<IFansubEntity> TryParseOPED(string preprocessedString, FileParseState state)
+        private static Maybe<IFansubEntity> TryParseOPEDHelper(
+            FileParseState state,
+            Parser<EntityParsers.OPEDParseResult> parser,
+            FansubOPEDEntity.Segment segment,
+            string preprocessedString
+        )
         {
-            var result = new FansubOPEDEntity();
-            SetCommonFileProperties(result, state);
+            var entity = new FansubOPEDEntity();
+            SetCommonFileProperties(entity, state);
 
-            var opParseResult = EntityParsers.ParseOpeningFromLine.TryParse(preprocessedString);
-            if (opParseResult.WasSuccessful)
+            var parseResult = parser.TryParse(preprocessedString);
+            if (parseResult.WasSuccessful)
             {
-                var opValue = opParseResult.Value;
-                result.NoCredits = opValue.CreditlessPrefix.HasValue;
-            }
+                var parseValue = parseResult.Value;
+                entity.NoCredits = parseValue.CreditlessPrefix.HasValue;
+                entity.Part = segment.ToMaybe();
+                entity.SequenceNumber = parseValue.SequenceNumber.ToMaybe();
 
-            var edParseResult = EntityParsers.ParseEndingFromLine.TryParse(preprocessedString);
-            if (edParseResult.WasSuccessful)
-            {
+                return ((IFansubEntity)entity).ToMaybe();
             }
 
             return Maybe<IFansubEntity>.Nothing;
+        }
+
+        private static Maybe<IFansubEntity> TryParseOPED(string preprocessedString, FileParseState state)
+        {
+            return TryParseOPEDHelper(
+                        state, 
+                        EntityParsers.ParseOpeningFromLine, 
+                        FansubOPEDEntity.Segment.OP, 
+                        preprocessedString
+                   ).Or(
+                        TryParseOPEDHelper(
+                            state, 
+                            EntityParsers.ParseEndingFromLine, 
+                            FansubOPEDEntity.Segment.ED, 
+                            preprocessedString
+                        )
+                   );
         }
 
         private static Maybe<IFansubEntity> TryParseOVAONA(string preprocessedString, FileParseState state)

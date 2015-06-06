@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser.Metadata;
 using Functional.Maybe;
 using Newtonsoft.Json;
 using System;
@@ -40,7 +39,6 @@ namespace FansubFileNameParser.Entity.Directory
         #region private static readonly fields
         private const string VolumeKey = "Volume";
         private const string EpisodeRangeKey = "EpisodeRange";
-        private const string MediaMetadataKey = "MediaMetadata";
         #endregion
 
         #region ctor
@@ -58,7 +56,6 @@ namespace FansubFileNameParser.Entity.Directory
         {
             Volume = MaybeExtensions.GetValueNullableMaybe<int>(info, VolumeKey);
             EpisodeRange = ((Tuple<int, int>)info.GetValue(EpisodeRangeKey, typeof(Tuple<int, int>))).ToMaybe();
-            MediaMetadata = ((MediaMetadata)info.GetValue(MediaMetadataKey, typeof(MediaMetadata))).ToMaybe();
         }
         #endregion
 
@@ -76,15 +73,6 @@ namespace FansubFileNameParser.Entity.Directory
         /// <value>The episode range.</value>
         [JsonProperty(PropertyName = "EpisodeRange")]
         public Maybe<Tuple<int, int>> EpisodeRange { get; set; }
-
-        /// <summary>
-        /// Gets or sets the media metadata.
-        /// </summary>
-        /// <value>
-        /// The media metadata.
-        /// </value>
-        [JsonProperty(PropertyName = "MediaMetadata")]
-        public Maybe<MediaMetadata> MediaMetadata { get; set; }
         #endregion
 
         #region public methods
@@ -97,11 +85,10 @@ namespace FansubFileNameParser.Entity.Directory
         public override string ToString()
         {
             return string.Format(
-                "{0} [Volume = {1}] [Episode Range = {2}] [Media Metadata = {3}]",
+                "{0} [Volume = {1}] [Episode Range = {2}]",
                 base.ToString(),
                 Volume,
-                EpisodeRange,
-                MediaMetadata
+                EpisodeRange
             );
         }
 
@@ -121,8 +108,7 @@ namespace FansubFileNameParser.Entity.Directory
 
             return base.Equals(other)
                 && Volume.Equals(other.Volume)
-                && EpisodeRange.Equals(other.EpisodeRange)
-                && MediaMetadata.Equals(other.MediaMetadata);
+                && EpisodeRange.Equals(other.EpisodeRange);
         }
 
         /// <summary>
@@ -147,8 +133,7 @@ namespace FansubFileNameParser.Entity.Directory
         {
             return base.GetHashCode()
                 ^ Volume.GetHashCode()
-                ^ EpisodeRange.GetHashCode()
-                ^ MediaMetadata.GetHashCode();
+                ^ EpisodeRange.GetHashCode();
         }
 
         /// <summary>
@@ -160,7 +145,6 @@ namespace FansubFileNameParser.Entity.Directory
         {
             info.AddValue(VolumeKey, Volume.ToNullable());
             info.AddValue(EpisodeRangeKey, EpisodeRange.OrElseDefault());
-            info.AddValue(MediaMetadataKey, MediaMetadata.OrElseDefault());
 
             base.GetObjectData(info, context);
         }

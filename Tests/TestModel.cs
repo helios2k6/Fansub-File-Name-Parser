@@ -22,15 +22,13 @@
  * THE SOFTWARE.
  */
 
-using Functional.Maybe;
-using FansubFileNameParser;
+using FansubFileNameParser.Entity;
+using FansubFileNameParser.Entity.Directory;
 using FansubFileNameParser.Metadata;
+using Functional.Maybe;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using FansubFileNameParser.Entity;
-using FansubFileNameParser.Entity.Directory;
 
 namespace UnitTests.Models
 {
@@ -46,7 +44,7 @@ namespace UnitTests.Models
                 { 
                     Group = "Doki-Chihiro".ToMaybe(), 
                     Series = "Kokoro Connect".ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
                         PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
@@ -60,7 +58,7 @@ namespace UnitTests.Models
                 {
                     Group = "Vivid".ToMaybe(),
                     Series = "The World God Only Knows - Goddesses Arc".ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
@@ -73,7 +71,7 @@ namespace UnitTests.Models
                     Group = "BlurayDesuYo".ToMaybe(),
                     Series = "Amagi Brilliant Park".ToMaybe(),
                     Volume = 1.ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
@@ -87,7 +85,7 @@ namespace UnitTests.Models
                     Group = "Coalgirls".ToMaybe(),
                     Series = "Amagi Brilliant Park".ToMaybe(),
                     EpisodeRange = Tuple.Create(1, 2).ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         Resolution = new Resolution(1920, 1080).ToMaybe(),
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
@@ -100,7 +98,7 @@ namespace UnitTests.Models
                     Group = "FFF".ToMaybe(),
                     Series = "Medaka Box Abnormal".ToMaybe(),
                     Volume = 3.ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
@@ -113,7 +111,7 @@ namespace UnitTests.Models
                     Group = "Tsundere".ToMaybe(),
                     Series = "Fate Kaleid Prisma Illya 2wei".ToMaybe(),
                     EpisodeRange = Tuple.Create(1, 2).ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoCodec = VideoCodec.H264.ToMaybe(),
@@ -127,7 +125,7 @@ namespace UnitTests.Models
                 {
                     Group = "Elysium".ToMaybe(),
                     Series = "Spiace and Wolf II".ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
@@ -139,7 +137,7 @@ namespace UnitTests.Models
                 {
                     Group = "Yabai".ToMaybe(),
                     Series = "Spice and Wolf II".ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                     }.ToMaybe(),
@@ -149,7 +147,7 @@ namespace UnitTests.Models
                 {
                     Group = "Zurako".ToMaybe(),
                     Series = "Spice and Wolf II".ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
@@ -162,7 +160,7 @@ namespace UnitTests.Models
                     Group = "UTW".ToMaybe(),
                     Series = "Fate stay night Unlimited Blade Works".ToMaybe(),
                     EpisodeRange = Tuple.Create(0, 12).ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoCodec = VideoCodec.H264.ToMaybe(),
@@ -176,7 +174,7 @@ namespace UnitTests.Models
                     Group = "Commie".ToMaybe(),
                     Series = "Chihayafuru 2".ToMaybe(),
                     Volume = 1.ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoMode = VideoMode.SevenTwentyProgressive.ToMaybe(),
@@ -188,7 +186,7 @@ namespace UnitTests.Models
                 {
                     Group = "Coalgirls".ToMaybe(),
                     Series = "Hyouka".ToMaybe(),
-                    MediaMetadata = new MediaMetadata
+                    Metadata = new MediaMetadata
                     {
                         Resolution = new Resolution(1920, 1080).ToMaybe(),
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),

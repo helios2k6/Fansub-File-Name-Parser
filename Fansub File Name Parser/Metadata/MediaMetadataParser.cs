@@ -123,7 +123,7 @@ namespace FansubFileNameParser.Metadata
                 }
             }
 
-            metadata.UnusedTags = ((IEnumerable<string>)unusedTags).ToMaybe();
+            metadata.UnusedTags = unusedTags;
             return anythingTagged ? metadata.ToMaybe() : Maybe<MediaMetadata>.Nothing;
         }
 

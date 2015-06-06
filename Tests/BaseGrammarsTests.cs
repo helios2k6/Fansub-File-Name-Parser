@@ -26,59 +26,12 @@ using FansubFileNameParser;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sprache;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnitTests;
 
 namespace UnitTests.Model.Grammars
 {
     [TestClass]
     public class BaseGrammarsTests
     {
-        [TestMethod]
-        public void DashParser()
-        {
-            var inputOutputMap = new Dictionary<string, string>
-            {
-                {"-", "-"},
-                {"-A-", "-"},
-                {"--", "--"}
-            };
-
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.DashAtLeastOnce);
-        }
-
-        [TestMethod]
-        public void LineParser()
-        {
-            var inputOutputMap = new Dictionary<string, string>
-            {
-                {"hello", "hello"},
-                {" hello ", "hello"},
-                {"hello world", "hello world"},
-                {"hello world ", "hello world"},
-                {" hello world ", "hello world"}
-            };
-
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.Line);
-        }
-
-        [TestMethod]
-        public void IdentifierParser()
-        {
-            var inputString = "name";
-            var parseResult = BaseGrammars.Identifier.TryParse(inputString);
-
-            Assert.IsTrue(parseResult.WasSuccessful);
-            Assert.AreEqual(inputString, parseResult.Value);
-
-            var inputString2 = "name__k";
-            var parseResult2 = BaseGrammars.Identifier.TryParse(inputString2);
-
-            Assert.IsTrue(parseResult2.WasSuccessful);
-            Assert.AreEqual(inputString, parseResult2.Value);
-        }
-
         [TestMethod]
         public void OpenTagDeliminatorParser()
         {
@@ -208,23 +161,20 @@ namespace UnitTests.Model.Grammars
                 {"hello world[", "hello world"}
             };
 
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineExceptTagDeliminator);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToTagDeliminator);
         }
 
         [TestMethod]
-        public void LinesSeparatedByDash()
+        public void LineUpToDashSeparatorToken()
         {
-            var inputOutputMap = new Dictionary<string, IEnumerable<string>>
+            var inputOutputMap = new Dictionary<string, string>
             {
-                {"-hello world", new[] {"", "hello world"}},
-                {" hello - world", new[] {"hello", "world"}},
-                {"hello world", new[] {"hello world"}},
-                {"hello world-", new[] {"hello world"}},
-                {"-hello-world", new[] {"", "hello", "world"}},
-                {"hello-world", new[] {"hello", "world"}}
+                {"[Tsundere] Fate Kaleid Prisma Illya 2wei - 01-02 [BDRip h264 1920x1080 10bit FLAC]", "[Tsundere] Fate Kaleid Prisma Illya 2wei"},
+                {"[Elysium]Spice and Wolf II(BD 1080p FLAC)", "[Elysium]Spice and Wolf II(BD 1080p FLAC)"},
+                {"[UTW] Fate stay night Unlimited Blade Works - 00-12 [BD][h264-1080p][FLAC]", "[UTW] Fate stay night Unlimited Blade Works"},
             };
 
-            TestUtils.TestMultiTokenParse(inputOutputMap, BaseGrammars.LinesSeparatedByDash);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToDashSeparatorToken);
         }
     }
 }

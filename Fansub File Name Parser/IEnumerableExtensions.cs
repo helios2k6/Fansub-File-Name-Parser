@@ -73,31 +73,5 @@ namespace FansubFileNameParser
 
             return @this.Aggregate(1, (acc, t) => acc ^= t.GetHashCode());
         }
-
-        /// <summary>
-        /// Determines whether or not the two <see cref="Maybe{IEnumerable{T}}"/>s are equal by
-        /// comparing their sequences after standard <see cref="Maybe{T}"/> checks
-        /// </summary>
-        /// <typeparam name="T">The type of element</typeparam>
-        /// <param name="first">The first value</param>
-        /// <param name="second">The second value.</param>
-        /// <returns>True if they are equal. False otherwise</returns>
-        public static bool EqualsMaybeEx<T>(Maybe<IEnumerable<T>> first, Maybe<IEnumerable<T>> second)
-        {
-            if (ReferenceEquals(first, second))
-            {
-                return true;
-            }
-
-            if (first.HasValue && second.HasValue)
-            {
-                var firstValue = first.Value;
-                var secondValue = second.Value;
-
-                return Enumerable.SequenceEqual<T>(firstValue, secondValue);
-            }
-
-            return false;
-        }
     }
 }

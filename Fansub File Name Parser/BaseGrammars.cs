@@ -23,13 +23,7 @@
  */
 
 using Sprache;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
 
 namespace FansubFileNameParser
 {
@@ -39,14 +33,18 @@ namespace FansubFileNameParser
     internal static class BaseGrammars
     {
         /// <summary>
-        /// Parses a whole word, which is a contiguous set of letters with at least 1 letter in it
-        /// </summary>
-        public static readonly Parser<string> Identifier = Parse.Letter.AtLeastOnce().Text();
-
-        /// <summary>
         /// Parses a single dash ('-') character
         /// </summary>
-        public static readonly Parser<string> DashAtLeastOnce = Parse.Char('-').AtLeastOnce().Text();
+        private static readonly Parser<char> Dash = Parse.Char('-');
+
+        /// <summary>
+        /// Parses a single dash separator token (' - ')
+        /// </summary>
+        private static readonly Parser<string> DashSeparatorToken =
+            from frontSpace in Parse.WhiteSpace
+            from dash in BaseGrammars.Dash
+            from backSpace in Parse.WhiteSpace
+            select new string(new[] { frontSpace, dash, backSpace });
 
         /// <summary>
         /// Parses a single open parenthesis character ('(')
@@ -84,28 +82,17 @@ namespace FansubFileNameParser
         public static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
 
         /// <summary>
-        /// Parses an entire line of text, including special characters
+        /// Parses a string of text up until a "dash separator token," which is defined as a dash (-) with a 
+        /// single space before and after it: (" - ")
         /// </summary>
-        public static readonly Parser<string> Line =
-            from line in Parse.AnyChar.AtLeastOnce().Text()
+        public static readonly Parser<string> LineUpToDashSeparatorToken =
+            from line in Parse.AnyChar.Except(DashSeparatorToken).Many().Text()
             select line.Trim();
-
-        /// <summary>
-        /// Parses a line of text until a dash character is hit
-        /// </summary>
-        private static readonly Parser<string> LineUntilDash =
-            from line in Parse.AnyChar.Until(DashAtLeastOnce).Text()
-            select line.Trim();
-
-        /// <summary>
-        /// Parses a line of text until a dash character or a full line if there wasn't a dash character
-        /// </summary>
-        private static readonly Parser<string> LineUntilDashOrFullLine = LineUntilDash.Or(Line);
 
         /// <summary>
         /// Parses a line of text until a tag delmiinator is encountered
         /// </summary>
-        public static readonly Parser<string> LineExceptTagDeliminator =
+        public static readonly Parser<string> LineUpToTagDeliminator =
             from line in Parse.AnyChar.Except(TagDeliminator).Many().Text()
             select line.Trim();
 
@@ -114,7 +101,7 @@ namespace FansubFileNameParser
         /// </summary>
         public static readonly Parser<string> TagEnclosedText =
             from openTag in OpenTagDeliminator
-            from content in LineExceptTagDeliminator
+            from content in LineUpToTagDeliminator
             from closedTag in ClosedTagDeliminator
             select content;
 
@@ -123,14 +110,9 @@ namespace FansubFileNameParser
         /// </summary>
         public static readonly Parser<string> TagEnclosedTextWithDeliminator =
             from openTag in OpenTagDeliminator
-            from content in LineExceptTagDeliminator
+            from content in LineUpToTagDeliminator
             from closedBracket in ClosedTagDeliminator
             select string.Concat(openTag, content, closedBracket);
-
-        /// <summary>
-        /// Parses a stream of lines separated by a dash
-        /// </summary>
-        public static readonly Parser<IEnumerable<string>> LinesSeparatedByDash = LineUntilDashOrFullLine.Many();
 
         /// <summary>
         /// Parses multiple metadata tags
