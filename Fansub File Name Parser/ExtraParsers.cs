@@ -24,6 +24,10 @@
 
 using Functional.Maybe;
 using Sprache;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FansubFileNameParser
 {
@@ -40,6 +44,67 @@ namespace FansubFileNameParser
             let parseResult = TryParseInt(intAsString)
             where parseResult.IsSomething()
             select parseResult.Value;
+
+        /// <summary>
+        /// Implodes this <see cref="Parser{T}"/>'s results from a nested <see cref="IEnumerable{T}"/> to a single
+        /// IEnumerable{T}.
+        /// </summary>
+        /// <typeparam name="T">The element type</typeparam>
+        /// <param name="this">The parser</param>
+        /// <returns>A new parser that implodes the return value of the parser</returns>
+        public static Parser<IEnumerable<T>> Implode<T>(this Parser<IEnumerable<IEnumerable<T>>> @this)
+        {
+            return input =>
+            {
+                var result = @this.Invoke(input);
+                if (result.WasSuccessful == false)
+                {
+                    var message = string.Format("Failure to implode. Dependent parser failed. {0}", result.Message);
+                    return Result.Failure<IEnumerable<T>>(result.Remainder, message, result.Expectations);
+                }
+
+                return Result.Success<IEnumerable<T>>(result.Value.SelectMany(i => i), result.Remainder);
+            };
+        }
+
+        /// <summary>
+        /// Implodes the <see cref="Parser{T}"/>'s <see cref="IEnumerable{T}"/> with the specified aggregator
+        /// </summary>
+        /// <typeparam name="TInput">The type of the input.</typeparam>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="this">The parser.</param>
+        /// <param name="seed">The seed value.</param>
+        /// <param name="accumulator">The accumulator function.</param>
+        /// <returns>A <see cref="Parser{T}"/> that will aggregate the results afterwards</returns>
+        public static Parser<TResult> Implode<TInput, TResult>(
+            this Parser<IEnumerable<TInput>> @this,
+            TResult seed,
+            Func<TResult, TInput, TResult> accumulator
+        )
+        {
+            return input =>
+            {
+                var result = @this.Invoke(input);
+                if (result.WasSuccessful == false)
+                {
+                    var message = string.Format("Failure to implode. Dependent parser failed. {0}", result.Message);
+                    return Result.Failure<TResult>(result.Remainder, message, result.Expectations);
+                }
+                return Result.Success<TResult>(result.Value.Aggregate<TInput, TResult>(seed, accumulator), result.Remainder);
+            };
+        }
+
+        /// <summary>
+        /// Memoizes the specified <see cref="Parser{T}"/>
+        /// </summary>
+        /// <typeparam name="T">The type of result</typeparam>
+        /// <param name="this">The parser</param>
+        /// <returns>A memoized version of this parser</returns>
+        public static Parser<T> Memoize<T>(this Parser<T> @this)
+        {
+            var memopad = new ConcurrentDictionary<IInput, IResult<T>>();
+            return input => memopad.GetOrAdd(input, @this.Invoke);
+        }
 
         private static Maybe<int> TryParseInt(string input)
         {

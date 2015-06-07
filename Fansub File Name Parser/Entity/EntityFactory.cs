@@ -153,7 +153,7 @@ namespace FansubFileNameParser.Entity
         private static Maybe<CommonParseState> TryParseCommonState(string preprocessedString)
         {
             var commonParseState = new CommonParseState();
-            var tags = BaseParsers.AllTags.TryParse(preprocessedString);
+            var tags = BaseGrammars.CollectTags.TryParse(preprocessedString);
             if (tags.WasSuccessful)
             {
                 commonParseState.Metadata = MediaMetadataParser.TryParseMediaMetadata(tags.Value);

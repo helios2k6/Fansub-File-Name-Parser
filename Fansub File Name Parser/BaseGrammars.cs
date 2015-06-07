@@ -23,7 +23,9 @@
  */
 
 using Sprache;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FansubFileNameParser
 {
@@ -35,7 +37,12 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses a single dash ('-') character
         /// </summary>
-        private static readonly Parser<char> Dash = Parse.Char('-');
+        public static readonly Parser<char> Dash = Parse.Char('-');
+
+        /// <summary>
+        /// Parses a single underscore ('_') character
+        /// </summary>
+        private static readonly Parser<char> Underscore = Parse.Char('_');
 
         /// <summary>
         /// Parses a single dash separator token (' - ')
@@ -69,17 +76,17 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses any open metadata tag deliminator, such as the open parenthesis or open square bracket
         /// </summary>
-        public static readonly Parser<char> OpenTagDeliminator = OpenParenthesis.Or(OpenSquareBracket);
+        private static readonly Parser<char> OpenTagDeliminator = OpenParenthesis.Or(OpenSquareBracket);
 
         /// <summary>
         /// Parses any closed metadata tag deliminator, such as the closed parenthesis or closed square bracket
         /// </summary>
-        public static readonly Parser<char> ClosedTagDeliminator = ClosedParenthesis.Or(ClosedSquareBracket);
+        private static readonly Parser<char> ClosedTagDeliminator = ClosedParenthesis.Or(ClosedSquareBracket);
 
         /// <summary>
         /// Parses a single tag delminator
         /// </summary>
-        public static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
+        private static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
 
         /// <summary>
         /// Parses a string of text up until a "dash separator token," which is defined as a dash (-) with a 
@@ -97,18 +104,15 @@ namespace FansubFileNameParser
             select line.Trim();
 
         /// <summary>
-        /// Parses a single metadata tag
+        /// Parses the content of a metatag
         /// </summary>
-        public static readonly Parser<string> TagEnclosedText =
-            from openTag in OpenTagDeliminator
-            from content in LineUpToTagDeliminator
-            from closedTag in ClosedTagDeliminator
-            select content;
+        public static readonly Parser<string> MetaTagContent = 
+            LineUpToTagDeliminator.Contained(OpenTagDeliminator, ClosedTagDeliminator);
 
         /// <summary>
         /// Parses a single metadata tag, but includes the metadata tag deliminator
         /// </summary>
-        public static readonly Parser<string> TagEnclosedTextWithDeliminator =
+        public static readonly Parser<string> MetaTag =
             from openTag in OpenTagDeliminator
             from content in LineUpToTagDeliminator
             from closedBracket in ClosedTagDeliminator
@@ -117,6 +121,63 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses multiple metadata tags
         /// </summary>
-        public static readonly Parser<IEnumerable<string>> MultipleTagEnclosedText = TagEnclosedText.Token().Many();
+        public static readonly Parser<IEnumerable<string>> MetaTagGroup = MetaTagContent.Token().Many();
+
+        /// <summary>
+        /// Parses content that's contained between any group of multiple tags
+        /// </summary>
+        public static readonly Parser<string> ContentBetweenTagGroups =
+            LineUpToTagDeliminator.Contained(MetaTagGroup.Optional(), MetaTagGroup.Optional());
+
+        /// <summary>
+        /// Parses and captures all of the metadata tags that appear in the string, including the tag deliminator token
+        /// </summary>
+        public static readonly Parser<IEnumerable<string>> CollectTags =
+            from tags in
+                (from tag in MetaTagGroup.Optional()
+                 from _ in Parse.AnyChar.Except(MetaTag).Optional()
+                 select tag.ToIEnumerable()).Many().Implode()
+            select tags;
+
+        /// <summary>
+        /// Parses any media file extension
+        /// </summary>
+        private static readonly Parser<string> MediaFileExtension =
+            Parse.IgnoreCase(".AVI")
+            .Or(Parse.IgnoreCase(".MKV"))
+            .Or(Parse.IgnoreCase(".MP4"))
+            .Or(Parse.IgnoreCase(".M2TS"))
+            .Or(Parse.IgnoreCase(".OGM"))
+            .Or(Parse.IgnoreCase(".TS"))
+            .Or(Parse.IgnoreCase(".WMV"))
+            .End()
+            .Text();
+
+        /// <summary>
+        /// Replaces the dots in the string with spaces while preserving the file extension of a media file
+        /// TODO: WRITE UNIT TESTS
+        /// </summary>
+        public static readonly Parser<string> ReplaceDotsExceptMediaFileExtension =
+            from frontSegment in Parse.AnyChar.Except(MediaFileExtension).Many().Text()
+            from extension in MediaFileExtension.Optional()
+            select string.Format(
+                "{0}{1}", 
+                frontSegment.Replace('.', ' '), 
+                extension.IsDefined 
+                ? extension.Get() 
+                : string.Empty
+            );
+
+        /// <summary>
+        /// Replaces the underscores of an input string with spaces
+        /// TODO: WRITE UNIT TESTS
+        /// </summary>
+        public static readonly Parser<string> ReplaceUnderscores =
+            from segments in
+                (from content in Parse.AnyChar.Except(Underscore).Many().Text()
+                 from _ in Underscore
+                 select content
+                ).Many().Implode(string.Empty, (acc, i) => string.Format("{0} {1}", acc, i))
+            select segments;
     }
 }

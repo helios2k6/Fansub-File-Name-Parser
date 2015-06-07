@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Metadata;
 using Functional.Maybe;
 using Sprache;
 using System;
@@ -127,7 +128,20 @@ namespace FansubFileNameParser.Entity
 
         }
         #endregion
+        #region Base
+        #endregion
         #region Directory
+        private static readonly Parser<string> Volume = Parse.IgnoreCase("VOLUME").Text();
+
+        private static readonly Parser<string> Vol = Parse.IgnoreCase("VOL").Text();
+
+        private static readonly Parser<string> VolumeToken = Volume.Or(Vol);
+
+        private static readonly Parser<Tuple<int, int>> EpisodeRange =
+            from firstNumber in ExtraParsers.Int
+            from _ in BaseGrammars.Dash
+            from secondNumber in ExtraParsers.Int
+            select Tuple.Create(firstNumber, secondNumber);
         #endregion
         #region OP / ED
         #region Parsers

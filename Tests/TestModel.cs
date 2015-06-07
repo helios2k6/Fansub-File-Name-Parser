@@ -194,6 +194,20 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
+            {"[Doki] Mahouka Koukou no Rettousei - Vol 1 (1920x1080 Hi10P BD FLAC)", new FansubDirectoryEntity
+                {
+                    Group = "Doki".ToMaybe(),
+                    Series = "Mahouka Koukou no Rettousei".ToMaybe(),
+                    Volume = 1.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
+                    }.ToMaybe(),
+                }
+            },
         };
         #endregion
 

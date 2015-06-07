@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fansub File Name Parser", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{DA0A6B0F-AB6D-449C-9109-966626480582}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser Tester", "Parser Tester\Parser Tester.csproj", "{2337867D-4E44-4BE5-9591-6E3A541BC7B4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{DA0A6B0F-AB6D-449C-9109-966626480582}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA0A6B0F-AB6D-449C-9109-966626480582}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA0A6B0F-AB6D-449C-9109-966626480582}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2337867D-4E44-4BE5-9591-6E3A541BC7B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2337867D-4E44-4BE5-9591-6E3A541BC7B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2337867D-4E44-4BE5-9591-6E3A541BC7B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2337867D-4E44-4BE5-9591-6E3A541BC7B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

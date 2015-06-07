@@ -53,6 +53,19 @@ namespace FansubFileNameParser.Entity
         /// <summary>
         /// Initializes a new instance of the <see cref="FansubFileEntityBase"/> class.
         /// </summary>
+        /// <param name="extension">The file extension.</param>
+        /// <param name="group">The fansub group.</param>
+        /// <param name="series">The anime series name.</param>
+        /// <param name="metadata">The media metadata.</param>
+        protected FansubFileEntityBase(Maybe<string> extension, Maybe<string> group, Maybe<string> series, Maybe<MediaMetadata> metadata)
+            : base(group, series, metadata)
+        {
+            Extension = extension;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FansubFileEntityBase"/> class.
+        /// </summary>
         /// <param name="info">The information.</param>
         /// <param name="context">The context.</param>
         protected FansubFileEntityBase(SerializationInfo info, StreamingContext context)

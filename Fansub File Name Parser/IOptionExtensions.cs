@@ -25,6 +25,8 @@
 using Functional.Maybe;
 using Sprache;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace FansubFileNameParser
@@ -50,6 +52,22 @@ namespace FansubFileNameParser
             }
 
             return Maybe<T>.Nothing;
+        }
+
+        /// <summary>
+        /// Converts an <see cref="IOption{T}"/> to an <see cref="IEnumerable{T}"/>. 
+        /// </summary>
+        /// <typeparam name="T">The type of items in the IEnumerable{T}</typeparam>
+        /// <param name="this">The IOption{T}</param>
+        /// <returns>The IEnumerable{T} contained in the IOption{T}. Otherwise, an empty sequence</returns>
+        public static IEnumerable<T> ToIEnumerable<T>(this IOption<IEnumerable<T>> @this)
+        {
+            if (@this.IsDefined)
+            {
+                return @this.Get();
+            }
+
+            return Enumerable.Empty<T>();
         }
 
         /// <summary>

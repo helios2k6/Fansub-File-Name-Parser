@@ -22,15 +22,39 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sprache;
+using System.Collections.Generic;
 
-namespace ParserTester
+namespace UnitTests
 {
-    public static class Driver
+    [TestClass]
+    public sealed class ExtraParserTests
     {
-        #region public methods
-        public static void Main(string[] args)
+        [TestMethod]
+        public void IntParser()
         {
+            var inputOutputMap = new Dictionary<string, int>
+            {
+                {"0", 0},
+                {"10", 10},
+                {"01", 1},
+            };
+
+            TestUtils.TestParser(inputOutputMap, ExtraParsers.Int);
         }
-        #endregion
+
+        [TestMethod]
+        public void ImplodeParser()
+        {
+            var implodedParser = Parse.AnyChar.Many().Many().Implode();
+            var inputOutputMap = new Dictionary<string, IEnumerable<char>>
+            {
+                {"abcd", new[] {'a', 'b', 'c', 'd'}},
+            };
+
+            TestUtils.TestMultiTokenParse<char>(inputOutputMap, implodedParser);
+        }
     }
 }

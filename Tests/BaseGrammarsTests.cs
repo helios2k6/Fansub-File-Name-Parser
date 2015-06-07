@@ -30,75 +30,8 @@ using System.Collections.Generic;
 namespace UnitTests.Model.Grammars
 {
     [TestClass]
-    public class BaseGrammarsTests
+    public sealed class BaseGrammarsTests
     {
-        [TestMethod]
-        public void OpenTagDeliminatorParser()
-        {
-            var inputOutputMap = new Dictionary<string, char>
-            {
-                // Open parenthesis
-                {"(", '('},
-                {"(A)", '('},
-                {"((", '('},
-                
-                // Open square bracket
-                {"[", '['},
-                {"[A]", '['},
-                {"[[", '['},
-            };
-
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.OpenTagDeliminator);
-        }
-
-        [TestMethod]
-        public void ClosedTagDeliminatorParser()
-        {
-            var inputOutputMap = new Dictionary<string, char>
-            {
-                // Closed parenthesis
-                {")", ')'},
-                {")A)", ')'},
-                {"))", ')'},
-                
-                // Closed square bracket
-                {"]", ']'},
-                {"]A]", ']'},
-                {"]]", ']'},
-            };
-
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.ClosedTagDeliminator);
-        }
-
-        [TestMethod]
-        public void AnyTagDeliminatorParser()
-        {
-            var inputOutputMap = new Dictionary<string, char>
-            {
-                // Open parenthesis
-                {"(", '('},
-                {"(A)", '('},
-                {"((", '('},
-                
-                // Open square bracket
-                {"[", '['},
-                {"[A]", '['},
-                {"[[", '['},
-
-                // Closed parenthesis
-                {")", ')'},
-                {")A)", ')'},
-                {"))", ')'},
-                
-                // Closed square bracket
-                {"]", ']'},
-                {"]A]", ']'},
-                {"]]", ']'},
-            };
-
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.TagDeliminator);
-        }
-
         [TestMethod]
         public void TagEnclosedText()
         {
@@ -111,7 +44,7 @@ namespace UnitTests.Model.Grammars
 
             };
 
-            TestUtils.TestParser(inputMap, BaseGrammars.TagEnclosedText);
+            TestUtils.TestParser(inputMap, BaseGrammars.MetaTagContent);
         }
 
         [TestMethod]
@@ -125,7 +58,7 @@ namespace UnitTests.Model.Grammars
                 {"(test multiword)", "(test multiword)"},
             };
 
-            TestUtils.TestParser(inputMap, BaseGrammars.TagEnclosedTextWithDeliminator);
+            TestUtils.TestParser(inputMap, BaseGrammars.MetaTag);
         }
 
         [TestMethod]
@@ -141,9 +74,10 @@ namespace UnitTests.Model.Grammars
                 {" [test multiple] [tags] ", new[] {"test multiple", "tags"}},
                 {" (test) (multiple) (tags) ", new[] {"test", "multiple", "tags"}},
                 {" (test multiple) (tags) ", new[] {"test multiple", "tags"}},
+                {"(test multiple) STUFF IN BETWEEN (tags) ", new[] {"test multiple"}},
             };
 
-            TestUtils.TestMultiTokenParse(inputMap, BaseGrammars.MultipleTagEnclosedText);
+            TestUtils.TestMultiTokenParse(inputMap, BaseGrammars.MetaTagGroup);
         }
 
         [TestMethod]
@@ -175,6 +109,35 @@ namespace UnitTests.Model.Grammars
             };
 
             TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToDashSeparatorToken);
+        }
+
+        [TestMethod]
+        public void ContentBetweenTagGroups()
+        {
+            var inputOutputMap = new Dictionary<string, string>
+            {
+                {"Kokoro Connect (2012) [Doki-Chihiro][1920x1080 Hi10P BD FLAC]", "Kokoro Connect"},
+                {"[Vivid] The World God Only Knows - Goddesses Arc [BD 1080p FLAC]", "The World God Only Knows - Goddesses Arc"},
+                {"[BlurayDesuYo] Amagi Brilliant Park - Vol. 1 (BD 1920x1080 10bit FLAC)", "Amagi Brilliant Park - Vol. 1"},
+            };
+
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.ContentBetweenTagGroups);
+        }
+
+        [TestMethod]
+        public void CollectTags()
+        {
+            var inputMap = new Dictionary<string, IEnumerable<string>>
+            {
+                {"[Doki] Akame ga Kill! - Vol 1 (1920x1080 Hi10P BD FLAC)", new[] {"Doki", "1920x1080 Hi10P BD FLAC"}},
+                {"[HorribleSubs] Akame ga Kill! - 01 [720p].mkv", new[] {"HorribleSubs", "720p"}},
+                {"[gg]_Ben-to_-_12_[33993A13].mkv", new[] {"gg", "33993A13"}},
+                {"[Coalgirls]_Amagi_Brilliant_Park_01_(1920x1080_Blu-Ray_FLAC)_[54A49F15].mkv", new[] {"Coalgirls", "1920x1080_Blu-Ray_FLAC", "54A49F15"}},
+                {"[TCL]_Claymore_01_[Blu-Ray][720p][13A866AC].mkv", new[] {"TCL", "Blu-Ray", "720p", "13A866AC"}},
+                {"(B-A)Devilman_Lady_-_01_(2E088B82).mkv", new[] {"B-A", "2E088B82"}},
+            };
+
+            TestUtils.TestMultiTokenParse(inputMap, BaseGrammars.CollectTags);
         }
     }
 }
