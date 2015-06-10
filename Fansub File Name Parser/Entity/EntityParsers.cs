@@ -65,6 +65,18 @@ namespace FansubFileNameParser.Entity
         private static readonly Lazy<Parser<BaseParseResult>> BaseEntityParserLazy = 
             new Lazy<Parser<BaseParseResult>>(CreateBaseEntityParser);
         #endregion
+        #region public static methods
+        /// <summary>
+        /// Tries to parse the string into an <see cref="IFansubEntity"/> object
+        /// </summary>
+        /// <param name="unprocessedString">The unprocessed string.</param>
+        /// <returns>The parse result</returns>
+        public static Maybe<IFansubEntity> TryParseEntity(string unprocessedString)
+        {
+            return Maybe<IFansubEntity>.Nothing;
+        }
+        #endregion
+        #region private static methods
         #region Base
         /// <summary>
         /// Parses the data required to construct a <see cref="FansubEntityBase"/>. This parser will not consume
@@ -249,6 +261,9 @@ namespace FansubFileNameParser.Entity
             };
 
         private static readonly Parser<IFansubEntity> OpeningOrEnding = ParseOpening.Or(ParseEnding);
+        #endregion
+        #endregion
+        #region OVA / ONA
         #endregion
         #endregion
     }

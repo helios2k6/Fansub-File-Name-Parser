@@ -38,6 +38,49 @@ namespace UnitTests.Models
         private static readonly Lazy<IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>>> InputToMediaMetadataMap =
             new Lazy<IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>>>(InitMediaMetadataTestModel);
 
+        private static readonly IDictionary<string, IFansubEntity> OriginalVideoInputToEntityMap = new Dictionary<string, IFansubEntity>
+        {
+            {"[SFW] Mahou Sensei Negima! OAD ~Mou Hitotsu no Sekai~ 02 [DVD][87942D8A].mkv", null},
+            {"[Hatsuyuki]_Noragami_OAD_-_01_[10bit][848x480][FDCA30AA].mkv", null},
+            {"[SubDESU]_R-15_OAD_(DVD_720x480_x264_AAC)_[7D1F1EDF].mkv", null},
+            {"[Chihiro]_Hitsugi_no_Chaika_-_OAD_[1280x720_Blu-ray_AAC][7ECAA5A1].mkv", null},
+            {"[Saizen]_Attack_on_Titan_-_OAD_1_[06EA79B8].mkv", null},
+            {"[gg]_Joshiraku_-_OAD_[869F6659].mkv", null},
+            {"[Vivid] Tonari no Seki-kun - OAD [DVD 576p AAC][9D6909E7].mkv", null},
+            {"[WCP] Nisekoi OAD 3 - Bath House & Service [576p][BCBBA0B2].mkv", null},
+            {"[AniYoshi]_School_Days_OVA_-_Valentine_Days_(DVD)_[5DE6B483].mkv", null},
+            {"[Coalgirls]_Valkyria_Chronicles_(1920x1080_Blu-Ray_FLAC)/[Coalgirls]_Valkyria_Chronicles_OVA_08_(1920x1080_Blu-Ray_FLAC)_[F015CD71].mkv", null},
+            {"[Doki] Seto no Hanayome OVA - 01 (720x480 h264 DVD AAC) [032D22A4].mkv", null},
+            {"[Procrastinating] Seitokai Yakuindomo OVA 03 [BD 1080p].mkv", null},
+            {"[Ayako-Himatsubushi] Seitokai Yakuindomo OVA - 01v2 [DVD][480p][EF82D238].mkv", null},
+            {"[Coalgirls]_Utawarerumono_OVA_03_(1920x1080_Blu-Ray_FLAC)_[D3BD62B6].mkv", null},
+            {"The World God Only Knows OVA - Four Plus an Idol.mkv", null},
+            {"[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail - 04 [BD][480p][926257C1].mkv", null},
+            {"[UTW]_Fate_Kaleid_Liner_Prisma_Ilya_-_OVA_[BD][h264-1080p_FLAC][002240CB].mkv", null},
+        };
+
+        private static readonly IDictionary<string, IFansubEntity> OpeningEndingInputToEntityMap = new Dictionary<string, IFansubEntity>
+        {
+            {"[FFF] Hyakka Ryouran Samurai Bride - ED06 [BD][1080p-FLAC][2218ADB6].mkv", null},
+            {"[Ryuumaru] Hyakka Ryouran Samurai Girls - ED (Clean) [1080p - Bluray][DB8185D1].mkv", null},
+            {"[FFF] Hataraku Maou-sama! - ED02 [BD][1080p-FLAC][577E003B].mkv", null},
+            {"[Doki] GJ-bu - NCED 2 (1920x1080 Hi10P BD FLAC) [71E9D167].mkv", null},
+            {"[Coalgirls]_Yahari_Ore_no_Seishun_Love_Comedy_wa_Machigatteiru_NCED3_(1920x1080_Blu-Ray_FLAC)_[759447B3].mkv", null},
+            {"[Underwater-FFF] Saki Achiga-hen - Episode of Side-A - ED02 [BD][1080p-FLAC][280EFFB2].mkv", null},
+            {"[Commie] Yuyushiki - NCED 09 [BD 720p AAC] [E291A643].mkv", null},
+            {"[UTW]_Shinsekai_Yori_-_Creditless_ED2_[BD][h264-1080p_FLAC][E3C12E42].mkv", null},
+            {"[Coalgirls]_C3-Cube_x_Cursed_x_Curious_NCED_(1920x1080_Blu-Ray_FLAC)_[50450AA5].mkv", null},
+            {"[Coalgirls]_Valkyria_Chronicles_OP1_-_alt_(1920x1080_Blu-Ray_FLAC)_[414F6192].mkv", null},
+            {"[Doki] UN-GO - NCOP (1920x1080 Hi10P BD FLAC) [8C5BF375].mkv", null},
+            {"[Coalgirls]_Tokyo_Ghoul_NCOP1_(1920x1080_Blu-ray_FLAC)_[D91E552D].mkv", null},
+            {"[WhyNot] Steins;Gate - NCOP [BD 720p AAC][1B65071D].mkv", null},
+            {"[FFF] NouCome - OP02 [BD][1080p-FLAC][03E64080].mkv", null},
+            {"[Final8]Mirai Nikki (Creditless OP3 - The Live World) (BD 10-bit 1280x720 x264 AAC)[8F8B757F].mkv", null},
+            {"[Doki] Air - NCOP A (1280x720 Hi10P BD FLAC) [43076542].mkv", null},
+            {"[joseole99] Gurren Lagann - NCOP3v2 (853x480 h264 AC3 AC3) [956587FD].mkv", null},
+            {"[Doki] Yuru Yuri 2 - NCOP 2v2 (1920x1080 Hi10P BD FLAC) [8CABBF62].mkv", null},
+        };
+
         private static readonly IDictionary<string, IFansubEntity> DirectoryInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
             {"Kokoro Connect (2012) [Doki-Chihiro][1920x1080 Hi10P BD FLAC]", new FansubDirectoryEntity 
@@ -330,7 +373,7 @@ namespace UnitTests.Models
                                     videoModeTag,
                                     new KeyValuePair<string, Resolution>(res1, new Resolution(1920, 1080))
                                 );
-                                
+
                                 var map2 = CreateMapping(
                                     audioTag,
                                     pixelBitDepthTag,
