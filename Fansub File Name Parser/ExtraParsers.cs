@@ -59,11 +59,39 @@ namespace FansubFileNameParser
                 var result = @this.Invoke(input);
                 if (result.WasSuccessful == false)
                 {
-                    var message = string.Format("Failure to implode. Dependent parser failed. {0}", result.Message);
-                    return Result.Failure<IEnumerable<T>>(result.Remainder, message, result.Expectations);
+                    return Result.Failure<IEnumerable<T>>(
+                        result.Remainder,
+                        string.Format("Failure to implode. Dependent parser failed. {0}", result.Message), 
+                        result.Expectations
+                    );
                 }
 
                 return Result.Success<IEnumerable<T>>(result.Value.SelectMany(i => i), result.Remainder);
+            };
+        }
+
+        /// <summary>
+        /// Attempt parsing only if all of the parsers in <paramref name="parsers"/> fail
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="this">The parser.</param>
+        /// <param name="parsers">The other except parsers.</param>
+        /// <returns>A new parser that will only succeed if the subsequent parsers fail</returns>
+        public static Parser<TResult> ExceptAny<TResult>(this Parser<TResult> @this, params Parser<dynamic>[] parsers)
+        {
+            return input =>
+            {
+                var anyResult = parsers.Any(t => t.Invoke(input).WasSuccessful);
+                if (anyResult)
+                {
+                    return Result.Failure<TResult>(
+                        input,
+                        string.Format("One of the excepted parsers succeeded"),
+                        new[] { string.Empty }
+                    );
+                }
+
+                return @this.Invoke(input);
             };
         }
 
@@ -87,11 +115,69 @@ namespace FansubFileNameParser
                 var result = @this.Invoke(input);
                 if (result.WasSuccessful == false)
                 {
-                    var message = string.Format("Failure to implode. Dependent parser failed. {0}", result.Message);
-                    return Result.Failure<TResult>(result.Remainder, message, result.Expectations);
+                    return Result.Failure<TResult>(
+                        result.Remainder,
+                        string.Format("Failure to implode. Dependent parser failed. {0}", result.Message), 
+                        result.Expectations
+                    );
                 }
                 return Result.Success<TResult>(result.Value.Aggregate<TInput, TResult>(seed, accumulator), result.Remainder);
             };
+        }
+
+        /// <summary>
+        /// Parses the antecedent parser and feeds its results into the <paramref name="continuation" /> parser
+        /// 
+        /// TODO: WRITE UTS
+        /// </summary>
+        /// <typeparam name="TInput">The type of the input.</typeparam>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="this">The antecedent parser</param>
+        /// <param name="converter">The converter function to link the two parsers together.</param>
+        /// <param name="continuation">The continuation parser.</param>
+        /// <returns>
+        /// A new parser that is the parsing of the antecedent's result using the continuation parser
+        /// </returns>
+        public static Parser<TResult> ContinueWith<TInput, TResult>(
+            this Parser<TInput> @this,
+            Func<TInput, string> converter,
+            Parser<TResult> continuation
+        )
+        {
+            return input =>
+            {
+                var result = @this.Invoke(input);
+                if (result.WasSuccessful == false)
+                {
+                    return Result.Failure<TResult>(
+                        result.Remainder,
+                        string.Format("Failure to continue with the continuation parser. The antecedent parser failed. {0}", result.Message),
+                        result.Expectations
+                    );
+                }
+
+                var convertedInput = converter.Invoke(result.Value);
+                return continuation.Invoke(new Input(convertedInput));
+            };
+        }
+
+        /// <summary>
+        /// Parses the antecedent parser and feeds its results into the <paramref name="continuation" /> parser
+        /// 
+        /// TODO: WRITE UTS
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="this">The antecedent parser.</param>
+        /// <param name="continuation">The continuation parser.</param>
+        /// <returns>
+        /// A new parser that is the parsing of the antecedent's result using the continuation parser
+        /// </returns>
+        public static Parser<TResult> ContinueWith<TResult>(
+            this Parser<string> @this,
+            Parser<TResult> continuation
+        )
+        {
+            return @this.ContinueWith(i => i, continuation);
         }
 
         /// <summary>

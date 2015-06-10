@@ -52,26 +52,6 @@ namespace FansubFileNameParser.Entity.Directory
             EpisodeRange = Maybe<Tuple<int, int>>.Nothing;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FansubDirectoryEntity"/> class.
-        /// </summary>
-        /// <param name="volume">The BD/DVD volume.</param>
-        /// <param name="episodeRange">The episode range.</param>
-        /// <param name="group">The fansub group.</param>
-        /// <param name="series">The anime series name.</param>
-        /// <param name="metadata">The media metadata.</param>
-        public FansubDirectoryEntity(
-            Maybe<int> volume, 
-            Maybe<Tuple<int, int>> episodeRange,
-            Maybe<string> group,
-            Maybe<string> series,
-            Maybe<MediaMetadata> metadata
-        ) : base(group, series, metadata)
-        {
-            Volume = volume;
-            EpisodeRange = episodeRange;
-        }
-
         private FansubDirectoryEntity(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

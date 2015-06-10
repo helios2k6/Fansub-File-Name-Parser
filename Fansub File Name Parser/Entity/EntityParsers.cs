@@ -22,10 +22,12 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Entity.Directory;
 using FansubFileNameParser.Metadata;
 using Functional.Maybe;
 using Sprache;
 using System;
+using System.Linq;
 
 namespace FansubFileNameParser.Entity
 {
@@ -34,101 +36,89 @@ namespace FansubFileNameParser.Entity
     /// </summary>
     internal static class EntityParsers
     {
-        #region public nested class
+        #region private nested class
+        private class FileBasedParseResult : BaseParseResult
+        {
+            public Maybe<string> Extension { get; set; }
+        }
         /// <summary>
         /// The result of an OP/ED Parser
         /// </summary>
-        public sealed class OPEDParseResult : IEquatable<OPEDParseResult>
+        private sealed class OPEDParseResult
         {
-            /// <summary>
-            /// Gets or sets the creditless prefix.
-            /// </summary>
-            /// <value>
-            /// The creditless prefix.
-            /// </value>
             public Maybe<string> CreditlessPrefix { get; set; }
-            /// <summary>
-            /// Gets or sets the Opening or Ending Token
-            /// </summary>
-            /// <value>
-            /// The Opening or Ending Token
-            /// </value>
             public Maybe<string> OPEDToken { get; set; }
-            /// <summary>
-            /// Gets or sets the sequence number.
-            /// </summary>
-            /// <value>
-            /// The sequence number.
-            /// </value>
             public Maybe<int> SequenceNumber { get; set; }
+        }
 
-            /// <summary>
-            /// Returns a <see cref="System.String" /> that represents this instance.
-            /// </summary>
-            /// <returns>
-            /// A <see cref="System.String" /> that represents this instance.
-            /// </returns>
-            public override string ToString()
-            {
-                return string.Format("[{0}] [{1}] [{2}]", CreditlessPrefix, OPEDToken, SequenceNumber);
-            }
-
-            /// <summary>
-            /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
-            /// </summary>
-            /// <param name="other">The <see cref="System.Object" /> to compare with this instance.</param>
-            /// <returns>
-            ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
-            /// </returns>
-            public override bool Equals(object other)
-            {
-                return Equals(other as OPEDParseResult);
-            }
-
-            /// <summary>
-            /// Indicates whether the current object is equal to another object of the same type.
-            /// </summary>
-            /// <param name="other">An object to compare with this object.</param>
-            /// <returns>
-            /// true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.
-            /// </returns>
-            public bool Equals(OPEDParseResult other)
-            {
-                if (EqualsPreamble(other) == false)
-                {
-                    return false;
-                }
-
-                return CreditlessPrefix.Equals(other.CreditlessPrefix)
-                    && OPEDToken.Equals(other.OPEDToken)
-                    && SequenceNumber.Equals(other.SequenceNumber);
-            }
-
-            /// <summary>
-            /// Returns a hash code for this instance.
-            /// </summary>
-            /// <returns>
-            /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
-            /// </returns>
-            public override int GetHashCode()
-            {
-                return CreditlessPrefix.GetHashCode()
-                    ^ OPEDToken.GetHashCode()
-                    ^ SequenceNumber.GetHashCode();
-            }
-
-            private bool EqualsPreamble(object other)
-            {
-                if (ReferenceEquals(null, other)) return false;
-                if (ReferenceEquals(this, other)) return true;
-                if (GetType() != other.GetType()) return false;
-
-                return true;
-            }
-
+        /// <summary>
+        /// The result of the base parser
+        /// </summary>
+        private class BaseParseResult
+        {
+            public Maybe<string> Group { get; set; }
+            public Maybe<string> Series { get; set; }
+            public Maybe<MediaMetadata> Metadata { get; set; }
         }
         #endregion
+        #region private static fields
+        private static readonly Lazy<Parser<BaseParseResult>> BaseEntityParserLazy = 
+            new Lazy<Parser<BaseParseResult>>(CreateBaseEntityParser);
+        #endregion
         #region Base
+        /// <summary>
+        /// Parses the data required to construct a <see cref="FansubEntityBase"/>. This parser will not consume
+        /// any characters, but is subject to the remainder of any strings that were consumed, so it should always
+        /// be the first parser in any parser comprehension.
+        /// </summary>
+        private static Parser<BaseParseResult> BaseEntity
+        {
+            get { return BaseEntityParserLazy.Value; }
+        }
+
+        private static Parser<BaseParseResult> CreateBaseEntityParser()
+        {
+            Parser<BaseParseResult> parser = input =>
+            {
+                var substring = input.Source.Substring(input.Column);
+                var tags = BaseGrammars.CollectTags.TryParse(substring);
+                var metadata = tags.WasSuccessful
+                    ? MediaMetadataParser.TryParseMediaMetadata(tags.Value)
+                    : Maybe<MediaMetadata>.Nothing;
+
+                DateTime _;
+                Maybe<string> group = from metadataVar in metadata
+                                      let unusedTags = metadataVar.UnusedTags
+                                      let filteredOutDate = unusedTags.Where(s => DateTime.TryParse(s, out _) == false)
+                                      let groupCandidate = filteredOutDate.FirstOrDefault()
+                                      select groupCandidate;
+
+                Maybe<string> seriesName = Maybe<string>.Nothing;
+
+                var mainContentParser = BaseGrammars.ContentBetweenTagGroups.ContinueWith(BaseGrammars.LineUpToDashSeparatorToken);
+                var mainContent = mainContentParser.TryParse(substring);
+                if (mainContent.WasSuccessful)
+                {
+                    var name = BaseGrammars.LineUpToDashSeparatorToken.TryParse(mainContent.Value);
+                    seriesName = name.WasSuccessful
+                        ? name.Value.Trim().ToMaybe()
+                        : Maybe<string>.Nothing;
+                }
+
+                return Result.Success<BaseParseResult>(
+                    new BaseParseResult
+                    {
+                        Group = group,
+                        Series = seriesName,
+                        Metadata = metadata,
+                    },
+                    input
+                );
+            };
+
+            return parser.Memoize();
+        }
+
         #endregion
         #region Directory
         private static readonly Parser<string> Volume = Parse.IgnoreCase("VOLUME").Text();
@@ -142,6 +132,39 @@ namespace FansubFileNameParser.Entity
             from _ in BaseGrammars.Dash
             from secondNumber in ExtraParsers.Int
             select Tuple.Create(firstNumber, secondNumber);
+
+        private static readonly Parser<int> VolumeNumber =
+            from volumeToken in VolumeToken
+            from dotAndSpace in Parse.AnyChar.Except(ExtraParsers.Int).Many()
+            from number in ExtraParsers.Int
+            select number;
+
+        private static readonly Parser<IFansubEntity> Directory =
+            from @base in BaseEntity
+            from _ in Parse.AnyChar.ExceptAny(EpisodeRange, VolumeToken).Many().Text().Optional()
+            from vol in VolumeNumber.Optional()
+            from range in EpisodeRange.Optional()
+            select new FansubDirectoryEntity
+            {
+                Group = @base.Group,
+                Series = @base.Series,
+                Metadata = @base.Metadata,
+                Volume = vol.ConvertFromIOptionToMaybe(),
+                EpisodeRange = range.ConvertFromIOptionToMaybe(),
+            };
+        #endregion
+        #region File
+        private static readonly Parser<FileBasedParseResult> FileEntityBase =
+            (from @base in BaseEntity
+             from _ in Parse.AnyChar.Except(BaseGrammars.FileExtension).Many()
+             from ext in BaseGrammars.FileExtension
+             select new FileBasedParseResult
+             {
+                 Extension = ext.ToMaybe(),
+                 Group = @base.Group,
+                 Series = @base.Series,
+                 Metadata = @base.Metadata,
+             }).Memoize();
         #endregion
         #region OP / ED
         #region Parsers
@@ -195,21 +218,37 @@ namespace FansubFileNameParser.Entity
                 SequenceNumber = sequenceNumber.ConvertFromIOptionToMaybe(),
             };
 
-        /// <summary>
-        /// Parses the OP embedded in any amount of text
-        /// </summary>
-        public static readonly Parser<OPEDParseResult> ParseOpeningFromLine =
-            from contentBefore in Parse.AnyChar.Except(AnyOpeningToken).Many().Optional()
+        private static readonly Parser<IFansubEntity> ParseOpening =
+            from @base in FileEntityBase
+            from _ in Parse.AnyChar.Except(AnyOpeningToken).Many().Optional()
             from openingToken in AnyOpeningToken
-            select openingToken;
+            select new FansubOPEDEntity
+            {
+                Group = @base.Group,
+                Series = @base.Series,
+                Metadata = @base.Metadata,
+                Extension = @base.Extension,
+                SequenceNumber = openingToken.SequenceNumber,
+                Part = FansubOPEDEntity.Segment.OP.ToMaybe(),
+                NoCredits = openingToken.CreditlessPrefix.HasValue,
+            };
 
-        /// <summary>
-        /// Parses the ED embedded in any amount of text 
-        /// </summary>
-        public static readonly Parser<OPEDParseResult> ParseEndingFromLine =
-            from contentBefore in Parse.AnyChar.Except(AnyEndingToken).Many().Optional()
-            from endingToken in AnyEndingToken
-            select endingToken;
+        private static readonly Parser<IFansubEntity> ParseEnding =
+            from @base in FileEntityBase
+            from _ in Parse.AnyChar.Except(AnyEndingToken).Many().Optional()
+            from openingToken in AnyEndingToken
+            select new FansubOPEDEntity
+            {
+                Group = @base.Group,
+                Series = @base.Series,
+                Metadata = @base.Metadata,
+                Extension = @base.Extension,
+                SequenceNumber = openingToken.SequenceNumber,
+                Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
+                NoCredits = openingToken.CreditlessPrefix.HasValue,
+            };
+
+        private static readonly Parser<IFansubEntity> OpeningOrEnding = ParseOpening.Or(ParseEnding);
         #endregion
         #endregion
     }

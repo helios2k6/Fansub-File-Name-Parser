@@ -75,31 +75,6 @@ namespace FansubFileNameParser.Entity
         /// <summary>
         /// Initializes a new instance of the <see cref="FansubOPEDEntity"/> class.
         /// </summary>
-        /// <param name="sequenceNumber">The OP/ED sequence number.</param>
-        /// <param name="part">Whether this is an OP or ED.</param>
-        /// <param name="noCredits">Whether this is a No-Credit OP/ED.</param>
-        /// <param name="extension">The file extension.</param>
-        /// <param name="group">The fansub group.</param>
-        /// <param name="series">The anime series name.</param>
-        /// <param name="metadata">The media metadata.</param>
-        public FansubOPEDEntity(
-            Maybe<int> sequenceNumber, 
-            Maybe<Segment> part, 
-            bool noCredits, 
-            Maybe<string> extension, 
-            Maybe<string> group, 
-            Maybe<string> series, 
-            Maybe<MediaMetadata> metadata
-        ) : base(extension, group, series, metadata)
-        {
-            SequenceNumber = sequenceNumber;
-            Part = part;
-            NoCredits = noCredits;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FansubOPEDEntity"/> class.
-        /// </summary>
         /// <param name="info">The information.</param>
         /// <param name="context">The context.</param>
         private FansubOPEDEntity(SerializationInfo info, StreamingContext context)

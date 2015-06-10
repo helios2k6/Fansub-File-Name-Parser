@@ -139,5 +139,21 @@ namespace UnitTests.Model.Grammars
 
             TestUtils.TestMultiTokenParse(inputMap, BaseGrammars.CollectTags);
         }
+
+        [TestMethod]
+        public void CleanString()
+        {
+            var inputMap = new Dictionary<string, string>
+            {
+                {"[Doki] Akame ga Kill! - Vol 1 (1920x1080 Hi10P BD FLAC)", "[Doki] Akame ga Kill! - Vol 1 (1920x1080 Hi10P BD FLAC)"},
+                {"(B-A)Devilman_Lady_-_01_(2E088B82).mkv", "(B-A)Devilman Lady - 01 (2E088B82).mkv"},
+                {"[Elysium]Spice.and.Wolf.II(BD.1080p.FLAC)", "[Elysium]Spice and Wolf II(BD 1080p FLAC)"},
+                {"[gg].Binbougami_ga!_-.01_[D909F54C].mkv", "[gg] Binbougami ga! - 01 [D909F54C].mkv"},
+                {"[gg]_Binbougami_ga!_-_01_[D909F54C].mkv", "[gg] Binbougami ga! - 01 [D909F54C].mkv"},
+                {"[Coalgirls]_Amagi_Brilliant_Park_01-02_(1920x1080_Blu-Ray_FLAC)", "[Coalgirls] Amagi Brilliant Park 01-02 (1920x1080 Blu-Ray FLAC)"},
+            };
+
+            TestUtils.TestParser(inputMap, BaseGrammars.CleanInputString);
+        }
     }
 }

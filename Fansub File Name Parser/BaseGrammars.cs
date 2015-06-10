@@ -40,6 +40,11 @@ namespace FansubFileNameParser
         public static readonly Parser<char> Dash = Parse.Char('-');
 
         /// <summary>
+        /// Parses a single dot ('.') character
+        /// </summary>
+        private static readonly Parser<char> Dot = Parse.Char('.');
+
+        /// <summary>
         /// Parses a single underscore ('_') character
         /// </summary>
         private static readonly Parser<char> Underscore = Parse.Char('_');
@@ -93,15 +98,15 @@ namespace FansubFileNameParser
         /// single space before and after it: (" - ")
         /// </summary>
         public static readonly Parser<string> LineUpToDashSeparatorToken =
-            from line in Parse.AnyChar.Except(DashSeparatorToken).Many().Text()
-            select line.Trim();
+            (from line in Parse.AnyChar.Except(DashSeparatorToken).Many().Text()
+             select line.Trim()).Memoize();
 
         /// <summary>
         /// Parses a line of text until a tag delmiinator is encountered
         /// </summary>
         public static readonly Parser<string> LineUpToTagDeliminator =
-            from line in Parse.AnyChar.Except(TagDeliminator).Many().Text()
-            select line.Trim();
+            (from line in Parse.AnyChar.Except(TagDeliminator).Many().Text()
+             select line.Trim()).Memoize();
 
         /// <summary>
         /// Parses the content of a metatag
@@ -140,26 +145,21 @@ namespace FansubFileNameParser
             select tags;
 
         /// <summary>
-        /// Parses any media file extension
+        /// Parses a file extension
+        /// 
+        /// TODO: WRITE UTS
         /// </summary>
-        private static readonly Parser<string> MediaFileExtension =
-            Parse.IgnoreCase(".AVI")
-            .Or(Parse.IgnoreCase(".MKV"))
-            .Or(Parse.IgnoreCase(".MP4"))
-            .Or(Parse.IgnoreCase(".M2TS"))
-            .Or(Parse.IgnoreCase(".OGM"))
-            .Or(Parse.IgnoreCase(".TS"))
-            .Or(Parse.IgnoreCase(".WMV"))
-            .End()
-            .Text();
+        public static readonly Parser<string> FileExtension =
+            from dot in Dot
+            from extContent in Parse.AnyChar.Except(Dot.Or(TagDeliminator)).Many().End().Text()
+            select string.Concat(dot, extContent);
 
         /// <summary>
         /// Replaces the dots in the string with spaces while preserving the file extension of a media file
-        /// TODO: WRITE UNIT TESTS
         /// </summary>
-        public static readonly Parser<string> ReplaceDotsExceptMediaFileExtension =
-            from frontSegment in Parse.AnyChar.Except(MediaFileExtension).Many().Text()
-            from extension in MediaFileExtension.Optional()
+        private static readonly Parser<string> ReplaceDotsExceptMediaFileExtension =
+            from frontSegment in Parse.AnyChar.Except(FileExtension).Many().Text()
+            from extension in FileExtension.Optional()
             select string.Format(
                 "{0}{1}", 
                 frontSegment.Replace('.', ' '), 
@@ -170,14 +170,19 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Replaces the underscores of an input string with spaces
-        /// TODO: WRITE UNIT TESTS
         /// </summary>
-        public static readonly Parser<string> ReplaceUnderscores =
+        private static readonly Parser<string> ReplaceUnderscores =
             from segments in
                 (from content in Parse.AnyChar.Except(Underscore).Many().Text()
-                 from _ in Underscore
-                 select content
-                ).Many().Implode(string.Empty, (acc, i) => string.Format("{0} {1}", acc, i))
-            select segments;
+                 from _ in Underscore.Optional()
+                 select content).Many().Implode(string.Empty, (acc, i) => string.Format("{0} {1}", acc, i))
+            select segments.Trim();
+
+        /// <summary>
+        /// Sanitizes the input string by replacing dots and dashes with spaces, with the exception 
+        /// of any file extensions
+        /// </summary>
+        public static readonly Parser<string> CleanInputString =
+            ReplaceDotsExceptMediaFileExtension.ContinueWith(ReplaceUnderscores);
     }
 }

@@ -56,7 +56,6 @@
   <ItemGroup>
     <Compile Include="Assembly.cs" />
     <Compile Include="BaseGrammars.cs" />
-    <Compile Include="Entity\EntityFactory.cs" />
     <Compile Include="Entity\EntityParsers.cs" />
     <Compile Include="Entity\FansubEntityBase.cs" />
     <Compile Include="Entity\FansubFileEntityBase.cs" />
