@@ -52,7 +52,7 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses a single dash separator token (' - ')
         /// </summary>
-        private static readonly Parser<string> DashSeparatorToken =
+        public static readonly Parser<string> DashSeparatorToken =
             from frontSpace in Parse.WhiteSpace
             from dash in BaseGrammars.Dash
             from backSpace in Parse.WhiteSpace
@@ -132,22 +132,18 @@ namespace FansubFileNameParser
         /// Parses content that's contained between any group of multiple tags
         /// </summary>
         public static readonly Parser<string> ContentBetweenTagGroups =
-            LineUpToTagDeliminator.Contained(MetaTagGroup.Optional(), MetaTagGroup.Optional());
+            LineUpToTagDeliminator.Contained(MetaTagGroup, MetaTagGroup);
 
         /// <summary>
         /// Parses and captures all of the metadata tags that appear in the string, including the tag deliminator token
         /// </summary>
         public static readonly Parser<IEnumerable<string>> CollectTags =
-            from tags in
-                (from tag in MetaTagGroup.Optional()
-                 from _ in Parse.AnyChar.Except(MetaTag).Optional()
-                 select tag.ToIEnumerable()).Many().Implode()
-            select tags;
+            ExtraParsers.ScanFor(MetaTagContent).Many();
 
         /// <summary>
         /// Parses a file extension
         /// 
-        /// TODO: WRITE UTS
+        /// TODO: UTs
         /// </summary>
         public static readonly Parser<string> FileExtension =
             from dot in Dot

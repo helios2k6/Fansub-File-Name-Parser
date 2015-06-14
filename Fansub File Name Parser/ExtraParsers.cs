@@ -156,15 +156,14 @@ namespace FansubFileNameParser
                     );
                 }
 
-                var convertedInput = converter.Invoke(result.Value);
-                return continuation.Invoke(new Input(convertedInput));
+                return continuation.Invoke(new Input(converter.Invoke(result.Value)));
             };
         }
 
         /// <summary>
         /// Parses the antecedent parser and feeds its results into the <paramref name="continuation" /> parser
         /// 
-        /// TODO: WRITE UTS
+        /// TODO: UTs
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="this">The antecedent parser.</param>
@@ -181,14 +180,65 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Returns a parser that will scan for a token that is parsable by the given parser
+        /// 
+        /// TODO: UTs
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="scanner">The parser.</param>
+        /// <returns>A new parser that scans for any token that is parsable by the given parser</returns>
+        public static Parser<TResult> ScanFor<TResult>(Parser<TResult> scanner)
+        {
+            return from _ in Parse.AnyChar.Except(scanner).Many().Text()
+                   from s in scanner
+                   select s;
+        }
+
+        /// <summary>
+        /// Returns a new parser that will invoke this parser and then reset the input back to what it was when it
+        /// was fed into this parser
+        /// 
+        /// TODO: UTs
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="this">The parser.</param>
+        /// <returns>A new parser that resets its input on completion</returns>
+        public static Parser<TResult> ResetInput<TResult>(this Parser<TResult> @this)
+        {
+            return input =>
+            {
+                var result = @this.Invoke(input);
+                return result.WasSuccessful
+                    ? Result.Success<TResult>(result.Value, input)
+                    : Result.Failure<TResult>(input, result.Message, result.Expectations);
+            };
+        }
+
+        /// <summary>
+        /// Constructs a parser that indicates the given parser is optional. The only difference between the 
+        /// traditional Parser{TResult}.Optional() construct is that this parser will return a Maybe{TResult} instead of
+        /// an IOption{TResult}
+        /// 
+        /// TODO: UTs
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="this">The parser.</param>
+        /// <returns>A new parser that returns a Maybe{TResult}</returns>
+        public static Parser<Maybe<TResult>> OptionalMaybe<TResult>(this Parser<TResult> @this)
+        {
+            return from r in @this.Optional()
+                   select r.ConvertFromIOptionToMaybe();
+        }
+
+        /// <summary>
         /// Memoizes the specified <see cref="Parser{T}"/>
         /// </summary>
-        /// <typeparam name="T">The type of result</typeparam>
+        /// <typeparam name="TResult">The type of result</typeparam>
         /// <param name="this">The parser</param>
         /// <returns>A memoized version of this parser</returns>
-        public static Parser<T> Memoize<T>(this Parser<T> @this)
+        public static Parser<TResult> Memoize<TResult>(this Parser<TResult> @this)
         {
-            var memopad = new ConcurrentDictionary<IInput, IResult<T>>();
+            var memopad = new ConcurrentDictionary<IInput, IResult<TResult>>();
             return input => memopad.GetOrAdd(input, @this.Invoke);
         }
 

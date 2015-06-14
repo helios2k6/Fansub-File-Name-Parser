@@ -60,6 +60,7 @@ namespace FansubFileNameParser.Entity
         #region private static fields
         private const string EpisodeNumberKey = "EpisodeNumber";
         private const string TypeKey = "Type";
+        private const string TitleKey = "Title";
         #endregion
 
         #region ctor
@@ -70,6 +71,7 @@ namespace FansubFileNameParser.Entity
         {
             EpisodeNumber = Maybe<int>.Nothing;
             Type = Maybe<ReleaseType>.Nothing;
+            Title = Maybe<string>.Nothing;
         }
 
         /// <summary>
@@ -82,6 +84,7 @@ namespace FansubFileNameParser.Entity
         {
             EpisodeNumber = MaybeExtensions.GetValueNullableMaybe<int>(info, EpisodeNumberKey);
             Type = MaybeExtensions.GetValueNullableMaybe<ReleaseType>(info, TypeKey);
+            Title = ((string)info.GetValue(TitleKey, typeof(string))).ToMaybe();
         }
         #endregion
 
@@ -103,6 +106,19 @@ namespace FansubFileNameParser.Entity
         /// </value>
         [JsonProperty(PropertyName = "Type")]
         public Maybe<ReleaseType> Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the title of this Original Animation. 
+        /// 
+        /// Many Original Animations will have their own title, such as Black Lagoon: Roberta's Blood Trail 
+        /// or Nisekoi - Bath House & Service. In order to distinguish between the "root" series name and
+        /// the name given to this OVA, we separate out the special title given to this Original Animation
+        /// </summary>
+        /// <value>
+        /// The title of the Original Animation.
+        /// </value>
+        [JsonProperty(PropertyName = "Title")]
+        public Maybe<string> Title { get; set; }
         #endregion
 
         #region public methods
@@ -123,10 +139,13 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} [Episode Number = {1}] [Release Type = {2}]", 
+            return string.Format(
+                "{0} [Episode Number = {1}] [Release Type = {2}] [Title = {3}]",
                 base.ToString(),
                 EpisodeNumber,
-                Type.ToStringEnum());
+                Type.ToStringEnum(),
+                Title
+            );
         }
 
         /// <summary>
@@ -145,7 +164,8 @@ namespace FansubFileNameParser.Entity
 
             return base.Equals(other)
                 && EpisodeNumber.Equals(other.EpisodeNumber)
-                && Type.Equals(other.Type);
+                && Type.Equals(other.Type)
+                && Title.Equals(other.Title);
         }
 
         /// <summary>
@@ -170,7 +190,8 @@ namespace FansubFileNameParser.Entity
         {
             return base.GetHashCode()
                 ^ EpisodeNumber.GetHashCode()
-                ^ Type.GetHashCode();
+                ^ Type.GetHashCode()
+                ^ Title.GetHashCode();
         }
 
         /// <summary>
@@ -182,6 +203,7 @@ namespace FansubFileNameParser.Entity
         {
             info.AddValue(EpisodeNumberKey, EpisodeNumber.ToNullable());
             info.AddValue(TypeKey, Type.ToNullable());
+            info.AddValue(TitleKey, Title.OrElseDefault());
 
             base.GetObjectData(info, context);
         }

@@ -49,7 +49,7 @@ namespace UnitTests.Models
             {"[Vivid] Tonari no Seki-kun - OAD [DVD 576p AAC][9D6909E7].mkv", null},
             {"[WCP] Nisekoi OAD 3 - Bath House & Service [576p][BCBBA0B2].mkv", null},
             {"[AniYoshi]_School_Days_OVA_-_Valentine_Days_(DVD)_[5DE6B483].mkv", null},
-            {"[Coalgirls]_Valkyria_Chronicles_(1920x1080_Blu-Ray_FLAC)/[Coalgirls]_Valkyria_Chronicles_OVA_08_(1920x1080_Blu-Ray_FLAC)_[F015CD71].mkv", null},
+            {"[Coalgirls]_Valkyria_Chronicles_OVA_08_(1920x1080_Blu-Ray_FLAC)_[F015CD71].mkv", null},
             {"[Doki] Seto no Hanayome OVA - 01 (720x480 h264 DVD AAC) [032D22A4].mkv", null},
             {"[Procrastinating] Seitokai Yakuindomo OVA 03 [BD 1080p].mkv", null},
             {"[Ayako-Himatsubushi] Seitokai Yakuindomo OVA - 01v2 [DVD][480p][EF82D238].mkv", null},
