@@ -48,21 +48,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void TagEnclosedTextWithDeliminator()
-        {
-            var inputMap = new Dictionary<string, string>
-            {
-                {"[test]", "[test]"},
-                {"(test)", "(test)"},
-                {"[test multiword]", "[test multiword]"},
-                {"(test multiword)", "(test multiword)"},
-            };
-
-            TestUtils.TestParser(inputMap, BaseGrammars.MetaTag);
-        }
-
-        [TestMethod]
-        public void MultipleTagEnclsoedText()
+        public void MultipleTagEnclosedText()
         {
             var inputMap = new Dictionary<string, IEnumerable<string>>
             {
@@ -106,9 +92,10 @@ namespace UnitTests.Model.Grammars
                 {"[Tsundere] Fate Kaleid Prisma Illya 2wei - 01-02 [BDRip h264 1920x1080 10bit FLAC]", "[Tsundere] Fate Kaleid Prisma Illya 2wei"},
                 {"[Elysium]Spice and Wolf II(BD 1080p FLAC)", "[Elysium]Spice and Wolf II(BD 1080p FLAC)"},
                 {"[UTW] Fate stay night Unlimited Blade Works - 00-12 [BD][h264-1080p][FLAC]", "[UTW] Fate stay night Unlimited Blade Works"},
+                {"[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail - 04 [BD][480p][926257C1].mkv", "[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail"},
             };
 
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToDashSeparatorToken);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToLastDashSeparatorToken);
         }
 
         [TestMethod]

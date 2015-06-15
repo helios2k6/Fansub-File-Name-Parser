@@ -97,8 +97,8 @@ namespace FansubFileNameParser
         /// Parses a string of text up until a "dash separator token," which is defined as a dash (-) with a 
         /// single space before and after it: (" - ")
         /// </summary>
-        public static readonly Parser<string> LineUpToDashSeparatorToken =
-            (from line in Parse.AnyChar.Except(DashSeparatorToken).Many().Text()
+        public static readonly Parser<string> LineUpToLastDashSeparatorToken =
+            (from line in Parse.AnyChar.Except(DashSeparatorToken.Last()).Many().Text()
              select line.Trim()).Memoize();
 
         /// <summary>
@@ -115,15 +115,6 @@ namespace FansubFileNameParser
             LineUpToTagDeliminator.Contained(OpenTagDeliminator, ClosedTagDeliminator);
 
         /// <summary>
-        /// Parses a single metadata tag, but includes the metadata tag deliminator
-        /// </summary>
-        public static readonly Parser<string> MetaTag =
-            from openTag in OpenTagDeliminator
-            from content in LineUpToTagDeliminator
-            from closedBracket in ClosedTagDeliminator
-            select string.Concat(openTag, content, closedBracket);
-
-        /// <summary>
         /// Parses multiple metadata tags
         /// </summary>
         public static readonly Parser<IEnumerable<string>> MetaTagGroup = MetaTagContent.Token().Many();
@@ -132,7 +123,7 @@ namespace FansubFileNameParser
         /// Parses content that's contained between any group of multiple tags
         /// </summary>
         public static readonly Parser<string> ContentBetweenTagGroups =
-            LineUpToTagDeliminator.Contained(MetaTagGroup, MetaTagGroup);
+            LineUpToTagDeliminator.Contained(MetaTagGroup, MetaTagGroup).Memoize();
 
         /// <summary>
         /// Parses and captures all of the metadata tags that appear in the string, including the tag deliminator token
@@ -167,12 +158,7 @@ namespace FansubFileNameParser
         /// <summary>
         /// Replaces the underscores of an input string with spaces
         /// </summary>
-        private static readonly Parser<string> ReplaceUnderscores =
-            from segments in
-                (from content in Parse.AnyChar.Except(Underscore).Many().Text()
-                 from _ in Underscore.Optional()
-                 select content).Many().Implode(string.Empty, (acc, i) => string.Format("{0} {1}", acc, i))
-            select segments.Trim();
+        private static readonly Parser<string> ReplaceUnderscores = ExtraParsers.Filter(Underscore);
 
         /// <summary>
         /// Sanitizes the input string by replacing dots and dashes with spaces, with the exception 

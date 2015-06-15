@@ -61,7 +61,7 @@ namespace FansubFileNameParser
                 {
                     return Result.Failure<IEnumerable<T>>(
                         result.Remainder,
-                        string.Format("Failure to implode. Dependent parser failed. {0}", result.Message), 
+                        string.Format("Failure to implode. Dependent parser failed. {0}", result.Message),
                         result.Expectations
                     );
                 }
@@ -117,7 +117,7 @@ namespace FansubFileNameParser
                 {
                     return Result.Failure<TResult>(
                         result.Remainder,
-                        string.Format("Failure to implode. Dependent parser failed. {0}", result.Message), 
+                        string.Format("Failure to implode. Dependent parser failed. {0}", result.Message),
                         result.Expectations
                     );
                 }
@@ -231,6 +231,37 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Constructs a parser that will only succeed if it consumes the last possible token that satisfies this 
+        /// parser
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <param name="this">The parser</param>
+        /// <returns>A new parser that will succeed only if it parses the last token that satisfies this parser</returns>
+        public static Parser<TResult> Last<TResult>(this Parser<TResult> @this)
+        {
+            return from f in @this
+                   from _ in ExtraParsers.ScanFor(@this).Not()
+                   select f;
+        }
+
+        /// <summary>
+        /// Constructs a filtering parser that removes anything the given parser successfully parses.
+        /// This parser consumes all characters
+        /// 
+        /// TODO: UTs
+        /// </summary>
+        /// <param name="filter">The filter parser</param>
+        /// <returns>A newly constructed parser that filters tokens</returns>
+        public static Parser<string> Filter<TResult>(Parser<TResult> filter)
+        {
+            return (from articles in
+                        (from mainToken in Parse.AnyChar.Except(filter).Many().Text()
+                         from _ in filter
+                         select mainToken.Trim()).Many()
+                    select articles).Implode(string.Empty, (acc, i) => string.Format("{0} {1}", acc, i));
+        }
+
+        /// <summary>
         /// Memoizes the specified <see cref="Parser{T}"/>
         /// </summary>
         /// <typeparam name="TResult">The type of result</typeparam>
@@ -240,6 +271,28 @@ namespace FansubFileNameParser
         {
             var memopad = new ConcurrentDictionary<IInput, IResult<TResult>>();
             return input => memopad.GetOrAdd(input, @this.Invoke);
+        }
+
+        /// <summary>
+        /// Invokes this parser and upon success will set the remainder string to whatever
+        /// this parser returned.
+        /// 
+        /// On failure, this will return the result of the failed parse
+        /// </summary>
+        /// <param name="this">The parser.</param>
+        /// <returns>A new parser that sets the remainder as the value</returns>
+        public static Parser<string> SetResultAsRemainder(this Parser<string> @this)
+        {
+            return input =>
+            {
+                var result = @this.Invoke(input);
+                if (result.WasSuccessful == false)
+                {
+                    return result;
+                }
+
+                return Result.Success<string>(result.Value, new Input(result.Value));
+            };
         }
 
         private static Maybe<int> TryParseInt(string input)

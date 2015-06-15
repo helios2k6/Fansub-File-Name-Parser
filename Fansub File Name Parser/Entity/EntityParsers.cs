@@ -107,13 +107,12 @@ namespace FansubFileNameParser.Entity
 
                 Maybe<string> seriesName = Maybe<string>.Nothing;
 
-                var mainContentParser = BaseGrammars.ContentBetweenTagGroups.ContinueWith(BaseGrammars.LineUpToDashSeparatorToken);
+                var mainContentParser = BaseGrammars.ContentBetweenTagGroups.ContinueWith(BaseGrammars.LineUpToLastDashSeparatorToken);
                 var mainContent = mainContentParser.TryParse(substring);
                 if (mainContent.WasSuccessful)
                 {
-                    var name = BaseGrammars.LineUpToDashSeparatorToken.TryParse(mainContent.Value);
-                    seriesName = name.WasSuccessful
-                        ? name.Value.Trim().ToMaybe()
+                    seriesName = mainContent.WasSuccessful
+                        ? mainContent.Value.Trim().ToMaybe()
                         : Maybe<string>.Nothing;
                 }
 
@@ -260,83 +259,59 @@ namespace FansubFileNameParser.Entity
         #endregion
         #endregion
         #region OVA / ONA / OAD
-        #region Parsers
-        private static readonly Parser<string> OVA = Parse.IgnoreCase("OVA").Text();
+        #region OA Tokens
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OVA = 
+            Parse.IgnoreCase("OVA").Return(FansubOriginalAnimationEntity.ReleaseType.OVA);
 
-        private static readonly Parser<string> ONA = Parse.IgnoreCase("ONA").Text();
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> ONA =
+            Parse.IgnoreCase("ONA").Return(FansubOriginalAnimationEntity.ReleaseType.ONA);
 
-        private static readonly Parser<string> OAD = Parse.IgnoreCase("OAD").Text();
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OAD =
+            Parse.IgnoreCase("OAD").Return(FansubOriginalAnimationEntity.ReleaseType.OAD);
 
-        private static readonly Parser<string> OAToken = OVA.Or(ONA).Or(OAD);
-
-        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OVAReleaseType =
-            from _ in OVA
-            select FansubOriginalAnimationEntity.ReleaseType.OVA;
-
-        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> ONAReleaseType =
-            from _ in ONA
-            select FansubOriginalAnimationEntity.ReleaseType.ONA;
-
-        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OADReleaseType =
-            from _ in OAD
-            select FansubOriginalAnimationEntity.ReleaseType.ONA;
-
-        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> ReleaseType =
-            OVAReleaseType.Or(ONAReleaseType).Or(OADReleaseType).Memoize();
-
-        private static readonly Parser<int> OAEpisodeNumberNoDash =
-            from _ in OAToken
-            from ep in ExtraParsers.Int
-            select ep;
-
-        private static readonly Parser<int> OAEpisodeNumberWithDash =
-            from _ in OAToken
-            from __ in BaseGrammars.DashSeparatorToken
-            from ep in ExtraParsers.Int
-            select ep;
-
-        private static readonly Parser<int> OAEpisodeNumberToken =
-            OAEpisodeNumberNoDash.Or(OAEpisodeNumberWithDash).Memoize();
-
-        private static Parser<IFansubEntity> CreateOriginalAnimationParser()
-        {
-            return input =>
-            {
-                // Parse the basics
-                var oaInfoParser = from @base in FileEntityBase.ResetInput()
-                                   from type in ExtraParsers.ScanFor(ReleaseType).ResetInput()
-                                   from episodeNumber in ExtraParsers.ScanFor(OAEpisodeNumberToken).Optional()
-                                   select new { Base = @base, ReleaseType = type, EpisodeNumber = episodeNumber };
-
-                var oaInfo = oaInfoParser.Invoke(input);
-                if (oaInfo.WasSuccessful == false)
-                {
-                    return Result.Failure<IFansubEntity>(
-                        oaInfo.Remainder,
-                        string.Format(
-                            "Could not parse the base file entity type or the Original Animation Release Type: {0}",
-                            oaInfo.Message
-                        ),
-                        oaInfo.Expectations
-                    );
-                }
-
-                // Do fancy stuff to parse the root series name and title of this OA
-
-
-
-                // TODO DELETE THIS
-                return Result.Failure<IFansubEntity>(
-                    oaInfo.Remainder,
-                    string.Format(
-                        "Could not parse the base file entity type or the Original Animation Release Type: {0}",
-                        oaInfo.Message
-                    ),
-                    oaInfo.Expectations
-                );
-            };
-        }
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OAToken =
+            OVA.Or(ONA).Or(OAD).Memoize();
         #endregion
+        #region Root Name
+        private static readonly Parser<string> RootName = Parse.AnyChar.Except(OAToken).Many().Text().Token();
+        #endregion
+        #region Title and Episode Number
+        private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> TitleThenEpisodeNumber =
+            from title in Parse.AnyChar.Except(ExtraParsers.Int).Many().Text().Token().OptionalMaybe()
+            from episodeNumber in ExtraParsers.Int.OptionalMaybe()
+            where title.HasValue || episodeNumber.HasValue
+            select Tuple.Create(title, episodeNumber);
+
+        private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> EpisodeNumberThenTitle =
+            from episodeNumber in ExtraParsers.Int.Token().OptionalMaybe()
+            from title in Parse.AnyChar.Many().Text().Token().OptionalMaybe()
+            where episodeNumber.HasValue || title.HasValue
+            select Tuple.Create(title, episodeNumber);
+
+        private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> TitleAndEpisodeNumber = 
+            TitleThenEpisodeNumber.Or(EpisodeNumberThenTitle);
+        #endregion
+        #region Composite Parsers
+        private static readonly Parser<IFansubEntity> OriginalAnimation =
+            from @base in FileEntityBase
+            from _ in ExtraParsers.Filter(BaseGrammars.DashSeparatorToken).SetResultAsRemainder()
+            from rootName in BaseGrammars.ContentBetweenTagGroups.ContinueWith(RootName)
+            from oaToken in OAToken.Token()
+            from titleAndEpisode in TitleAndEpisodeNumber
+            select new FansubOriginalAnimationEntity
+            {
+                Group = @base.Group,
+                Series = rootName.ToMaybe(),
+                Metadata = @base.Metadata,
+                Extension = @base.Extension,
+                Type = oaToken.ToMaybe(),
+                Title = titleAndEpisode.Item1,
+                EpisodeNumber = titleAndEpisode.Item2,
+            };
+        #endregion
+        #endregion
+        #region Episode
+
         #endregion
         #endregion
     }

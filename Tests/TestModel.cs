@@ -54,7 +54,6 @@ namespace UnitTests.Models
             {"[Procrastinating] Seitokai Yakuindomo OVA 03 [BD 1080p].mkv", null},
             {"[Ayako-Himatsubushi] Seitokai Yakuindomo OVA - 01v2 [DVD][480p][EF82D238].mkv", null},
             {"[Coalgirls]_Utawarerumono_OVA_03_(1920x1080_Blu-Ray_FLAC)_[D3BD62B6].mkv", null},
-            {"The World God Only Knows OVA - Four Plus an Idol.mkv", null},
             {"[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail - 04 [BD][480p][926257C1].mkv", null},
             {"[UTW]_Fate_Kaleid_Liner_Prisma_Ilya_-_OVA_[BD][h264-1080p_FLAC][002240CB].mkv", null},
         };
