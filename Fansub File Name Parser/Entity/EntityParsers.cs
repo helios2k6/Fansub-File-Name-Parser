@@ -73,10 +73,22 @@ namespace FansubFileNameParser.Entity
         /// <returns>The parse result</returns>
         public static Maybe<IFansubEntity> TryParseEntity(string unprocessedString)
         {
+            var parseResult = EntityParser.TryParse(unprocessedString);
+            if (parseResult.WasSuccessful)
+            {
+                return parseResult.Value.ToMaybe();
+            }
+
             return Maybe<IFansubEntity>.Nothing;
         }
         #endregion
         #region private static methods
+        #region Top level
+        private static readonly Parser<IFansubEntity> EntityParser =
+            (from _ in BaseGrammars.CleanInputString.SetResultAsRemainder()
+             from entity in Directory.Or(OpeningOrEnding).Or(OriginalAnimation)
+             select entity).Memoize();
+        #endregion
         #region Base
         /// <summary>
         /// Parses the data required to construct a <see cref="FansubEntityBase"/>. This parser will not consume
@@ -198,7 +210,8 @@ namespace FansubFileNameParser.Entity
 
         private static readonly Parser<string> NonDashCredit = Parse.IgnoreCase("NON-CREDIT").Text();
 
-        private static readonly Parser<string> CreditlessToken = NC.Or(Creditless).Or(NonCredit).Or(NonDashCredit);
+        private static readonly Parser<string> CreditlessToken = 
+            NC.Or(Creditless).Or(NonCredit).Or(NonDashCredit).Memoize();
         #endregion
         #region Composite Parsers
         private static readonly Parser<OPEDParseResult> AnyOpeningToken =
