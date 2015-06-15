@@ -276,15 +276,17 @@ namespace FansubFileNameParser.Entity
         private static readonly Parser<string> RootName = Parse.AnyChar.Except(OAToken).Many().Text().Token();
         #endregion
         #region Title and Episode Number
+        private static readonly Parser<string> OATitle = Parse.AnyChar.Except(ExtraParsers.Int).Many().Text();
+
         private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> TitleThenEpisodeNumber =
-            from title in Parse.AnyChar.Except(ExtraParsers.Int).Many().Text().Token().OptionalMaybe()
+            from title in OATitle.Token().OptionalMaybe()
             from episodeNumber in ExtraParsers.Int.OptionalMaybe()
             where title.HasValue || episodeNumber.HasValue
             select Tuple.Create(title, episodeNumber);
 
         private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> EpisodeNumberThenTitle =
             from episodeNumber in ExtraParsers.Int.Token().OptionalMaybe()
-            from title in Parse.AnyChar.Many().Text().Token().OptionalMaybe()
+            from title in OATitle.Token().OptionalMaybe()
             where episodeNumber.HasValue || title.HasValue
             select Tuple.Create(title, episodeNumber);
 
