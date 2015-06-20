@@ -111,7 +111,7 @@ namespace FansubFileNameParser.Entity
         /// Gets or sets the title of this Original Animation. 
         /// 
         /// Many Original Animations will have their own title, such as Black Lagoon: Roberta's Blood Trail 
-        /// or Nisekoi - Bath House & Service. In order to distinguish between the "root" series name and
+        /// or Nisekoi - Bath House Service. In order to distinguish between the "root" series name and
         /// the name given to this OVA, we separate out the special title given to this Original Animation
         /// </summary>
         /// <value>
