@@ -56,7 +56,9 @@
   <ItemGroup>
     <Compile Include="Assembly.cs" />
     <Compile Include="BaseGrammars.cs" />
-    <Compile Include="Entity\EntityParsers.cs" />
+    <Compile Include="Entity\Parsers\BaseEntityParsers.cs" />
+    <Compile Include="Entity\Parsers\DirectoryEntityParsers.cs" />
+    <Compile Include="Entity\Parsers\EntityParsers.cs" />
     <Compile Include="Entity\FansubEntityBase.cs" />
     <Compile Include="Entity\FansubFileEntityBase.cs" />
     <Compile Include="Entity\FansubEpisodeEntity.cs" />
@@ -65,6 +67,9 @@
     <Compile Include="Entity\FansubOriginalAnimationEntity.cs" />
     <Compile Include="Entity\IFansubEntity.cs" />
     <Compile Include="Entity\IFansubEntityVisitor.cs" />
+    <Compile Include="Entity\Parsers\FileEntityParsers.cs" />
+    <Compile Include="Entity\Parsers\OPEDEntityParsers.cs" />
+    <Compile Include="Entity\Parsers\OriginalAnimationEntityParsers.cs" />
     <Compile Include="EnumExtensions.cs" />
     <Compile Include="IEnumerableExtensions.cs" />
     <Compile Include="MaybeExtensions.cs" />
