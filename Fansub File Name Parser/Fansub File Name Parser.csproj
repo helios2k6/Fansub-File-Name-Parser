@@ -67,7 +67,9 @@
     <Compile Include="Entity\FansubOriginalAnimationEntity.cs" />
     <Compile Include="Entity\IFansubEntity.cs" />
     <Compile Include="Entity\IFansubEntityVisitor.cs" />
+    <Compile Include="Entity\Parsers\EpisodeEntityParsers.cs" />
     <Compile Include="Entity\Parsers\FileEntityParsers.cs" />
+    <Compile Include="Entity\Parsers\MovieEntityParsers.cs" />
     <Compile Include="Entity\Parsers\OPEDEntityParsers.cs" />
     <Compile Include="Entity\Parsers\OriginalAnimationEntityParsers.cs" />
     <Compile Include="EnumExtensions.cs" />
@@ -91,6 +93,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entity\Directory\FansubDirectoryEntity.cs" />
     <Compile Include="IOptionExtensions.cs" />
+    <Compile Include="Utils\RomanNumerals.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

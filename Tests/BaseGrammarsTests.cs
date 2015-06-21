@@ -33,7 +33,33 @@ namespace UnitTests.Model.Grammars
     public sealed class BaseGrammarsTests
     {
         [TestMethod]
-        public void TagEnclosedText()
+        public void DashSeparatorToken()
+        {
+            var inputOutputMap = new Dictionary<string, string>
+            {
+                {" - ", " - "}
+            };
+
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.DashSeparatorToken);
+        }
+
+        [TestMethod]
+        public void TagDeliminator()
+        {
+            var inputMap = new Dictionary<string, char>
+            {
+                {"[", '['},
+                {"(", '('},
+                {"]", ']'},
+                {")", ')'},
+
+            };
+
+            TestUtils.TestParser(inputMap, BaseGrammars.TagDeliminator);
+        }
+
+        [TestMethod]
+        public void MetaTagContent()
         {
             var inputMap = new Dictionary<string, string>
             {
@@ -48,7 +74,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void MultipleTagEnclosedText()
+        public void MetaTagGroup()
         {
             var inputMap = new Dictionary<string, IEnumerable<string>>
             {
@@ -64,6 +90,47 @@ namespace UnitTests.Model.Grammars
             };
 
             TestUtils.TestMultiTokenParse(inputMap, BaseGrammars.MetaTagGroup);
+        }
+
+        [TestMethod]
+        public void EpisodeNumber()
+        {
+            var inputOutputMap = new Dictionary<string, int>
+            {
+                {" 4 ", 4},
+                {" 04 ", 4},
+                {" 15 ", 15},
+                {" 015 ", 15},
+            };
+
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.EpisodeNumber);
+        }
+
+        [TestMethod]
+        public void LineUpToEpisodeNumberToken()
+        {
+            var inputOutputMap = new Dictionary<string, string>
+            {
+                {"[Doki] Akame ga Kill! - 01 (1920x1080 Hi10P BD FLAC) [395609BF].mkv", "[Doki] Akame ga Kill! -"},
+                {"[Coalgirls] Kill Me Baby 01 (1280x720_Blu-ray_FLAC) [1D51648A].mkv", "[Coalgirls] Kill Me Baby"},
+                {"[Coalgirls] Kill Me Baby (1280x720 Blu-Ray FLAC)", "[Coalgirls] Kill Me Baby (1280x720 Blu-Ray FLAC)"},
+            };
+
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToEpisodeNumberToken);
+        }
+
+        [TestMethod]
+        public void LineUpToLastDashSeparatorToken()
+        {
+            var inputOutputMap = new Dictionary<string, string>
+            {
+                {"[Tsundere] Fate Kaleid Prisma Illya 2wei - 01-02 [BDRip h264 1920x1080 10bit FLAC]", "[Tsundere] Fate Kaleid Prisma Illya 2wei"},
+                {"[Elysium]Spice and Wolf II(BD 1080p FLAC)", "[Elysium]Spice and Wolf II(BD 1080p FLAC)"},
+                {"[UTW] Fate stay night Unlimited Blade Works - 00-12 [BD][h264-1080p][FLAC]", "[UTW] Fate stay night Unlimited Blade Works"},
+                {"[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail - 04 [BD][480p][926257C1].mkv", "[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail"},
+            };
+
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToLastDashSeparatorToken);
         }
 
         [TestMethod]
@@ -84,19 +151,6 @@ namespace UnitTests.Model.Grammars
             TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToTagDeliminator);
         }
 
-        [TestMethod]
-        public void LineUpToDashSeparatorToken()
-        {
-            var inputOutputMap = new Dictionary<string, string>
-            {
-                {"[Tsundere] Fate Kaleid Prisma Illya 2wei - 01-02 [BDRip h264 1920x1080 10bit FLAC]", "[Tsundere] Fate Kaleid Prisma Illya 2wei"},
-                {"[Elysium]Spice and Wolf II(BD 1080p FLAC)", "[Elysium]Spice and Wolf II(BD 1080p FLAC)"},
-                {"[UTW] Fate stay night Unlimited Blade Works - 00-12 [BD][h264-1080p][FLAC]", "[UTW] Fate stay night Unlimited Blade Works"},
-                {"[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail - 04 [BD][480p][926257C1].mkv", "[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail"},
-            };
-
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToLastDashSeparatorToken);
-        }
 
         [TestMethod]
         public void ContentBetweenTagGroups()
@@ -125,6 +179,48 @@ namespace UnitTests.Model.Grammars
             };
 
             TestUtils.TestMultiTokenParse(inputMap, BaseGrammars.CollectTags);
+        }
+
+        [TestMethod]
+        public void FileExtension()
+        {
+            var inputMap = new Dictionary<string, string>
+            {
+                {".avi", ".avi"},
+                {".mkv", ".mkv"},
+                {".mp4", ".mp4"},
+                {".m2ts", ".m2ts"},
+                {".ogg", ".ogg"},
+                {".wmv", ".wmv"},
+            };
+
+            TestUtils.TestParser(inputMap, BaseGrammars.FileExtension);
+        }
+
+        [TestMethod]
+        public void ReplaceDotsExceptMediaFileExtension()
+        {
+            var inputMap = new Dictionary<string, string>
+            {
+                {"[Elysium]Spice.and.Wolf.II(BD.1080p.FLAC)", "[Elysium]Spice and Wolf II(BD 1080p FLAC)"},
+                {"[Elysium]Spice.and.Wolf.II(BD.1080p.FLAC).mkv", "[Elysium]Spice and Wolf II(BD 1080p FLAC).mkv"},
+                {"[gg]_Binbougami_ga!_-_01_[D909F54C].mkv", "[gg]_Binbougami_ga!_-_01_[D909F54C].mkv"},
+            };
+
+            TestUtils.TestParser(inputMap, BaseGrammars.ReplaceDotsExceptMediaFileExtension);
+        }
+
+        [TestMethod]
+        public void ReplaceUnderscores()
+        {
+            var inputMap = new Dictionary<string, string>
+            {
+                {"(B-A)Devilman_Lady_-_01_(2E088B82).mkv", "(B-A)Devilman Lady - 01 (2E088B82).mkv"},
+                {"[Elysium]Spice.and.Wolf.II(BD.1080p.FLAC)", "[Elysium]Spice.and.Wolf.II(BD.1080p.FLAC)"},
+                {"[Coalgirls]_Amagi_Brilliant_Park_01-02_(1920x1080_Blu-Ray_FLAC)", "[Coalgirls] Amagi Brilliant Park 01-02 (1920x1080 Blu-Ray FLAC)"},
+            };
+
+            TestUtils.TestParser(inputMap, BaseGrammars.ReplaceUnderscores);
         }
 
         [TestMethod]

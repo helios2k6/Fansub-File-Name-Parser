@@ -22,61 +22,49 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser.Entity.Directory;
+using Functional.Maybe;
 using Sprache;
-using System;
 
 namespace FansubFileNameParser.Entity.Parsers
 {
     /// <summary>
-    /// Contains the Fansub Directory parser
+    /// Contains the Episode Entity parsers
     /// </summary>
-    internal static class DirectoryEntityParsers
+    internal static class EpisodeEntityParsers
     {
-        #region private fields
-        private static readonly Parser<string> Volume = Parse.IgnoreCase("VOLUME").Text();
+        #region private static fields
+        private static readonly Parser<int> EpisodeNumberParser =
+            from _ in BaseGrammars.LineUpToEpisodeNumberToken.Or(BaseGrammars.LineUpToLastDashSeparatorToken)
+            from __ in BaseGrammars.DashSeparatorToken.Optional()
+            from ep in BaseGrammars.EpisodeNumber
+            select ep;
 
-        private static readonly Parser<string> Vol = Parse.IgnoreCase("VOL").Text();
-
-        private static readonly Parser<string> VolumeToken = Volume.Or(Vol);
-
-        private static readonly Parser<Tuple<int, int>> EpisodeRange =
-            from firstNumber in ExtraParsers.Int
-            from _ in BaseGrammars.Dash
-            from secondNumber in ExtraParsers.Int
-            select Tuple.Create(firstNumber, secondNumber);
-
-        private static readonly Parser<int> VolumeNumber =
-            from volumeToken in VolumeToken
-            from dotAndSpace in Parse.AnyChar.Except(ExtraParsers.Int).Many()
-            from number in ExtraParsers.Int
-            select number;
-
-        private static readonly Parser<IFansubEntity> DirectoryParser =
+        private static readonly Parser<IFansubEntity> EpisodeParser =
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
-            from vol in ExtraParsers.ScanFor(VolumeNumber).OptionalMaybe()
-            from range in ExtraParsers.ScanFor(EpisodeRange).OptionalMaybe()
-            select new FansubDirectoryEntity
+            from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
+            from episode in EpisodeNumberParser
+            select new FansubEpisodeEntity
             {
+                Metadata = metadata,
                 Group = fansubGroup,
                 Series = series,
-                Metadata = metadata,
-                Volume = vol,
-                EpisodeRange = range,
+                Extension = extension,
+                EpisodeNumber = episode.ToMaybe(),
             };
         #endregion
+
         #region public static properties
         /// <summary>
-        /// Gets the directory parser
+        /// Gets the Episode parser
         /// </summary>
         /// <value>
-        /// The directory parser
+        /// The Episode parser
         /// </value>
-        public static Parser<IFansubEntity> Directory
+        public static Parser<IFansubEntity> Episode
         {
-            get { return DirectoryParser; }
+            get { return EpisodeParser; }
         }
         #endregion
     }

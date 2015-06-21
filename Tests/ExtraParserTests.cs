@@ -23,6 +23,7 @@
  */
 
 using FansubFileNameParser;
+using Functional.Maybe;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sprache;
 using System.Collections.Generic;
@@ -46,15 +47,122 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void ImplodeParser()
+        public void Implode()
         {
-            var implodedParser = Parse.AnyChar.Many().Many().Implode();
-            var inputOutputMap = new Dictionary<string, IEnumerable<char>>
-            {
-                {"abcd", new[] {'a', 'b', 'c', 'd'}},
-            };
+            var multiCharParserImploded = Parse.AnyChar.Many().Implode<char, string>(string.Empty, (acc, ch) => string.Format("{0}{1}", acc, ch));
+            var testString = "abcdef";
 
-            TestUtils.TestMultiTokenParse<char>(inputOutputMap, implodedParser);
+            var result = multiCharParserImploded.TryParse(testString);
+            Assert.IsTrue(result.WasSuccessful);
+            Assert.AreEqual<string>(testString, result.Value);
+        }
+
+        [TestMethod]
+        public void ContinueWith()
+        {
+            var antecedentParser = Parse.AnyChar;
+            var continuationParser = Parse.AnyChar;
+            var continuedParser = antecedentParser.ContinueWith(s => new string(s, 1), continuationParser);
+
+            var result = continuationParser.TryParse("ab");
+            Assert.IsTrue(result.WasSuccessful);
+            Assert.AreEqual<char>('a', result.Value);
+
+            var twoCharacterParser = Parse.AnyChar.Repeat(2).Text();
+            var twoCharacterContinuedParser = twoCharacterParser.ContinueWith(twoCharacterParser);
+
+            var secondResult = twoCharacterContinuedParser.TryParse("abc");
+            Assert.IsTrue(secondResult.WasSuccessful);
+            Assert.AreEqual<string>("ab", secondResult.Value);
+        }
+
+        [TestMethod]
+        public void ScanFor()
+        {
+            var excepter = Parse.String("TOKEN").Text();
+
+            var result = ExtraParsers.ScanFor(excepter).TryParse("abcdTOKENefgh");
+            Assert.IsTrue(result.WasSuccessful);
+            Assert.AreEqual<string>("TOKEN", result.Value);
+        }
+
+        [TestMethod]
+        public void CollectExcept()
+        {
+            var exceptor = Parse.String("TOKEN").Text();
+
+            var result = ExtraParsers.CollectExcept(exceptor).TryParse("abcdTOKENefghTOKEN");
+            Assert.IsTrue(result.WasSuccessful);
+            Assert.AreEqual<string>("abcd", result.Value);
+        }
+
+        [TestMethod]
+        public void ResetInput()
+        {
+            var parser = Parse.String("TOKEN").Text();
+
+            var compositeParser = from _ in parser.ResetInput()
+                                  from s in parser
+                                  select s;
+
+            var result = compositeParser.TryParse("TOKEN");
+            Assert.IsTrue(result.WasSuccessful);
+            Assert.AreEqual<string>("TOKEN", result.Value);
+        }
+
+        [TestMethod]
+        public void OptionalMaybe()
+        {
+            var parser = from f in Parse.Char('a').OptionalMaybe()
+                         from s in Parse.Char('b').OptionalMaybe()
+                         select f;
+
+            var firstResult = parser.TryParse("b");
+            Assert.IsTrue(firstResult.WasSuccessful);
+            Assert.AreEqual<Maybe<char>>(Maybe<char>.Nothing, firstResult.Value);
+
+            var secondResult = parser.TryParse("ac");
+            Assert.IsTrue(secondResult.WasSuccessful);
+            Assert.AreEqual<Maybe<char>>('a'.ToMaybe(), secondResult.Value);
+        }
+
+        [TestMethod]
+        public void Last()
+        {
+            var lastNumberParser = Parse.Number.Last();
+
+            var result = lastNumberParser.TryParse("1000");
+            Assert.IsTrue(result.WasSuccessful);
+            Assert.AreEqual<string>("1000", result.Value);
+
+            var failedResult = lastNumberParser.TryParse("1000 2000");
+            Assert.IsFalse(failedResult.WasSuccessful);
+        }
+
+        [TestMethod]
+        public void Filter()
+        {
+            var filteredParser = ExtraParsers.Filter(Parse.Number);
+
+            var result = filteredParser.TryParse("abc23efghij00");
+            Assert.IsTrue(result.WasSuccessful);
+            Assert.AreEqual<string>("abc efghij", result.Value);
+
+            var secondResult = filteredParser.TryParse("1000");
+            Assert.IsTrue(secondResult.WasSuccessful);
+            Assert.AreEqual<string>(string.Empty, secondResult.Value);
+        }
+
+        [TestMethod]
+        public void SetResultAsRemainder()
+        {
+            var remainderParser = from _ in Parse.Number.SetResultAsRemainder()
+                                  from n in Parse.Number
+                                  select n;
+
+            var result = remainderParser.TryParse("500");
+            Assert.IsTrue(result.WasSuccessful);
+            Assert.AreEqual<string>("500", result.Value);
         }
     }
 }

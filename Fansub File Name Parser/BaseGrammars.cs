@@ -42,12 +42,12 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses a single dot ('.') character
         /// </summary>
-        private static readonly Parser<char> Dot = Parse.Char('.');
+        public static readonly Parser<char> Dot = Parse.Char('.');
 
         /// <summary>
         /// Parses a single underscore ('_') character
         /// </summary>
-        private static readonly Parser<char> Underscore = Parse.Char('_');
+        public static readonly Parser<char> Underscore = Parse.Char('_');
 
         /// <summary>
         /// Parses a single dash separator token (' - ')
@@ -61,58 +61,68 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses a single open parenthesis character ('(')
         /// </summary>
-        private static readonly Parser<char> OpenParenthesis = Parse.Char('(');
+        public static readonly Parser<char> OpenParenthesis = Parse.Char('(');
 
         /// <summary>
         /// Parses a single closed parenthesis character (')')
         /// </summary>
-        private static readonly Parser<char> ClosedParenthesis = Parse.Char(')');
+        public static readonly Parser<char> ClosedParenthesis = Parse.Char(')');
 
         /// <summary>
         /// Parses a single a open square bracket ('[')
         /// </summary>
-        private static readonly Parser<char> OpenSquareBracket = Parse.Char('[');
+        public static readonly Parser<char> OpenSquareBracket = Parse.Char('[');
 
         /// <summary>
         /// Parses a single closed square bracket (']')
         /// </summary>
-        private static readonly Parser<char> ClosedSquareBracket = Parse.Char(']');
+        public static readonly Parser<char> ClosedSquareBracket = Parse.Char(']');
 
         /// <summary>
         /// Parses any open metadata tag deliminator, such as the open parenthesis or open square bracket
         /// </summary>
-        private static readonly Parser<char> OpenTagDeliminator = OpenParenthesis.Or(OpenSquareBracket);
+        public static readonly Parser<char> OpenTagDeliminator = OpenParenthesis.Or(OpenSquareBracket);
 
         /// <summary>
         /// Parses any closed metadata tag deliminator, such as the closed parenthesis or closed square bracket
         /// </summary>
-        private static readonly Parser<char> ClosedTagDeliminator = ClosedParenthesis.Or(ClosedSquareBracket);
+        public static readonly Parser<char> ClosedTagDeliminator = ClosedParenthesis.Or(ClosedSquareBracket);
 
         /// <summary>
         /// Parses a single tag delminator
         /// </summary>
-        private static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
+        public static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
+
+        /// <summary>
+        /// Parses an episode number
+        /// </summary>
+        public static readonly Parser<int> EpisodeNumber =
+            from _ in Parse.WhiteSpace
+            from ep in ExtraParsers.Int
+            from __ in Parse.WhiteSpace
+            select ep;
+
+        /// <summary>
+        /// Parses a string of text up until an episode number token
+        /// </summary>
+        public static Parser<string> LineUpToEpisodeNumberToken = ExtraParsers.CollectExcept(EpisodeNumber).Memoize();
 
         /// <summary>
         /// Parses a string of text up until a "dash separator token," which is defined as a dash (-) with a 
         /// single space before and after it: (" - ")
         /// </summary>
-        public static readonly Parser<string> LineUpToLastDashSeparatorToken =
-            (from line in Parse.AnyChar.Except(DashSeparatorToken.Last()).Many().Text()
-             select line.Trim()).Memoize();
+        public static readonly Parser<string> LineUpToLastDashSeparatorToken = ExtraParsers.CollectExcept(DashSeparatorToken.Last()).Memoize();
 
         /// <summary>
         /// Parses a line of text until a tag delmiinator is encountered
         /// </summary>
-        public static readonly Parser<string> LineUpToTagDeliminator =
-            (from line in Parse.AnyChar.Except(TagDeliminator).Many().Text()
-             select line.Trim()).Memoize();
+        public static readonly Parser<string> LineUpToTagDeliminator = ExtraParsers.CollectExcept(TagDeliminator).Memoize();
 
         /// <summary>
         /// Parses the content of a metatag
         /// </summary>
-        public static readonly Parser<string> MetaTagContent = 
-            LineUpToTagDeliminator.Contained(OpenTagDeliminator, ClosedTagDeliminator);
+        public static readonly Parser<string> MetaTagContent =
+             BaseGrammars.LineUpToTagDeliminator.Contained(BaseGrammars.OpenTagDeliminator, BaseGrammars.ClosedTagDeliminator);
 
         /// <summary>
         /// Parses multiple metadata tags
@@ -133,8 +143,6 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Parses a file extension
-        /// 
-        /// TODO: UTs
         /// </summary>
         public static readonly Parser<string> FileExtension =
             from dot in Dot
@@ -144,7 +152,7 @@ namespace FansubFileNameParser
         /// <summary>
         /// Replaces the dots in the string with spaces while preserving the file extension of a media file
         /// </summary>
-        private static readonly Parser<string> ReplaceDotsExceptMediaFileExtension =
+        public static readonly Parser<string> ReplaceDotsExceptMediaFileExtension =
             from frontSegment in Parse.AnyChar.Except(FileExtension).Many().Text()
             from extension in FileExtension.Optional()
             select string.Format(
@@ -158,7 +166,7 @@ namespace FansubFileNameParser
         /// <summary>
         /// Replaces the underscores of an input string with spaces
         /// </summary>
-        private static readonly Parser<string> ReplaceUnderscores = ExtraParsers.Filter(Underscore);
+        public static readonly Parser<string> ReplaceUnderscores = ExtraParsers.Filter(Underscore);
 
         /// <summary>
         /// Sanitizes the input string by replacing dots and dashes with spaces, with the exception 

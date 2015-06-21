@@ -45,54 +45,15 @@ namespace FansubFileNameParser
             where parseResult.IsSomething()
             select parseResult.Value;
 
-        /// <summary>
-        /// Implodes this <see cref="Parser{T}"/>'s results from a nested <see cref="IEnumerable{T}"/> to a single
-        /// IEnumerable{T}.
-        /// </summary>
-        /// <typeparam name="T">The element type</typeparam>
-        /// <param name="this">The parser</param>
-        /// <returns>A new parser that implodes the return value of the parser</returns>
-        public static Parser<IEnumerable<T>> Implode<T>(this Parser<IEnumerable<IEnumerable<T>>> @this)
+        private static Maybe<int> TryParseInt(string input)
         {
-            return input =>
+            int output;
+            if (int.TryParse(input, out output))
             {
-                var result = @this.Invoke(input);
-                if (result.WasSuccessful == false)
-                {
-                    return Result.Failure<IEnumerable<T>>(
-                        result.Remainder,
-                        string.Format("Failure to implode. Dependent parser failed. {0}", result.Message),
-                        result.Expectations
-                    );
-                }
+                return output.ToMaybe();
+            }
 
-                return Result.Success<IEnumerable<T>>(result.Value.SelectMany(i => i), result.Remainder);
-            };
-        }
-
-        /// <summary>
-        /// Attempt parsing only if all of the parsers in <paramref name="parsers"/> fail
-        /// </summary>
-        /// <typeparam name="TResult">The type of the result.</typeparam>
-        /// <param name="this">The parser.</param>
-        /// <param name="parsers">The other except parsers.</param>
-        /// <returns>A new parser that will only succeed if the subsequent parsers fail</returns>
-        public static Parser<TResult> ExceptAny<TResult>(this Parser<TResult> @this, params Parser<dynamic>[] parsers)
-        {
-            return input =>
-            {
-                var anyResult = parsers.Any(t => t.Invoke(input).WasSuccessful);
-                if (anyResult)
-                {
-                    return Result.Failure<TResult>(
-                        input,
-                        string.Format("One of the excepted parsers succeeded"),
-                        new[] { string.Empty }
-                    );
-                }
-
-                return @this.Invoke(input);
-            };
+            return Maybe<int>.Nothing;
         }
 
         /// <summary>
@@ -127,8 +88,6 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Parses the antecedent parser and feeds its results into the <paramref name="continuation" /> parser
-        /// 
-        /// TODO: WRITE UTS
         /// </summary>
         /// <typeparam name="TInput">The type of the input.</typeparam>
         /// <typeparam name="TResult">The type of the result.</typeparam>
@@ -162,8 +121,6 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Parses the antecedent parser and feeds its results into the <paramref name="continuation" /> parser
-        /// 
-        /// TODO: UTs
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="this">The antecedent parser.</param>
@@ -181,8 +138,6 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Returns a parser that will scan for a token that is parsable by the given parser
-        /// 
-        /// TODO: UTs
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="scanner">The parser.</param>
@@ -195,10 +150,19 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Collects the string leading up to a token
+        /// </summary>
+        /// <typeparam name="TThrowAway">The type of result to throw away.</typeparam>
+        /// <param name="excepter">The excepter parser.</param>
+        /// <returns>A new parser that collects the string all the way up to a specific point</returns>
+        public static Parser<string> CollectExcept<TThrowAway>(Parser<TThrowAway> excepter)
+        {
+            return Parse.AnyChar.Except(excepter).Many().Text().Select(t => t.Trim());
+        }
+
+        /// <summary>
         /// Returns a new parser that will invoke this parser and then reset the input back to what it was when it
         /// was fed into this parser
-        /// 
-        /// TODO: UTs
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="this">The parser.</param>
@@ -218,8 +182,6 @@ namespace FansubFileNameParser
         /// Constructs a parser that indicates the given parser is optional. The only difference between the 
         /// traditional Parser{TResult}.Optional() construct is that this parser will return a Maybe{TResult} instead of
         /// an IOption{TResult}
-        /// 
-        /// TODO: UTs
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="this">The parser.</param>
@@ -247,18 +209,21 @@ namespace FansubFileNameParser
         /// <summary>
         /// Constructs a filtering parser that removes anything the given parser successfully parses.
         /// This parser consumes all characters
-        /// 
-        /// TODO: UTs
         /// </summary>
         /// <param name="filter">The filter parser</param>
         /// <returns>A newly constructed parser that filters tokens</returns>
         public static Parser<string> Filter<TResult>(Parser<TResult> filter)
         {
-            return (from articles in
-                        (from mainToken in Parse.AnyChar.Except(filter).Many().Text()
-                         from _ in filter
-                         select mainToken.Trim()).Many()
-                    select articles).Implode(string.Empty, (acc, i) => string.Format("{0} {1}", acc, i));
+            var innerLoop = from mainToken in Parse.AnyChar.Except(filter).Many().Text()
+                            from _ in filter.Optional()
+                            select mainToken.Trim();
+
+            return innerLoop.Many().Implode(
+                string.Empty,
+                (acc, i) => string.IsNullOrWhiteSpace(acc)
+                    ? i
+                    : string.Format("{0} {1}", acc, i)
+            );
         }
 
         /// <summary>
@@ -293,17 +258,6 @@ namespace FansubFileNameParser
 
                 return Result.Success<string>(result.Value, new Input(result.Value));
             };
-        }
-
-        private static Maybe<int> TryParseInt(string input)
-        {
-            int output;
-            if (int.TryParse(input, out output))
-            {
-                return output.ToMaybe();
-            }
-
-            return Maybe<int>.Nothing;
         }
     }
 }

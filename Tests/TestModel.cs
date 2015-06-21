@@ -38,6 +38,12 @@ namespace UnitTests.Models
         private static readonly Lazy<IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>>> InputToMediaMetadataMap =
             new Lazy<IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>>>(InitMediaMetadataTestModel);
 
+        private static readonly IDictionary<string, IFansubEntity> EpisodeInputToEntityMap = new Dictionary<string, IFansubEntity>
+        {
+            {"[Coalgirls]_Cardcaptor_Sakura_01_(1440x1080_Blu-ray_FLAC)_[9B5FDB33].mkv", null},
+
+        };
+
         private static readonly IDictionary<string, IFansubEntity> OriginalVideoInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
             {"[SFW] Mahou Sensei Negima! OAD ~Mou Hitotsu no Sekai~ 02 [DVD][87942D8A].mkv", null},

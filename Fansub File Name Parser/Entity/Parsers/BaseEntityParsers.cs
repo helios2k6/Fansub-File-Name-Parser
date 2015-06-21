@@ -82,7 +82,7 @@ namespace FansubFileNameParser.Entity.Parsers
         private static Parser<string> CreateSeriesNameParser()
         {
             var parser = from _ in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
-                         from content in BaseGrammars.LineUpToLastDashSeparatorToken
+                         from content in BaseGrammars.LineUpToLastDashSeparatorToken.Or(BaseGrammars.LineUpToEpisodeNumberToken)
                          select content.Trim();
 
             return parser.Memoize();
