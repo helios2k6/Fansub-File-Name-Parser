@@ -33,7 +33,5 @@ namespace UnitTests
     [TestClass]
     public sealed class EntityParserTests
     {
-        #region OP/ED Parsers
-        #endregion
     }
 }
