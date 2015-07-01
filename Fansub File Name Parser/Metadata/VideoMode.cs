@@ -60,5 +60,9 @@ namespace FansubFileNameParser.Metadata
         /// Designates 1080p video
         /// </summary>
         TenEightyProgressive = 1 << 5,
+        /// <summary>
+        /// Designates 576p video
+        /// </summary>
+        FiveSeventySixProgressive = 1 << 6,
     }
 }

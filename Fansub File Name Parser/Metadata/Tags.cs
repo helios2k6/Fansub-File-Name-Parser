@@ -136,6 +136,10 @@ namespace FansubFileNameParser.Metadata
                     {MediaMetadataTags.TenEightyP, VideoMode.TenEightyProgressive},
                     {MediaMetadataTags.TenEightyI, VideoMode.TenEightyInterlaced},
                     {MediaMetadataTags.TenEightyIWithSpace, VideoMode.TenEightyInterlaced},
+                    {MediaMetadataTags.FiveSeventySixProgressive, VideoMode.FiveSeventySixProgressive},
+                    {MediaMetadataTags.FiveSeventySixProgressiveWithSpace, VideoMode.FiveSeventySixProgressive},
+                    {MediaMetadataTags.FiveSeventySixInterlaced, VideoMode.FiveSeventySixInterlaced},
+                    {MediaMetadataTags.FiveSeventySixInterlacedWithSpace, VideoMode.FiveSeventySixInterlaced},
                 };
             }
         }

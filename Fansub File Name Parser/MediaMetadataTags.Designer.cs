@@ -160,6 +160,42 @@ namespace FansubFileNameParser {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 576I.
+        /// </summary>
+        internal static string FiveSeventySixInterlaced {
+            get {
+                return ResourceManager.GetString("FiveSeventySixInterlaced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 576 I.
+        /// </summary>
+        internal static string FiveSeventySixInterlacedWithSpace {
+            get {
+                return ResourceManager.GetString("FiveSeventySixInterlacedWithSpace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 576P.
+        /// </summary>
+        internal static string FiveSeventySixProgressive {
+            get {
+                return ResourceManager.GetString("FiveSeventySixProgressive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 576 P.
+        /// </summary>
+        internal static string FiveSeventySixProgressiveWithSpace {
+            get {
+                return ResourceManager.GetString("FiveSeventySixProgressiveWithSpace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to FLAC.
         /// </summary>
         internal static string FLAC {

@@ -40,50 +40,541 @@ namespace UnitTests.Models
 
         private static readonly IDictionary<string, IFansubEntity> EpisodeInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
-            {"[Coalgirls]_Cardcaptor_Sakura_01_(1440x1080_Blu-ray_FLAC)_[9B5FDB33].mkv", null},
+            {
+                "[Coalgirls]_Cardcaptor_Sakura_01_(1440x1080_Blu-ray_FLAC)_[9B5FDB33].mkv",
+                new FansubEpisodeEntity
+                {
+                    Group = "Coalgirls".ToMaybe(),
+                    Series = "Cardcaptor Sakura".ToMaybe(),
+                    EpisodeNumber = 1.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "9B5FDB33".ToMaybe(),
+                        Resolution = new Resolution(1440, 1080).ToMaybe(),
+                        UnusedTags = new[] {"Coalgirls"},
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[HorribleSubs] Akame ga Kill! - 01 [720p].mkv", 
+                new FansubEpisodeEntity
+                {
+                    Group = "HorribleSubs".ToMaybe(),
+                    EpisodeNumber = 1.ToMaybe(),
+                    Series = "Akame ga Kill!".ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMode = VideoMode.SevenTwentyProgressive.ToMaybe(),
+                        UnusedTags = new[] {"HorribleSubs"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Vivid-Asenshi] Akame ga Kill - 01 [85196310].mkv", 
+                new FansubEpisodeEntity
+                {
+                    Group = "Vivid-Asenshi".ToMaybe(),
+                    Series = "Akame ga Kill".ToMaybe(),
+                    EpisodeNumber = 1.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        CRC32 = "85196310".ToMaybe(),
+                        UnusedTags = new[] {"Vivid-Asenshi"},
 
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Commie] Ore Monogatari!! - 01 [0C0EE0AB].mkv", 
+                new FansubEpisodeEntity
+                {
+                    Group = "Commie".ToMaybe(),
+                    Series = "Ore Monogatari!!".ToMaybe(),
+                    EpisodeNumber = 1.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        CRC32 = "0C0EE0AB".ToMaybe(),
+                        UnusedTags = new[] {"Commie"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Yabai]_Spice_and_Wolf_II_-_05_[BD][E84477A3].mkv",
+                new FansubEpisodeEntity
+                {
+                    Group = "Yabai".ToMaybe(),
+                    Series = "Spice and Wolf II".ToMaybe(),
+                    EpisodeNumber = 5.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        CRC32 = "E84477A3".ToMaybe(),
+                        UnusedTags = new[] {"Yabao"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
         };
 
         private static readonly IDictionary<string, IFansubEntity> OriginalVideoInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
-            {"[SFW] Mahou Sensei Negima! OAD ~Mou Hitotsu no Sekai~ 02 [DVD][87942D8A].mkv", null},
-            {"[Hatsuyuki]_Noragami_OAD_-_01_[10bit][848x480][FDCA30AA].mkv", null},
-            {"[SubDESU]_R-15_OAD_(DVD_720x480_x264_AAC)_[7D1F1EDF].mkv", null},
-            {"[Chihiro]_Hitsugi_no_Chaika_-_OAD_[1280x720_Blu-ray_AAC][7ECAA5A1].mkv", null},
-            {"[Saizen]_Attack_on_Titan_-_OAD_1_[06EA79B8].mkv", null},
-            {"[gg]_Joshiraku_-_OAD_[869F6659].mkv", null},
-            {"[Vivid] Tonari no Seki-kun - OAD [DVD 576p AAC][9D6909E7].mkv", null},
-            {"[WCP] Nisekoi OAD 3 - Bath House & Service [576p][BCBBA0B2].mkv", null},
-            {"[AniYoshi]_School_Days_OVA_-_Valentine_Days_(DVD)_[5DE6B483].mkv", null},
-            {"[Coalgirls]_Valkyria_Chronicles_OVA_08_(1920x1080_Blu-Ray_FLAC)_[F015CD71].mkv", null},
-            {"[Doki] Seto no Hanayome OVA - 01 (720x480 h264 DVD AAC) [032D22A4].mkv", null},
-            {"[Procrastinating] Seitokai Yakuindomo OVA 03 [BD 1080p].mkv", null},
-            {"[Ayako-Himatsubushi] Seitokai Yakuindomo OVA - 01v2 [DVD][480p][EF82D238].mkv", null},
-            {"[Coalgirls]_Utawarerumono_OVA_03_(1920x1080_Blu-Ray_FLAC)_[D3BD62B6].mkv", null},
-            {"[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail - 04 [BD][480p][926257C1].mkv", null},
-            {"[UTW]_Fate_Kaleid_Liner_Prisma_Ilya_-_OVA_[BD][h264-1080p_FLAC][002240CB].mkv", null},
+            {
+                "[SFW] Mahou Sensei Negima! OAD ~Mou Hitotsu no Sekai~ 02 [DVD][87942D8A].mkv", 
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "SFW".ToMaybe(),
+                    Series = "Mahou Sensei Negima!".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OAD.ToMaybe(),
+                    Title = "~Mou Hitotsu no Sekai~".ToMaybe(),
+                    EpisodeNumber = 2.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.DVD.ToMaybe(),
+                        CRC32 = "87942D8A".ToMaybe(),
+                        UnusedTags = new[] {"SFW"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Hatsuyuki]_Noragami_OAD_-_01_[10bit][848x480][FDCA30AA].mkv",
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "Hatsuyuki".ToMaybe(),
+                    Series = "Noragami".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OAD.ToMaybe(),
+                    EpisodeNumber = 1.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
+                        Resolution = new Resolution(848, 480).ToMaybe(),
+                        CRC32 = "FDCA30AA".ToMaybe(),
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[SubDESU]_R-15_OAD_(DVD_720x480_x264_AAC)_[7D1F1EDF].mkv",
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "SubDESU".ToMaybe(),
+                    Series = "R-15".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OAD.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.DVD.ToMaybe(),
+                        Resolution = new Resolution(720, 480).ToMaybe(),
+                        VideoCodec = VideoCodec.H264.ToMaybe(),
+                        AudioCodec = AudioCodec.AAC.ToMaybe(),
+                        CRC32 = "7D1F1EDF".ToMaybe(),
+                        UnusedTags = new[] {"SubDESU"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Chihiro]_Hitsugi_no_Chaika_-_OAD_[1280x720_Blu-ray_AAC][7ECAA5A1].mkv", 
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "Chihiro".ToMaybe(),
+                    Series = "Hitsugi no Chaika".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OAD.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1280, 720).ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.AAC.ToMaybe(),
+                        CRC32 = "7ECAA5A1".ToMaybe(),
+                        UnusedTags = new[] {"Chihiro"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Saizen]_Attack_on_Titan_-_OAD_1_[06EA79B8].mkv", 
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "Saizen".ToMaybe(),
+                    Series = "Attack on Titan".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OAD.ToMaybe(),
+                    EpisodeNumber = 1.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        CRC32 = "06EA79B8".ToMaybe(),
+                        UnusedTags = new[] {"Saizen"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[gg]_Joshiraku_-_OAD_[869F6659].mkv", 
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "gg".ToMaybe(),
+                    Series = "Joshiraku".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OAD.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        CRC32 = "869F6659".ToMaybe(),
+                        UnusedTags = new[] {"gg"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[WCP] Nisekoi OAD 3 - Bath House & Service [576p][BCBBA0B2].mkv", 
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "WCP".ToMaybe(),
+                    Series = "Nisekoi".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OAD.ToMaybe(),
+                    EpisodeNumber = 3.ToMaybe(),
+                    Title = "Bath House & Service".ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMode = VideoMode.FiveSeventySixProgressive.ToMaybe(),
+                        CRC32 = "BCBBA0B2".ToMaybe(),
+                        UnusedTags = new[] {"WCP"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[AniYoshi]_School_Days_OVA_-_Valentine_Days_(DVD)_[5DE6B483].mkv", 
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "AniYoshi".ToMaybe(),
+                    Series = "School Days".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OVA.ToMaybe(),
+                    Title = "Valentine Days".ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.DVD.ToMaybe(),
+                        CRC32 = "5DE6B483".ToMaybe(),
+                        UnusedTags = new[] {"AniYoshi"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Coalgirls]_Valkyria_Chronicles_OVA_08_(1920x1080_Blu-Ray_FLAC)_[F015CD71].mkv", 
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "Coalgirls".ToMaybe(),
+                    Series = "Valkyria Chronicles".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OVA.ToMaybe(),
+                    EpisodeNumber = 8.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "F015CD71".ToMaybe(),
+                        UnusedTags = new[] {"Coalgirls"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Ayako-Himatsubushi] Seitokai Yakuindomo OVA - 01v2 [DVD][480p][EF82D238].mkv", 
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "Ayako-Himatsubushi".ToMaybe(),
+                    Series = "Seitokai Yakuindomo".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OVA.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.DVD.ToMaybe(),
+                        VideoMode = VideoMode.FourEightyProgressive.ToMaybe(),
+                        CRC32 = "EF82D238".ToMaybe(),
+                        UnusedTags = new[] {"Ayako-Himatsubushi"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail - 04 [BD][480p][926257C1].mkv", 
+                new FansubOriginalAnimationEntity
+                {
+                    Group = "TastyMelon".ToMaybe(),
+                    Series = "Black Lagoon".ToMaybe(),
+                    Type = FansubOriginalAnimationEntity.ReleaseType.OVA.ToMaybe(),
+                    Title = "Roberta's Blood Trail".ToMaybe(),
+                    EpisodeNumber = 4.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.FourEightyProgressive.ToMaybe(),
+                        CRC32 = "926257C1".ToMaybe(),
+                        UnusedTags = new[] {"TastyMelon"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
         };
 
         private static readonly IDictionary<string, IFansubEntity> OpeningEndingInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
-            {"[FFF] Hyakka Ryouran Samurai Bride - ED06 [BD][1080p-FLAC][2218ADB6].mkv", null},
-            {"[Ryuumaru] Hyakka Ryouran Samurai Girls - ED (Clean) [1080p - Bluray][DB8185D1].mkv", null},
-            {"[FFF] Hataraku Maou-sama! - ED02 [BD][1080p-FLAC][577E003B].mkv", null},
-            {"[Doki] GJ-bu - NCED 2 (1920x1080 Hi10P BD FLAC) [71E9D167].mkv", null},
-            {"[Coalgirls]_Yahari_Ore_no_Seishun_Love_Comedy_wa_Machigatteiru_NCED3_(1920x1080_Blu-Ray_FLAC)_[759447B3].mkv", null},
-            {"[Underwater-FFF] Saki Achiga-hen - Episode of Side-A - ED02 [BD][1080p-FLAC][280EFFB2].mkv", null},
-            {"[Commie] Yuyushiki - NCED 09 [BD 720p AAC] [E291A643].mkv", null},
-            {"[UTW]_Shinsekai_Yori_-_Creditless_ED2_[BD][h264-1080p_FLAC][E3C12E42].mkv", null},
-            {"[Coalgirls]_C3-Cube_x_Cursed_x_Curious_NCED_(1920x1080_Blu-Ray_FLAC)_[50450AA5].mkv", null},
-            {"[Coalgirls]_Valkyria_Chronicles_OP1_-_alt_(1920x1080_Blu-Ray_FLAC)_[414F6192].mkv", null},
-            {"[Doki] UN-GO - NCOP (1920x1080 Hi10P BD FLAC) [8C5BF375].mkv", null},
-            {"[Coalgirls]_Tokyo_Ghoul_NCOP1_(1920x1080_Blu-ray_FLAC)_[D91E552D].mkv", null},
-            {"[WhyNot] Steins;Gate - NCOP [BD 720p AAC][1B65071D].mkv", null},
-            {"[FFF] NouCome - OP02 [BD][1080p-FLAC][03E64080].mkv", null},
-            {"[Final8]Mirai Nikki (Creditless OP3 - The Live World) (BD 10-bit 1280x720 x264 AAC)[8F8B757F].mkv", null},
-            {"[Doki] Air - NCOP A (1280x720 Hi10P BD FLAC) [43076542].mkv", null},
-            {"[joseole99] Gurren Lagann - NCOP3v2 (853x480 h264 AC3 AC3) [956587FD].mkv", null},
-            {"[Doki] Yuru Yuri 2 - NCOP 2v2 (1920x1080 Hi10P BD FLAC) [8CABBF62].mkv", null},
+            {
+                "[FFF] Hyakka Ryouran Samurai Bride - ED06 [BD][1080p-FLAC][2218ADB6].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "FFF".ToMaybe(),
+                    Series = "Hyakka Ryouran Samurai Bride".ToMaybe(),
+                    Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
+                    SequenceNumber = 6.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "2218ADB6".ToMaybe(),
+                        UnusedTags = new[] {"FFF"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Ryuumaru] Hyakka Ryouran Samurai Girls - ED (Clean) [1080p - Bluray][DB8185D1].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "Ryuumaru".ToMaybe(),
+                    Series = "Hyakka Ryouran Samurai Girls".ToMaybe(),
+                    Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
+                    NoCredits = true,
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        CRC32 = "DB8185D1".ToMaybe(),
+                        UnusedTags = new[] {"Ryuumaru"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Doki] GJ-bu - NCED 2 (1920x1080 Hi10P BD FLAC) [71E9D167].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "Doki".ToMaybe(),
+                    Series = "GJ-bu".ToMaybe(),
+                    Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
+                    SequenceNumber = 2.ToMaybe(),
+                    NoCredits = true,
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "71E9D167".ToMaybe(),
+                        UnusedTags = new[] {"Doki"},
+                    }.ToMaybe(),
+                }
+            },
+            {
+                "[Underwater-FFF] Saki Achiga-hen - Episode of Side-A - ED02 [BD][1080p-FLAC][280EFFB2].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "Underwater-FFF".ToMaybe(),
+                    Series = "Saki Achiga-hen - Episode of Side-A".ToMaybe(),
+                    Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
+                    SequenceNumber = 2.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "280EFFB2".ToMaybe(),
+                        UnusedTags = new[] {"Underwater-FFF"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Commie] Yuyushiki - NCED 09 [BD 720p AAC] [E291A643].mkv",
+                new FansubOPEDEntity
+                {
+                    Group = "Commie".ToMaybe(),
+                    Series = "Yuyushiki".ToMaybe(),
+                    Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
+                    SequenceNumber = 9.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.SevenTwentyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.AAC.ToMaybe(),
+                        CRC32 = "E291A643".ToMaybe(),
+                        UnusedTags = new[] {"Commie"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[UTW]_Shinsekai_Yori_-_Creditless_ED2_[BD][h264-1080p_FLAC][E3C12E42].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "UTW".ToMaybe(),
+                    Series = "Shinsekai Yori".ToMaybe(),
+                    NoCredits = true,
+                    Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
+                    SequenceNumber = 2.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoCodec = VideoCodec.H264.ToMaybe(),
+                        VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "E3C12E42".ToMaybe(),
+                        UnusedTags = new[] {"UTW"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Coalgirls]_C3-Cube_x_Cursed_x_Curious_NCED_(1920x1080_Blu-Ray_FLAC)_[50450AA5].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "Coalgirls".ToMaybe(),
+                    Series = "C3-Cube x Cursed x Curious".ToMaybe(),
+                    NoCredits = true,
+                    Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "50450AA5".ToMaybe(),
+                        UnusedTags = new[] {"Coalgirls"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Coalgirls]_Valkyria_Chronicles_OP1_-_alt_(1920x1080_Blu-Ray_FLAC)_[414F6192].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "Coalgirls".ToMaybe(),
+                    Series = "Valkyria Chronicles".ToMaybe(),
+                    Part = FansubOPEDEntity.Segment.OP.ToMaybe(),
+                    SequenceNumber = 1.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "414F6192".ToMaybe(),
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Coalgirls]_Tokyo_Ghoul_NCOP1_(1920x1080_Blu-ray_FLAC)_[D91E552D].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "Coalgirls".ToMaybe(),
+                    Series = "Tokyo Ghoul".ToMaybe(),
+                    NoCredits = true,
+                    Part = FansubOPEDEntity.Segment.OP.ToMaybe(),
+                    SequenceNumber = 1.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "D91E552D".ToMaybe(),
+                        UnusedTags = new[] {"Coalgirls"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[WhyNot] Steins;Gate - NCOP [BD 720p AAC][1B65071D].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "WhyNot".ToMaybe(),
+                    Series = "Steins;Gate".ToMaybe(),
+                    NoCredits = true,
+                    Part = FansubOPEDEntity.Segment.OP.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.SevenTwentyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.AAC.ToMaybe(),
+                        CRC32 = "1B65071D".ToMaybe(),
+                        UnusedTags = new[] {"WhyNot"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Final8]Mirai Nikki (Creditless OP3 - The Live World) (BD 10-bit 1280x720 x264 AAC)[8F8B757F].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "Final8".ToMaybe(),
+                    Series = "Mirai Nikki".ToMaybe(),
+                    NoCredits = true,
+                    Part = FansubOPEDEntity.Segment.OP.ToMaybe(),
+                    SequenceNumber = 3.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
+                        Resolution = new Resolution(1280, 720).ToMaybe(),
+                        VideoCodec = VideoCodec.H264.ToMaybe(),
+                        AudioCodec = AudioCodec.AAC.ToMaybe(),
+                        CRC32 = "8F8B757F".ToMaybe(),
+                        UnusedTags = new[] {"Final8"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[joseole99] Gurren Lagann - NCOP3v2 (853x480 h264 AC3 AC3) [956587FD].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "joseole99".ToMaybe(),
+                    Series = "Gurren Lagann".ToMaybe(),
+                    NoCredits = true,
+                    Part = FansubOPEDEntity.Segment.OP.ToMaybe(),
+                    SequenceNumber = 3.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(853, 480).ToMaybe(),
+                        VideoCodec = VideoCodec.H264.ToMaybe(),
+                        AudioCodec = AudioCodec.AC3.ToMaybe(),
+                        CRC32 = "956587FD".ToMaybe(),
+                        UnusedTags = new[] {"joseole99"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Doki] Yuru Yuri 2 - NCOP 2v2 (1920x1080 Hi10P BD FLAC) [8CABBF62].mkv",
+                new FansubOPEDEntity
+                {
+                    Group = "Doki".ToMaybe(),
+                    Series = "Yuru Yuri 2".ToMaybe(),
+                    NoCredits = true,
+                    Part = FansubOPEDEntity.Segment.OP.ToMaybe(),
+                    SequenceNumber = 2.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        CRC32 = "8CABBF62".ToMaybe(),
+                        UnusedTags = new[] {"Doki"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
         };
 
         private static readonly IDictionary<string, IFansubEntity> DirectoryInputToEntityMap = new Dictionary<string, IFansubEntity>

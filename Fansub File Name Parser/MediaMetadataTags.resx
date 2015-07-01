@@ -204,4 +204,16 @@
   <data name="BLURAY_WITH_DASH" xml:space="preserve">
     <value>BLU-RAY</value>
   </data>
+  <data name="FiveSeventySixInterlaced" xml:space="preserve">
+    <value>576I</value>
+  </data>
+  <data name="FiveSeventySixInterlacedWithSpace" xml:space="preserve">
+    <value>576 I</value>
+  </data>
+  <data name="FiveSeventySixProgressive" xml:space="preserve">
+    <value>576P</value>
+  </data>
+  <data name="FiveSeventySixProgressiveWithSpace" xml:space="preserve">
+    <value>576 P</value>
+  </data>
 </root>
