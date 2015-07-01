@@ -53,6 +53,8 @@ namespace FansubFileNameParser.Entity.Parsers
              from entity in DirectoryEntityParsers.Directory
                                 .Or(OPEDEntityParsers.OpeningOrEnding)
                                 .Or(OriginalAnimationEntityParsers.OriginalAnimation)
+                                .Or(EpisodeEntityParsers.Episode)
+                                .Or(MovieEntityParsers.Movie)
              select entity).Memoize();
     }
 }
