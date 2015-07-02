@@ -750,6 +750,16 @@ namespace UnitTests.Models
         };
         #endregion
 
+        #region public properties
+        /// <summary>
+        /// The Opening/Ending test model
+        /// </summary>
+        public static IEnumerable<KeyValuePair<string, IFansubEntity>> OpeningEndingTestModel
+        {
+            get { return OpeningEndingInputToEntityMap; }
+        }
+        #endregion
+
         #region public methods
         /// <summary>
         /// Creates the media metadata test model.

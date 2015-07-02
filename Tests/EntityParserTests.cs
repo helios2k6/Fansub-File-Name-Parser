@@ -24,6 +24,10 @@
 
 using FansubFileNameParser.Entity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sprache;
+using System;
+using System.Collections.Generic;
+using UnitTests.Models;
 
 namespace UnitTests
 {
@@ -33,5 +37,27 @@ namespace UnitTests
     [TestClass]
     public sealed class EntityParserTests
     {
+        private static void TestParserHelper<TResultType>(
+            IEnumerable<KeyValuePair<string, IFansubEntity>> model,
+            Parser<IFansubEntity> parser
+        )
+        {
+            foreach (var stringToModel in model)
+            {
+                var fansubString = stringToModel.Key;
+                var expectedParseResult = stringToModel.Value;
+                var parseResult = parser.TryParse(fansubString);
+                Assert.AreEqual<Type>(typeof(TResultType), expectedParseResult.GetType());
+                Assert.IsTrue(parseResult.WasSuccessful);
+                Assert.AreEqual<Type>(expectedParseResult.GetType(), parseResult.GetType());
+                Assert.AreEqual<TResultType>((TResultType)expectedParseResult, (TResultType)parseResult);
+            }
+        }
+
+        [TestMethod]
+        public void TestParseOPED()
+        {
+            TestParserHelper<FansubOPEDEntity>(TestModel.OpeningEndingTestModel)
+        }
     }
 }
