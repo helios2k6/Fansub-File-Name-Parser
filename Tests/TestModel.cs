@@ -353,7 +353,25 @@ namespace UnitTests.Models
                         VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         CRC32 = "DB8185D1".ToMaybe(),
-                        UnusedTags = new[] {"Ryuumaru"},
+                        UnusedTags = new[] {"Ryuumaru", "Clean"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
+            {
+                "[Ryuumaru] Hyakka Ryouran Samurai Girls - OP (Clean) [1080p - Bluray][DB8185D1].mkv", 
+                new FansubOPEDEntity
+                {
+                    Group = "Ryuumaru".ToMaybe(),
+                    Series = "Hyakka Ryouran Samurai Girls".ToMaybe(),
+                    Part = FansubOPEDEntity.Segment.OP.ToMaybe(),
+                    NoCredits = true,
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        CRC32 = "DB8185D1".ToMaybe(),
+                        UnusedTags = new[] {"Ryuumaru", "Clean"},
                     }.ToMaybe(),
                     Extension = ".mkv".ToMaybe(),
                 }
@@ -376,6 +394,7 @@ namespace UnitTests.Models
                         CRC32 = "71E9D167".ToMaybe(),
                         UnusedTags = new[] {"Doki"},
                     }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe()
                 }
             },
             {
@@ -405,6 +424,7 @@ namespace UnitTests.Models
                     Series = "Yuyushiki".ToMaybe(),
                     Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
                     SequenceNumber = 9.ToMaybe(),
+                    NoCredits = true,
                     Metadata = new MediaMetadata
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),

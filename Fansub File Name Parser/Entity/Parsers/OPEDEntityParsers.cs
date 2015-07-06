@@ -38,7 +38,7 @@ namespace FansubFileNameParser.Entity.Parsers
         /// </summary>
         private sealed class OPEDParseResult
         {
-            public Maybe<string> CreditlessPrefix { get; set; }
+            public bool CreditlessPrefix { get; set; }
             public Maybe<string> OPEDToken { get; set; }
             public Maybe<int> SequenceNumber { get; set; }
         }
@@ -68,30 +68,36 @@ namespace FansubFileNameParser.Entity.Parsers
 
         private static readonly Parser<string> CreditlessToken =
             NC.Or(Creditless).Or(NonCredit).Or(NonDashCredit).Memoize();
+
+        private static readonly Parser<string> Clean = Parse.IgnoreCase("CLEAN").Text();
+
+        private static readonly Parser<string> CleanInMetaTag = Clean.Contained(BaseGrammars.TagDeliminator, BaseGrammars.TagDeliminator);
+
+        private static readonly Parser<string> AnyCleanToken = Clean.Or(CleanInMetaTag);
         #endregion
         #region Composite Parsers
-        private static readonly Parser<OPEDParseResult> AnyOpeningToken =
-           from creditPrefix in CreditlessToken.OptionalMaybe()
-           from _ in Parse.WhiteSpace.Many()
-           from openingToken in OpeningToken
-           from __ in Parse.WhiteSpace.Many()
-           from sequenceNumber in ExtraParsers.Int.OptionalMaybe()
-           select new OPEDParseResult
-           {
-               CreditlessPrefix = creditPrefix,
-               OPEDToken = openingToken.ToMaybe(),
-               SequenceNumber = sequenceNumber,
-           };
 
-        private static readonly Parser<OPEDParseResult> AnyEndingToken =
-            from creditPrefix in CreditlessToken.OptionalMaybe()
-            from _ in Parse.WhiteSpace.Many()
-            from endingToken in EndingToken
-            from __ in Parse.WhiteSpace.Many()
+        private static readonly Parser<OPEDParseResult> MainOpeningToken =
+            from cleanToken in ExtraParsers.ScanFor(AnyCleanToken).WasSuccessful().ResetInput()
+            from creditlessPrefix in CreditlessToken.WasSuccessful()
+            from openingToken in OpeningToken.Token()
+            from sequenceNumber in ExtraParsers.Int.OptionalMaybe()
+
+            select new OPEDParseResult
+            {
+                CreditlessPrefix = creditlessPrefix || cleanToken,
+                OPEDToken = openingToken.ToMaybe(),
+                SequenceNumber = sequenceNumber,
+            };
+
+        private static readonly Parser<OPEDParseResult> MainEndingToken =
+            from cleanToken in ExtraParsers.ScanFor(AnyCleanToken).WasSuccessful().ResetInput()
+            from creditlessPrefix in CreditlessToken.WasSuccessful()
+            from endingToken in EndingToken.Token()
             from sequenceNumber in ExtraParsers.Int.OptionalMaybe()
             select new OPEDParseResult
             {
-                CreditlessPrefix = creditPrefix,
+                CreditlessPrefix = creditlessPrefix || cleanToken,
                 OPEDToken = endingToken.ToMaybe(),
                 SequenceNumber = sequenceNumber,
             };
@@ -101,7 +107,7 @@ namespace FansubFileNameParser.Entity.Parsers
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from openingToken in ExtraParsers.ScanFor(AnyOpeningToken)
+            from openingToken in ExtraParsers.ScanFor(MainOpeningToken)
             select new FansubOPEDEntity
             {
                 Group = fansubGroup,
@@ -110,7 +116,7 @@ namespace FansubFileNameParser.Entity.Parsers
                 Extension = extension,
                 SequenceNumber = openingToken.SequenceNumber,
                 Part = FansubOPEDEntity.Segment.OP.ToMaybe(),
-                NoCredits = openingToken.CreditlessPrefix.HasValue,
+                NoCredits = openingToken.CreditlessPrefix,
             };
 
         private static readonly Parser<IFansubEntity> ParseEnding =
@@ -118,7 +124,7 @@ namespace FansubFileNameParser.Entity.Parsers
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from openingToken in ExtraParsers.ScanFor(AnyEndingToken)
+            from openingToken in ExtraParsers.ScanFor(MainEndingToken)
             select new FansubOPEDEntity
             {
                 Group = fansubGroup,
@@ -127,7 +133,7 @@ namespace FansubFileNameParser.Entity.Parsers
                 Extension = extension,
                 SequenceNumber = openingToken.SequenceNumber,
                 Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
-                NoCredits = openingToken.CreditlessPrefix.HasValue,
+                NoCredits = openingToken.CreditlessPrefix,
             };
 
         private static readonly Parser<IFansubEntity> OpeningOrEndingParser = ParseOpening.Or(ParseEnding).Memoize();

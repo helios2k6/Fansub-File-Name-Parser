@@ -48,7 +48,15 @@ namespace FansubFileNameParser.Entity.Parsers
             return Maybe<IFansubEntity>.Nothing;
         }
 
-        private static readonly Parser<IFansubEntity> EntityParser =
+        /// <summary>
+        /// The Parser{IFansubEntity} used to parse fansub names
+        /// </summary>
+        public static Parser<IFansubEntity> EntityParser
+        {
+            get { return EntityParserField; }
+        }
+
+        private static readonly Parser<IFansubEntity> EntityParserField =
             (from _ in BaseGrammars.CleanInputString.SetResultAsRemainder()
              from entity in DirectoryEntityParsers.Directory
                                 .Or(OPEDEntityParsers.OpeningOrEnding)

@@ -23,6 +23,7 @@
  */
 
 using FansubFileNameParser.Entity;
+using FansubFileNameParser.Entity.Parsers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sprache;
 using System;
@@ -49,15 +50,15 @@ namespace UnitTests
                 var parseResult = parser.TryParse(fansubString);
                 Assert.AreEqual<Type>(typeof(TResultType), expectedParseResult.GetType());
                 Assert.IsTrue(parseResult.WasSuccessful);
-                Assert.AreEqual<Type>(expectedParseResult.GetType(), parseResult.GetType());
-                Assert.AreEqual<TResultType>((TResultType)expectedParseResult, (TResultType)parseResult);
+                Assert.AreEqual<Type>(expectedParseResult.GetType(), parseResult.Value.GetType());
+                Assert.AreEqual<TResultType>((TResultType)expectedParseResult, (TResultType)parseResult.Value);
             }
         }
 
         [TestMethod]
         public void TestParseOPED()
         {
-            TestParserHelper<FansubOPEDEntity>(TestModel.OpeningEndingTestModel)
+            TestParserHelper<FansubOPEDEntity>(TestModel.OpeningEndingTestModel, EntityParsers.EntityParser);
         }
     }
 }

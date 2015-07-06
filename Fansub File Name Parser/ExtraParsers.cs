@@ -239,6 +239,33 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Converts a Parser into a bool, mapping a successful parse to "true" and
+        /// any other result to "false." 
+        /// </summary>
+        /// <remarks>
+        /// This function ALWAYS succeeds, just like Optional{T}, but it simply maps the
+        /// optional result to a true or false. This parser will consume input exactly like
+        /// any Optional{T} parser would; it consumes the necessary input upon success and
+        /// no input on failure.
+        /// </remarks>
+        /// <typeparam name="TResult">The type of the result from the Parser</typeparam>
+        /// <param name="this">The Parser</param>
+        /// <returns>A new parser that returns true or false depending on the parse result</returns>
+        public static Parser<bool> WasSuccessful<TResult>(this Parser<TResult> @this)
+        {
+            return input =>
+            {
+                var result = @this.Invoke(input);
+                if (result.WasSuccessful)
+                {
+                    return Result.Success<bool>(true, result.Remainder);
+                }
+
+                return Result.Success<bool>(false, input);
+            };
+        }
+
+        /// <summary>
         /// Invokes this parser and upon success will set the remainder string to whatever
         /// this parser returned.
         /// 
