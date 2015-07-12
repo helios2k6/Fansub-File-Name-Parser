@@ -121,12 +121,6 @@ namespace FansubFileNameParser.Entity.Parsers
                 SequenceNumber = sequenceNumber,
             };
 
-        public static readonly Parser<string> TEST =
-            from creditlessPrefix in CreditlessToken.WasSuccessful()
-            from endingToken in EndingToken.Token()
-            from sequenceNumber in ExtraParsers.Int.OptionalMaybe()
-            select string.Format("SUCCESS");
-
         private static readonly Parser<IFansubEntity> ParseOpening =
             from cleanToken in ExtraParsers.ScanFor(AnyCleanToken).WasSuccessful().ResetInput()
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
@@ -134,7 +128,7 @@ namespace FansubFileNameParser.Entity.Parsers
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
             from _ in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
-            from openingToken in ExtraParsers.ScanFor(MainOpeningToken)
+            from openingToken in ExtraParsers.ScanFor(MainOpeningToken.Last())
             select new FansubOPEDEntity
             {
                 Group = fansubGroup,
@@ -152,7 +146,8 @@ namespace FansubFileNameParser.Entity.Parsers
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from endingToken in ExtraParsers.ScanFor(MainEndingToken)
+            from _ in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
+            from endingToken in ExtraParsers.ScanFor(MainEndingToken.Last())
             select new FansubOPEDEntity
             {
                 Group = fansubGroup,
