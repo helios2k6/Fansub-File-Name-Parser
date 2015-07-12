@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser;
 using FansubFileNameParser.Entity;
 using FansubFileNameParser.Entity.Parsers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

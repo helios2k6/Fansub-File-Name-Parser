@@ -170,17 +170,17 @@ namespace FansubFileNameParser.Metadata
         /// The unused tags.
         /// </value>
         [JsonProperty(PropertyName = "UnusedTags")]
-        public IEnumerable<string> UnusedTags 
-        { 
+        public IEnumerable<string> UnusedTags
+        {
             get { return _unusedFields ?? Enumerable.Empty<string>(); }
-            set 
+            set
             {
                 if (value == null)
                 {
                     throw new ArgumentNullException("Value is not allowed to be null");
                 }
-                _unusedFields = value; 
-            } 
+                _unusedFields = value;
+            }
         }
         #endregion
 
@@ -201,7 +201,7 @@ namespace FansubFileNameParser.Metadata
                 VideoCodec.ToStringEnum(),
                 VideoMedia.ToStringEnum(),
                 VideoMode.ToStringEnum(),
-                UnusedTags.Select(e => e.ToStringEx()));
+                UnusedTags.ToStringEx());
         }
 
         /// <summary>

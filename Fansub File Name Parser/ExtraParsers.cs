@@ -150,6 +150,21 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Returns a parser that will cut out the first occurrence of the token that satisfies
+        /// the given parser
+        /// </summary>
+        /// <typeparam name="TResult">The result this parser returns</typeparam>
+        /// <param name="chomper">The parser to use to cut out the token</param>
+        /// <returns>A new parser that removes the unwanted token</returns>
+        public static Parser<string> CutOut<TResult>(Parser<TResult> chomper)
+        {
+            return from front in Parse.AnyChar.Except(chomper).Many().Text()
+                   from chomp in chomper
+                   from end in Parse.AnyChar.Many().Text()
+                   select string.Format("{0} {1}", front, end).Trim();
+        }
+
+        /// <summary>
         /// Collects the string leading up to a token
         /// </summary>
         /// <typeparam name="TThrowAway">The type of result to throw away.</typeparam>

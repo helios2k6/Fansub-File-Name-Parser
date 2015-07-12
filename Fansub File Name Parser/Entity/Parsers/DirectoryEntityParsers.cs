@@ -53,6 +53,7 @@ namespace FansubFileNameParser.Entity.Parsers
             select number;
 
         private static readonly Parser<IFansubEntity> DirectoryParser =
+            from _ in ExtraParsers.ScanFor(BaseGrammars.FileExtension).Not().ResetInput()
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
