@@ -22,9 +22,12 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Metadata;
 using Functional.Maybe;
 using Sprache;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FansubFileNameParser.Entity.Parsers
 {
@@ -67,6 +70,9 @@ namespace FansubFileNameParser.Entity.Parsers
             NonDashCreditString,
             CleanString,
         };
+
+        private static Lazy<IEnumerable<Parser<IFansubEntity>>> AllParsers =
+            new Lazy<IEnumerable<Parser<IFansubEntity>>>(GenerateAllParsers);
         #region Parsers
         private static readonly Parser<string> OP = Parse.IgnoreCase(OPString).Text();
 
@@ -97,12 +103,18 @@ namespace FansubFileNameParser.Entity.Parsers
         private static readonly Parser<string> CleanInMetaTag = Clean.Contained(BaseGrammars.TagDeliminator, BaseGrammars.TagDeliminator);
 
         private static readonly Parser<string> AnyCleanToken = Clean.Or(CleanInMetaTag);
+
+        private static readonly Parser<int> VersionToken =
+            from _ in Parse.IgnoreCase('V')
+            from versionNo in ExtraParsers.Int
+            select versionNo;
         #endregion
         #region Composite Parsers
         private static readonly Parser<OPEDParseResult> MainOpeningToken =
             from creditlessPrefix in CreditlessToken.WasSuccessful()
             from openingToken in OpeningToken.Token()
             from sequenceNumber in ExtraParsers.Int.OptionalMaybe()
+            from version in VersionToken.OptionalMaybe()
             select new OPEDParseResult
             {
                 CreditlessPrefix = creditlessPrefix,
@@ -114,6 +126,7 @@ namespace FansubFileNameParser.Entity.Parsers
             from creditlessPrefix in CreditlessToken.WasSuccessful()
             from endingToken in EndingToken.Token()
             from sequenceNumber in ExtraParsers.Int.OptionalMaybe()
+            from version in VersionToken.OptionalMaybe()
             select new OPEDParseResult
             {
                 CreditlessPrefix = creditlessPrefix,
@@ -160,10 +173,142 @@ namespace FansubFileNameParser.Entity.Parsers
             };
 
         private static readonly Parser<IFansubEntity> OpeningOrEndingParser = ParseOpening.Or(ParseEnding).Memoize();
+
+        private static readonly Parser<IFansubEntity> SeriesOpeningOrEndingParser =
+            ExtraParsers.Any(AllParsers.Value).Memoize();
         #endregion
         #endregion
         #region private methods
-        private static Maybe<string> FilterOutNonCreditsFromSeriesName(Maybe<string> unfilteredSeriesName)
+        private static IEnumerable<Parser<IFansubEntity>> GenerateAllParsers()
+        {
+            return GenerateOPParsers().Concat(GenerateEDParsers());
+        }
+
+        private static IEnumerable<Parser<IFansubEntity>> GenerateOPParsers()
+        {
+            return GenerateParserTemplates(MainOpeningToken, FansubOPEDEntity.Segment.OP.ToMaybe());
+        }
+
+        private static IEnumerable<Parser<IFansubEntity>> GenerateEDParsers()
+        {
+            return GenerateParserTemplates(MainEndingToken, FansubOPEDEntity.Segment.ED.ToMaybe());
+        }
+
+        private static IEnumerable<Parser<IFansubEntity>> GenerateParserTemplates(
+            Parser<OPEDParseResult> tokenizer,
+            Maybe<FansubOPEDEntity.Segment> segment
+        )
+        {
+            var coreParser = (from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
+                              from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
+                              from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
+                              from ext in FileEntityParsers.FileExtension.OptionalMaybe()
+                              where series.HasValue
+                              select new
+                              {
+                                  Metatdata = metadata,
+                                  Group = fansubGroup,
+                                  Series = FilterOutNonCreditsFromSeriesName(series),
+                                  Extension = ext,
+                              }).Memoize();
+
+            // <series name> <dash> <token> (also checks metatags for "clean" tag)
+            yield return from core in coreParser.ResetInput()
+                         from _1 in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
+                         from _2 in BaseGrammars.LineUpToLastDashSeparatorToken
+                         from _3 in BaseGrammars.DashSeparatorToken
+                         from token in tokenizer
+                         select new FansubOPEDEntity
+                         {
+                             Group = core.Group,
+                             Series = core.Series,
+                             Metadata = core.Metatdata,
+                             Extension = core.Extension,
+                             SequenceNumber = token.SequenceNumber,
+                             Part = segment,
+                             NoCredits = token.CreditlessPrefix || CleanTokenFoundInMetadataTags(core.Metatdata),
+                         };
+
+            // <series name> <token (also checks metatags for "clean" tag)
+            yield return from core in coreParser.ResetInput()
+                         from _1 in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
+                         from _2 in Parse.String(core.Series.Value).Token()
+                         from token in tokenizer
+                         select new FansubOPEDEntity
+                         {
+                             Group = core.Group,
+                             Series = core.Series,
+                             Metadata = core.Metatdata,
+                             Extension = core.Extension,
+                             SequenceNumber = token.SequenceNumber,
+                             Part = segment,
+                             NoCredits = token.CreditlessPrefix || CleanTokenFoundInMetadataTags(core.Metatdata)
+                         };
+
+            // <series name> (metadata tags contain information)
+            yield return from core in coreParser
+                         let parseResult = ScanThroughMetadataTags(
+                            core.Group,
+                            core.Series,
+                            core.Metatdata,
+                            core.Extension,
+                            tokenizer,
+                            segment
+                         )
+                         where parseResult.HasValue
+                         select parseResult.Value;
+        }
+
+        private static Maybe<FansubOPEDEntity> ScanThroughMetadataTags(
+            Maybe<string> group,
+            Maybe<string> series,
+            Maybe<MediaMetadata> metadata,
+            Maybe<string> extension,
+            Parser<OPEDParseResult> tokenizer,
+            Maybe<FansubOPEDEntity.Segment> segment
+        )
+        {
+            if (metadata.HasValue == false)
+            {
+                return Maybe<FansubOPEDEntity>.Nothing;
+            }
+
+            var tagParser = ExtraParsers.ScanFor(tokenizer);
+            var cleanToken = CleanTokenFoundInMetadataTags(metadata);
+            foreach (var tag in metadata.Value.UnusedTags)
+            {
+                var tagParseResult = tagParser.TryParse(tag);
+                if (tagParseResult.WasSuccessful)
+                {
+                    return new FansubOPEDEntity
+                    {
+                        Group = group,
+                        Series = series,
+                        Metadata = metadata,
+                        Extension = extension,
+                        Part = segment,
+                        SequenceNumber = tagParseResult.Value.SequenceNumber,
+                        NoCredits = cleanToken || tagParseResult.Value.CreditlessPrefix,
+                    }.ToMaybe();
+                }
+            }
+
+            return Maybe<FansubOPEDEntity>.Nothing;
+        }
+
+        private static bool CleanTokenFoundInMetadataTags(Maybe<MediaMetadata> mediaMetadata)
+        {
+            if (mediaMetadata.IsNothing())
+            {
+                return false;
+            }
+
+            var cleanTokenScanner = ExtraParsers.ScanFor(AnyCleanToken);
+            return mediaMetadata.Value.UnusedTags.Any(tag => cleanTokenScanner.TryParse(tag).WasSuccessful);
+        }
+
+        //TODO MAKE PRIVATE AFTER TEST
+        public static Maybe<string> FilterOutNonCreditsFromSeriesName(Maybe<string> unfilteredSeriesName)
         {
             if (unfilteredSeriesName.HasValue == false)
             {
@@ -188,7 +333,7 @@ namespace FansubFileNameParser.Entity.Parsers
         /// </value>
         public static Parser<IFansubEntity> OpeningOrEnding
         {
-            get { return OpeningOrEndingParser; }
+            get { return SeriesOpeningOrEndingParser; }
         }
         #endregion
     }

@@ -151,17 +151,49 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Returns a parser that will cut out the first occurrence of the token that satisfies
-        /// the given parser
+        /// the given parser.
+        /// 
+        /// TODO: UNIT TEST
         /// </summary>
         /// <typeparam name="TResult">The result this parser returns</typeparam>
-        /// <param name="chomper">The parser to use to cut out the token</param>
+        /// <param name="cutter">The parser to use to cut out the token</param>
         /// <returns>A new parser that removes the unwanted token</returns>
-        public static Parser<string> CutOut<TResult>(Parser<TResult> chomper)
+        public static Parser<string> CutOut<TResult>(Parser<TResult> cutter)
         {
-            return from front in Parse.AnyChar.Except(chomper).Many().Text()
-                   from chomp in chomper
+            return from front in Parse.AnyChar.Except(cutter).Many().Text()
+                   from chomp in cutter
                    from end in Parse.AnyChar.Many().Text()
                    select string.Format("{0} {1}", front, end).Trim();
+        }
+
+        /// <summary>
+        /// Cycles through each parser in the IEnumerable{Parser{TResult}} and will return
+        /// the result of the first one that successfully parses the input string
+        /// 
+        /// TODO: UNIT TEST
+        /// </summary>
+        /// <typeparam name="TResult">The type of result to parse</typeparam>
+        /// <param name="parsers">The IEnumerable of parsers</param>
+        /// <returns>A single parser that will enumerate all of the given parsers</returns>
+        public static Parser<TResult> Any<TResult>(IEnumerable<Parser<TResult>> parsers)
+        {
+            return input =>
+            {
+                foreach (var parser in parsers)
+                {
+                    var result = parser.Invoke(input);
+                    if (result.WasSuccessful)
+                    {
+                        return result;
+                    }
+                }
+
+                return Result.Failure<TResult>(
+                    input,
+                    "None of the provided parsers successfully parsed the input",
+                    new string[0]
+                );
+            };
         }
 
         /// <summary>
