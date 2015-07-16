@@ -788,6 +788,14 @@ namespace UnitTests.Models
         {
             get { return OpeningEndingInputToEntityMap; }
         }
+
+        /// <summary>
+        /// The Directory test model
+        /// </summary>
+        public static IEnumerable<KeyValuePair<string, IFansubEntity>> DirectoryTestModel
+        {
+            get { return DirectoryInputToEntityMap; }
+        }
         #endregion
 
         #region public methods

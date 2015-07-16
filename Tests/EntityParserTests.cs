@@ -22,7 +22,9 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser;
 using FansubFileNameParser.Entity;
+using FansubFileNameParser.Entity.Directory;
 using FansubFileNameParser.Entity.Parsers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sprache;
@@ -59,6 +61,14 @@ namespace UnitTests
         public void TestParseOPED()
         {
             TestParserHelper<FansubOPEDEntity>(TestModel.OpeningEndingTestModel, EntityParsers.EntityParser);
+        }
+
+        [TestMethod]
+        public void TestParseDirectory()
+        {
+            var m = "Kokoro Connect (2012) [Doki-Chihiro][1920x1080 Hi10P BD FLAC]";
+            var rr = DirectoryEntityParsers.Directory.TryParse(m);
+            TestParserHelper<FansubDirectoryEntity>(TestModel.DirectoryTestModel, EntityParsers.EntityParser);
         }
     }
 }
