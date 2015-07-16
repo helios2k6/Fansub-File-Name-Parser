@@ -167,6 +167,20 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Returns a parser that will attempt to cut out the first occurance of the token that
+        /// satisfies the given parser, or it will return the original input.
+        /// 
+        /// TODO: UNIT TEST
+        /// </summary>
+        /// <typeparam name="TResult">The result this parser returns</typeparam>
+        /// <param name="cutter">The parser to use to cut out the token</param>
+        /// <returns>A new parser that removes the unwanted token or returns the original input</returns>
+        public static Parser<string> CutOutOrAllInput<TResult>(Parser<TResult> cutter)
+        {
+            return CutOut<TResult>(cutter).Or(Parse.AnyChar.Many().Text());
+        }
+
+        /// <summary>
         /// Cycles through each parser in the IEnumerable{Parser{TResult}} and will return
         /// the result of the first one that successfully parses the input string
         /// 

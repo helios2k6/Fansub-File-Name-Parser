@@ -58,19 +58,6 @@ namespace FansubFileNameParser.Entity.Parsers
         private const string NonDashCreditString = "NON-CREDIT";
         private const string CleanString = "CLEAN";
 
-        private static readonly ISet<string> InternalStrings = new HashSet<string>
-        {
-            OPString,
-            OpeningString,
-            EDString,
-            EndingString,
-            NCString,
-            CreditlessString,
-            NonCreditString,
-            NonDashCreditString,
-            CleanString,
-        };
-
         private static Lazy<IEnumerable<Parser<IFansubEntity>>> AllParsers =
             new Lazy<IEnumerable<Parser<IFansubEntity>>>(GenerateAllParsers);
         #region Parsers
@@ -134,46 +121,6 @@ namespace FansubFileNameParser.Entity.Parsers
                 SequenceNumber = sequenceNumber,
             };
 
-        private static readonly Parser<IFansubEntity> ParseOpening =
-            from cleanToken in ExtraParsers.ScanFor(AnyCleanToken).WasSuccessful().ResetInput()
-            from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
-            from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
-            from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
-            from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from _ in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
-            from openingToken in ExtraParsers.ScanFor(MainOpeningToken.Last())
-            select new FansubOPEDEntity
-            {
-                Group = fansubGroup,
-                Series = FilterOutNonCreditsFromSeriesName(series),
-                Metadata = metadata,
-                Extension = extension,
-                SequenceNumber = openingToken.SequenceNumber,
-                Part = FansubOPEDEntity.Segment.OP.ToMaybe(),
-                NoCredits = openingToken.CreditlessPrefix || cleanToken,
-            };
-
-        private static readonly Parser<IFansubEntity> ParseEnding =
-            from cleanToken in ExtraParsers.ScanFor(AnyCleanToken).WasSuccessful().ResetInput()
-            from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
-            from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
-            from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
-            from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from _ in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
-            from endingToken in ExtraParsers.ScanFor(MainEndingToken.Last())
-            select new FansubOPEDEntity
-            {
-                Group = fansubGroup,
-                Series = FilterOutNonCreditsFromSeriesName(series),
-                Metadata = metadata,
-                Extension = extension,
-                SequenceNumber = endingToken.SequenceNumber,
-                Part = FansubOPEDEntity.Segment.ED.ToMaybe(),
-                NoCredits = endingToken.CreditlessPrefix || cleanToken,
-            };
-
-        private static readonly Parser<IFansubEntity> OpeningOrEndingParser = ParseOpening.Or(ParseEnding).Memoize();
-
         private static readonly Parser<IFansubEntity> SeriesOpeningOrEndingParser =
             ExtraParsers.Any(AllParsers.Value).Memoize();
         #endregion
@@ -208,7 +155,7 @@ namespace FansubFileNameParser.Entity.Parsers
                               {
                                   Metatdata = metadata,
                                   Group = fansubGroup,
-                                  Series = FilterOutNonCreditsFromSeriesName(series),
+                                  UnfilteredSeries = series,
                                   Extension = ext,
                               }).Memoize();
 
@@ -221,7 +168,7 @@ namespace FansubFileNameParser.Entity.Parsers
                          select new FansubOPEDEntity
                          {
                              Group = core.Group,
-                             Series = core.Series,
+                             Series = core.UnfilteredSeries,
                              Metadata = core.Metatdata,
                              Extension = core.Extension,
                              SequenceNumber = token.SequenceNumber,
@@ -229,15 +176,14 @@ namespace FansubFileNameParser.Entity.Parsers
                              NoCredits = token.CreditlessPrefix || CleanTokenFoundInMetadataTags(core.Metatdata),
                          };
 
-            // <series name> <token (also checks metatags for "clean" tag)
+            // <series name> <token> <extra content> (also checks metatags for "clean" tag)
             yield return from core in coreParser.ResetInput()
                          from _1 in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
-                         from _2 in Parse.String(core.Series.Value).Token()
-                         from token in tokenizer
+                         from token in ExtraParsers.ScanFor(tokenizer.Last())
                          select new FansubOPEDEntity
                          {
                              Group = core.Group,
-                             Series = core.Series,
+                             Series = FilterOutNonCreditsFromSeriesName(core.UnfilteredSeries, tokenizer.Last()),
                              Metadata = core.Metatdata,
                              Extension = core.Extension,
                              SequenceNumber = token.SequenceNumber,
@@ -249,7 +195,7 @@ namespace FansubFileNameParser.Entity.Parsers
             yield return from core in coreParser
                          let parseResult = ScanThroughMetadataTags(
                             core.Group,
-                            core.Series,
+                            core.UnfilteredSeries,
                             core.Metatdata,
                             core.Extension,
                             tokenizer,
@@ -307,21 +253,21 @@ namespace FansubFileNameParser.Entity.Parsers
             return mediaMetadata.Value.UnusedTags.Any(tag => cleanTokenScanner.TryParse(tag).WasSuccessful);
         }
 
-        //TODO MAKE PRIVATE AFTER TEST
-        public static Maybe<string> FilterOutNonCreditsFromSeriesName(Maybe<string> unfilteredSeriesName)
+        private static Maybe<string> FilterOutNonCreditsFromSeriesName(
+            Maybe<string> unfilteredSeriesName,
+            Parser<OPEDParseResult> tokenizer
+        )
         {
             if (unfilteredSeriesName.HasValue == false)
             {
                 return Maybe<string>.Nothing;
             }
 
-            var filteredString = unfilteredSeriesName.Value;
-            foreach (var internalString in InternalStrings)
-            {
-                filteredString = filteredString.Replace(internalString, string.Empty);
-            }
+            // This always succeeds
+            var k = ExtraParsers.CutOut(tokenizer);
+            var m = k.TryParse(unfilteredSeriesName.Value);
 
-            return filteredString.Trim().ToMaybe();
+            return ExtraParsers.CutOutOrAllInput(tokenizer).TryParse(unfilteredSeriesName.Value).Value.ToMaybe();
         }
         #endregion
         #region public properies

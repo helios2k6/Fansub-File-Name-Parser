@@ -216,4 +216,7 @@
   <data name="FiveSeventySixProgressiveWithSpace" xml:space="preserve">
     <value>576 P</value>
   </data>
+  <data name="TenDashBit" xml:space="preserve">
+    <value>10-BIT</value>
+  </data>
 </root>

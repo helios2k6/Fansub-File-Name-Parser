@@ -38,6 +38,7 @@ namespace UnitTests.Models
         private static readonly Lazy<IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>>> InputToMediaMetadataMap =
             new Lazy<IEnumerable<KeyValuePair<IEnumerable<string>, MediaMetadata>>>(InitMediaMetadataTestModel);
 
+        #region episode test data
         private static readonly IDictionary<string, IFansubEntity> EpisodeInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
             {
@@ -121,7 +122,9 @@ namespace UnitTests.Models
                 }
             },
         };
+        #endregion
 
+        #region OVA test data
         private static readonly IDictionary<string, IFansubEntity> OriginalVideoInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
             {
@@ -318,7 +321,9 @@ namespace UnitTests.Models
                 }
             },
         };
+        #endregion
 
+        #region OP/ED Test Data
         private static readonly IDictionary<string, IFansubEntity> OpeningEndingInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
             {
@@ -490,6 +495,7 @@ namespace UnitTests.Models
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
                         CRC32 = "414F6192".ToMaybe(),
+                        UnusedTags = new[] {"Coalgirls"},
                     }.ToMaybe(),
                     Extension = ".mkv".ToMaybe(),
                 }
@@ -550,7 +556,7 @@ namespace UnitTests.Models
                         VideoCodec = VideoCodec.H264.ToMaybe(),
                         AudioCodec = AudioCodec.AAC.ToMaybe(),
                         CRC32 = "8F8B757F".ToMaybe(),
-                        UnusedTags = new[] {"Final8"},
+                        UnusedTags = new[] {"Final8", "Creditless OP3 - The Live World"},
                     }.ToMaybe(),
                     Extension = ".mkv".ToMaybe(),
                 }
@@ -586,6 +592,7 @@ namespace UnitTests.Models
                     SequenceNumber = 2.ToMaybe(),
                     Metadata = new MediaMetadata
                     {
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
                         Resolution = new Resolution(1920, 1080).ToMaybe(),
                         PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
@@ -596,7 +603,9 @@ namespace UnitTests.Models
                 }
             },
         };
+        #endregion
 
+        #region directory test data
         private static readonly IDictionary<string, IFansubEntity> DirectoryInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
             {"Kokoro Connect (2012) [Doki-Chihiro][1920x1080 Hi10P BD FLAC]", new FansubDirectoryEntity 
@@ -768,6 +777,7 @@ namespace UnitTests.Models
                 }
             },
         };
+        #endregion
         #endregion
 
         #region public properties

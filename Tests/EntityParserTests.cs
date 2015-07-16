@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 
-using FansubFileNameParser;
 using FansubFileNameParser.Entity;
 using FansubFileNameParser.Entity.Parsers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -59,34 +58,7 @@ namespace UnitTests
         [TestMethod]
         public void TestParseOPED()
         {
-            var coreParser = from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
-                             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
-                             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
-                             from ext in FileEntityParsers.FileExtension.OptionalMaybe()
-                             where series.HasValue
-                             select new
-                             {
-                                 Metatdata = metadata,
-                                 Group = fansubGroup,
-                                 Series = OPEDEntityParsers.FilterOutNonCreditsFromSeriesName(series),
-                                 Extension = ext,
-                             };
-
-            var input = "[Coalgirls]_Valkyria_Chronicles_OP1_-_alt_(1920x1080_Blu-Ray_FLAC)_[414F6192].mkv";
-            var parser = from _0 in BaseGrammars.CleanInputString.SetResultAsRemainder()
-                         from core in coreParser.ResetInput()
-                         //from _1 in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
-                         //from _2 in Parse.String(core.Series.Value).Token().Text()
-                         select new
-                         {
-                             Core = core,
-                             //A = _1,
-                             //B = _2,
-                         };
-
-            var result = parser.TryParse(input);
-            Console.WriteLine();
-            //TestParserHelper<FansubOPEDEntity>(TestModel.OpeningEndingTestModel, EntityParsers.EntityParser);
+            TestParserHelper<FansubOPEDEntity>(TestModel.OpeningEndingTestModel, EntityParsers.EntityParser);
         }
     }
 }

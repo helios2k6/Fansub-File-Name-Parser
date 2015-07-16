@@ -97,9 +97,9 @@ namespace FansubFileNameParser
         /// Parses an episode number
         /// </summary>
         public static readonly Parser<int> EpisodeNumber =
-            from _ in Parse.WhiteSpace
+            from _1 in Parse.WhiteSpace
             from ep in ExtraParsers.Int
-            from __ in Parse.WhiteSpace
+            from _2 in Parse.WhiteSpace
             select ep;
 
         /// <summary>
@@ -156,10 +156,10 @@ namespace FansubFileNameParser
             from frontSegment in Parse.AnyChar.Except(FileExtension).Many().Text()
             from extension in FileExtension.Optional()
             select string.Format(
-                "{0}{1}", 
-                frontSegment.Replace('.', ' '), 
-                extension.IsDefined 
-                ? extension.Get() 
+                "{0}{1}",
+                frontSegment.Replace('.', ' '),
+                extension.IsDefined
+                ? extension.Get()
                 : string.Empty
             );
 

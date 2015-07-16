@@ -70,6 +70,7 @@ namespace FansubFileNameParser.Metadata
                     {MediaMetadataTags.TenBit, PixelBitDepth.TenBits},
                     {MediaMetadataTags.TenBitWithSpace, PixelBitDepth.TenBits},
                     {MediaMetadataTags.Hi10P, PixelBitDepth.TenBits},
+                    {MediaMetadataTags.TenDashBit, PixelBitDepth.TenBits},
                 };
             }
         }
