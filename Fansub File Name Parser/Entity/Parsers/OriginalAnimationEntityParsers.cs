@@ -75,10 +75,11 @@ namespace FansubFileNameParser.Entity.Parsers
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from _ in ExtraParsers.Filter(BaseGrammars.DashSeparatorToken).SetResultAsRemainder()
+            from _1 in ExtraParsers.Filter(BaseGrammars.DashSeparatorToken).SetResultAsRemainder()
             from rootName in BaseGrammars.ContentBetweenTagGroups.ContinueWith(RootName)
             from oaToken in OAToken.Token()
             from titleAndEpisode in TitleAndEpisodeNumber
+            from _2 in ExtraParsers.RemainingCharacters
             select new FansubOriginalAnimationEntity
             {
                 Group = fansubGroup,

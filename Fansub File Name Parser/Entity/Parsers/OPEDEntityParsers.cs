@@ -122,7 +122,7 @@ namespace FansubFileNameParser.Entity.Parsers
             };
 
         private static readonly Parser<IFansubEntity> SeriesOpeningOrEndingParser =
-            ExtraParsers.Any(AllParsers.Value).Memoize();
+            ExtraParsers.Any(AllParsers.Value).ConsumeAllRemainingInput().Memoize();
         #endregion
         #endregion
         #region private methods

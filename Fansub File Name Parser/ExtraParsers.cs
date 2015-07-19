@@ -150,6 +150,29 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Consumes the remaining input and returns it as a string
+        /// </summary>
+        public static Parser<string> RemainingCharacters =
+            from _ in Parse.AnyChar.Many().Text()
+            select _;
+
+
+        /// <summary>
+        /// Evalutes this parser and then consumes the rest of the input and discards it
+        /// 
+        /// TODO: UT
+        /// </summary>
+        /// <typeparam name="TResult">The result of this parser</typeparam>
+        /// <param name="this">The parser</param>
+        /// <returns>A new parser that evalutes this parser and then consumes the remaining input</returns>
+        public static Parser<TResult> ConsumeAllRemainingInput<TResult>(this Parser<TResult> @this)
+        {
+            return from result in @this
+                   from _ in ExtraParsers.RemainingCharacters
+                   select result;
+        }
+
+        /// <summary>
         /// Returns a parser that will cut out the first occurrence of the token that satisfies
         /// the given parser.
         /// 

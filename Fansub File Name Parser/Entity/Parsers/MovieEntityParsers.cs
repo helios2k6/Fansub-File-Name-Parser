@@ -61,6 +61,7 @@ namespace FansubFileNameParser.Entity.Parsers
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
             from movieNumber in MovieNumberParser.OptionalMaybe()
+            from _ in ExtraParsers.RemainingCharacters
             select new FansubMovieEntity
             {
                 Metadata = metadata,

@@ -53,12 +53,13 @@ namespace FansubFileNameParser.Entity.Parsers
             select number;
 
         private static readonly Parser<IFansubEntity> DirectoryParser =
-            from _ in ExtraParsers.ScanFor(BaseGrammars.FileExtension).Not().ResetInput()
+            from _1 in ExtraParsers.ScanFor(BaseGrammars.FileExtension).Not().ResetInput()
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from vol in ExtraParsers.ScanFor(VolumeNumber).OptionalMaybe()
             from range in ExtraParsers.ScanFor(EpisodeRange).OptionalMaybe()
+            from _2 in ExtraParsers.RemainingCharacters
             select new FansubDirectoryEntity
             {
                 Group = fansubGroup,
