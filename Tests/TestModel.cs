@@ -617,8 +617,8 @@ namespace UnitTests.Models
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
                         PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
                         Resolution = new Resolution(1920, 1080).ToMaybe(),
-                        VideoCodec = VideoCodec.H264.ToMaybe(),
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        UnusedTags = new[] {"2012", "Doki-Chihiro"},
                     }.ToMaybe(),
                 }
             },
@@ -631,6 +631,7 @@ namespace UnitTests.Models
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
+                        UnusedTags = new[] {"Vivid"},
                     }.ToMaybe(),
                 }
             },
@@ -645,6 +646,7 @@ namespace UnitTests.Models
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
                         Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        UnusedTags = new[] {"BlurayDesuYo"},
                     }.ToMaybe(),
                 }
             },
@@ -658,6 +660,7 @@ namespace UnitTests.Models
                         Resolution = new Resolution(1920, 1080).ToMaybe(),
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        UnusedTags = new[] {"Coalgirls"},
                     }.ToMaybe(),
                 }
             },
@@ -671,6 +674,7 @@ namespace UnitTests.Models
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        UnusedTags = new[] {"FFF"},
                     }.ToMaybe(),
                 }
             },
@@ -686,6 +690,7 @@ namespace UnitTests.Models
                         Resolution = new Resolution(1920, 1080).ToMaybe(),
                         PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        UnusedTags = new[] {"Tsundere"},
                     }.ToMaybe(),
                 }
             },
@@ -698,6 +703,7 @@ namespace UnitTests.Models
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        UnusedTags = new[] {"Elysium"},
                     }.ToMaybe(),
                 }
             },
@@ -708,6 +714,7 @@ namespace UnitTests.Models
                     Metadata = new MediaMetadata
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        UnusedTags = new[] {"Yabai"},
                     }.ToMaybe(),
                 }
             },
@@ -720,6 +727,7 @@ namespace UnitTests.Models
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
                         AudioCodec = AudioCodec.AAC.ToMaybe(),
+                        UnusedTags = new[] {"Zurako"},
                     }.ToMaybe(),
                 }
             },
@@ -734,6 +742,7 @@ namespace UnitTests.Models
                         VideoCodec = VideoCodec.H264.ToMaybe(),
                         VideoMode = VideoMode.TenEightyProgressive.ToMaybe(),
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        UnusedTags = new[] {"UTW"},
                     }.ToMaybe(),
                 }
             },
@@ -747,6 +756,7 @@ namespace UnitTests.Models
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         VideoMode = VideoMode.SevenTwentyProgressive.ToMaybe(),
                         AudioCodec = AudioCodec.AAC.ToMaybe(),
+                        UnusedTags = new[] {"Commie"},
                     }.ToMaybe(),
                 }
             },
@@ -759,6 +769,7 @@ namespace UnitTests.Models
                         Resolution = new Resolution(1920, 1080).ToMaybe(),
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        UnusedTags = new[] {"Coalgirls"},
                     }.ToMaybe(),
                 }
             },
@@ -773,6 +784,7 @@ namespace UnitTests.Models
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         AudioCodec = AudioCodec.FLAC.ToMaybe(),
                         PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
+                        UnusedTags = new[] {"Doki"},
                     }.ToMaybe(),
                 }
             },

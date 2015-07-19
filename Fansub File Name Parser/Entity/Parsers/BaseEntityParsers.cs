@@ -26,6 +26,8 @@ using FansubFileNameParser.Metadata;
 using Functional.Maybe;
 using Sprache;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace FansubFileNameParser.Entity.Parsers
@@ -36,7 +38,7 @@ namespace FansubFileNameParser.Entity.Parsers
     internal static class BaseEntityParsers
     {
         #region private static fields
-        private static Lazy<Parser<MediaMetadata>> MediaMetadataParserLazy = 
+        private static Lazy<Parser<MediaMetadata>> MediaMetadataParserLazy =
             new Lazy<Parser<MediaMetadata>>(CreateMediaMetadataParser);
 
         private static Lazy<Parser<string>> FansubGroupParserLazy =
@@ -44,6 +46,11 @@ namespace FansubFileNameParser.Entity.Parsers
 
         private static Lazy<Parser<string>> SeriesNameParserLazy =
             new Lazy<Parser<string>>(CreateSeriesNameParser);
+
+        private static readonly ISet<string> DateFormatStrings = new HashSet<string>
+        {
+            "yyyy",
+        };
         #endregion
         #region private static methods
         private static Parser<MediaMetadata> CreateMediaMetadataParser()
@@ -72,11 +79,30 @@ namespace FansubFileNameParser.Entity.Parsers
             DateTime _;
             Parser<string> group = from metadataVar in MediaMetadata
                                    let unusedTags = metadataVar.UnusedTags
-                                   let filteredOutDate = unusedTags.Where(s => DateTime.TryParse(s, out _) == false)
+                                   let filteredOutDate = unusedTags.Where(s => IsDate(s) == false)
                                    let groupCandidate = filteredOutDate.FirstOrDefault()
                                    select groupCandidate;
 
             return group.Memoize();
+        }
+
+        private static bool IsDate(string dateTimeString)
+        {
+            DateTime _t;
+            if (DateTime.TryParse(dateTimeString, out _t))
+            {
+                return true;
+            }
+
+            foreach (var formatString in DateFormatStrings)
+            {
+                if (DateTime.TryParseExact(dateTimeString, formatString, CultureInfo.InvariantCulture, DateTimeStyles.None, out _t))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static Parser<string> CreateSeriesNameParser()
