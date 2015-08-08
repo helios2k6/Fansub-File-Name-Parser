@@ -52,11 +52,18 @@ namespace FansubFileNameParser.Entity.Parsers
             from number in ExtraParsers.Int
             select number;
 
+        private static readonly Parser<string> SeriesNameDirectory =
+            from baseSeriesName in BaseEntityParsers.SeriesName
+            from remainingName in ExtraParsers.CollectExcept(ExtraParsers.CoalesceOr(EpisodeRange, VolumeNumber))
+            select string.IsNullOrWhiteSpace(remainingName)
+                ? baseSeriesName
+                : string.Format("{0} {1}", baseSeriesName, remainingName.Trim());
+
         private static readonly Parser<IFansubEntity> DirectoryParser =
             from _1 in ExtraParsers.ScanFor(BaseGrammars.FileExtension).Not().ResetInput()
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
-            from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
+            from series in SeriesNameDirectory.OptionalMaybe().ResetInput()
             from vol in ExtraParsers.ScanFor(VolumeNumber).OptionalMaybe()
             from range in ExtraParsers.ScanFor(EpisodeRange).OptionalMaybe()
             from _2 in ExtraParsers.RemainingCharacters

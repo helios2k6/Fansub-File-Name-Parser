@@ -65,6 +65,9 @@ namespace UnitTests
         [TestMethod]
         public void TestParseDirectory()
         {
+            var b = "[BlurayDesuYo] Amagi Brilliant Park - Vol. 1 (BD 1920x1080 10bit FLAC)";
+            var fansubResult = BaseEntityParsers.FansubGroup.TryParse(b);
+            Console.WriteLine();
             TestParserHelper<FansubDirectoryEntity>(TestModel.DirectoryTestModel, EntityParsers.EntityParser);
         }
     }

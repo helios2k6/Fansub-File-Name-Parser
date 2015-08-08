@@ -68,7 +68,7 @@ namespace FansubFileNameParser.Entity.Parsers
                     return Result.Success<MediaMetadata>(mediaMetadata.Value, new Input(string.Empty));
                 }
 
-                return Result.Failure<MediaMetadata>(input, "Could not parse media metadata", new string[0]);
+                return Result.Failure<MediaMetadata>(input, "Could not parse media metadata", Enumerable.Empty<string>());
             };
 
             return parser.Memoize();

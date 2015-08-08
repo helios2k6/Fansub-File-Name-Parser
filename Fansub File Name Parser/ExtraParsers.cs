@@ -87,6 +87,43 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Coalesces two parsers, which may have different return types, into a single parser that succeeds if
+        /// either of the parsers succeeds. 
+        /// 
+        /// TODO: UT
+        /// </summary>
+        /// <typeparam name="TFirstParserReturnType">The return type of the first parser</typeparam>
+        /// <typeparam name="TSecondParserReturnType">The return type of the second parser</typeparam>
+        /// <param name="firstParser">The first parser</param>
+        /// <param name="secondParser">The second parser</param>
+        /// <returns>
+        /// A new parser that will succeed if either parser succeeds. The return value of the parser is a bool, 
+        /// where "true" means one of the parsers succeeded and "false" means neither parser succeeded
+        /// </returns>
+        public static Parser<bool> CoalesceOr<TFirstParserReturnType, TSecondParserReturnType>(
+            Parser<TFirstParserReturnType> firstParser,
+            Parser<TSecondParserReturnType> secondParser
+        )
+        {
+            return input =>
+            {
+                var result = firstParser.Invoke(input);
+                if (result.WasSuccessful)
+                {
+                    return Result.Success<bool>(true, result.Remainder);
+                }
+
+                var secondResult = secondParser.Invoke(input);
+                if (secondResult.WasSuccessful)
+                {
+                    return Result.Success<bool>(true, result.Remainder);
+                }
+
+                return Result.Failure<bool>(input, "Neither parser succeeded", Enumerable.Empty<string>());
+            };
+        }
+
+        /// <summary>
         /// Parses the antecedent parser and feeds its results into the <paramref name="continuation" /> parser
         /// </summary>
         /// <typeparam name="TInput">The type of the input.</typeparam>
@@ -228,7 +265,7 @@ namespace FansubFileNameParser
                 return Result.Failure<TResult>(
                     input,
                     "None of the provided parsers successfully parsed the input",
-                    new string[0]
+                    Enumerable.Empty<string>()
                 );
             };
         }
