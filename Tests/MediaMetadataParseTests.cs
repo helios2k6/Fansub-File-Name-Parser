@@ -38,7 +38,7 @@ namespace Tests
         [TestMethod]
         public void ParseAllTags()
         {
-            Parallel.ForEach(TestModel.CreateMediaMetadataTestModel().Take(2000), kvp =>
+            foreach (var kvp in TestModel.CreateMediaMetadataTestModel().Take(2000))
             {
                 var inputTags = kvp.Key;
                 var expectedMetadata = kvp.Value;
@@ -48,7 +48,7 @@ namespace Tests
                 {
                     Assert.AreEqual<MediaMetadata>(expectedMetadata, experimentalMetadataMaybe.Value);
                 }
-            });
+            }
         }
 
         [TestMethod]

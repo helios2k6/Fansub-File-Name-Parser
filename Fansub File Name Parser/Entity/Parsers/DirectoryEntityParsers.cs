@@ -52,9 +52,26 @@ namespace FansubFileNameParser.Entity.Parsers
             from number in ExtraParsers.Int
             select number;
 
+        private static readonly Parser<int> DashSeparatorTokenThenVolumeNumber =
+            from _1 in BaseGrammars.DashSeparatorToken
+            from _2 in VolumeNumber
+            select _2;
+
+        private static readonly Parser<Tuple<int, int>> DashSeparatorTokenThenEpisodeRange =
+            from _1 in BaseGrammars.DashSeparatorToken
+            from _2 in EpisodeRange
+            select _2;
+
         private static readonly Parser<string> SeriesNameDirectory =
             from baseSeriesName in BaseEntityParsers.SeriesName
-            from remainingName in ExtraParsers.CollectExcept(ExtraParsers.CoalesceOr(EpisodeRange, VolumeNumber))
+            from remainingName in ExtraParsers.CollectExcept(
+                ExtraParsers.Or(
+                    EpisodeRange,
+                    VolumeNumber,
+                    DashSeparatorTokenThenVolumeNumber,
+                    DashSeparatorTokenThenEpisodeRange
+                )
+            )
             select string.IsNullOrWhiteSpace(remainingName)
                 ? baseSeriesName
                 : string.Format("{0} {1}", baseSeriesName, remainingName.Trim());

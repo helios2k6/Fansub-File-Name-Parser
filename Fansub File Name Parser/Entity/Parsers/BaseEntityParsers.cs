@@ -76,7 +76,6 @@ namespace FansubFileNameParser.Entity.Parsers
 
         private static Parser<string> CreateFansubGroupParser()
         {
-            DateTime _;
             Parser<string> group = from metadataVar in MediaMetadata
                                    let unusedTags = metadataVar.UnusedTags
                                    let filteredOutDate = unusedTags.Where(s => IsDate(s) == false)

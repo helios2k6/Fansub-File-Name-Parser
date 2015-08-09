@@ -23,6 +23,7 @@
  */
 
 using Functional.Maybe;
+using Sprache;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -131,20 +132,33 @@ namespace FansubFileNameParser.Metadata
         {
             outputResult = default(T);
 
-            var upperCased = tag.ToUpperInvariant();
-
-            foreach (var tagCandidateKvp in candidateTags)
+            var splitString = tag.Split(' ');
+            foreach (var split in splitString)
             {
-                var tagCandidate = tagCandidateKvp.Key;
-                var tagCandidateUpperCased = tagCandidate.ToUpperInvariant();
-                if (upperCased.Contains(tagCandidateUpperCased))
+                var splitTagWithBracketsRemoved = split.Replace("[", string.Empty).Replace("]", string.Empty);
+                foreach (var tagCandidateKvp in candidateTags)
                 {
-                    outputResult = tagCandidateKvp.Value;
-                    return true;
+                    var tagCandidate = tagCandidateKvp.Key;
+                    if (DoesTagContainTagCandidate(splitTagWithBracketsRemoved, tagCandidate))
+                    {
+                        outputResult = tagCandidateKvp.Value;
+                        return true;
+                    }
                 }
             }
 
             return false;
+        }
+
+        private static bool DoesTagContainTagCandidate(string tag, string tagCandidate)
+        {
+            var tagParser = from _1 in ExtraParsers.NonLetterAndNonNumber.AsString().Or(ExtraParsers.BeginnningOfLine)
+                            from mainTag in Parse.IgnoreCase(tagCandidate).Text()
+                            from _2 in ExtraParsers.NonLetterAndNonNumber.AsString().Or(Parse.LineTerminator)
+                            select mainTag;
+            var scanner = ExtraParsers.ScanFor(tagParser);
+            var m = scanner.TryParse(tag);
+            return scanner.TryParse(tag).WasSuccessful;
         }
 
         private static bool TryGetAudioCodec(string tag, out AudioCodec audioCodec)

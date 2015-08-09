@@ -68,7 +68,6 @@ namespace FansubFileNameParser.Metadata
                     {MediaMetadataTags.EightBit, PixelBitDepth.EightBits},
                     {MediaMetadataTags.EightBitWithSpace, PixelBitDepth.EightBits},
                     {MediaMetadataTags.TenBit, PixelBitDepth.TenBits},
-                    {MediaMetadataTags.TenBitWithSpace, PixelBitDepth.TenBits},
                     {MediaMetadataTags.Hi10P, PixelBitDepth.TenBits},
                     {MediaMetadataTags.TenDashBit, PixelBitDepth.TenBits},
                 };
@@ -131,16 +130,13 @@ namespace FansubFileNameParser.Metadata
                 return new Dictionary<string, VideoMode>
                 {
                     {MediaMetadataTags.FourEightyI, VideoMode.FourEightyInterlaced},
-                    {MediaMetadataTags.FourEightIWithSpace, VideoMode.FourEightyInterlaced},
                     {MediaMetadataTags.FourEightyP, VideoMode.FourEightyProgressive},
                     {MediaMetadataTags.SevenTwentyP, VideoMode.SevenTwentyProgressive},
                     {MediaMetadataTags.TenEightyP, VideoMode.TenEightyProgressive},
                     {MediaMetadataTags.TenEightyI, VideoMode.TenEightyInterlaced},
                     {MediaMetadataTags.TenEightyIWithSpace, VideoMode.TenEightyInterlaced},
                     {MediaMetadataTags.FiveSeventySixProgressive, VideoMode.FiveSeventySixProgressive},
-                    {MediaMetadataTags.FiveSeventySixProgressiveWithSpace, VideoMode.FiveSeventySixProgressive},
                     {MediaMetadataTags.FiveSeventySixInterlaced, VideoMode.FiveSeventySixInterlaced},
-                    {MediaMetadataTags.FiveSeventySixInterlacedWithSpace, VideoMode.FiveSeventySixInterlaced},
                 };
             }
         }

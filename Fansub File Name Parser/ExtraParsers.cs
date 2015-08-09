@@ -37,6 +37,23 @@ namespace FansubFileNameParser
     internal static class ExtraParsers
     {
         /// <summary>
+        /// Parses the beginning of a line. On success, this returns the empty string. By 
+        /// definition, it does not consume any input
+        /// 
+        /// TODO: UT
+        /// </summary>
+        public static readonly Parser<string> BeginnningOfLine =
+            input =>
+            {
+                if (input.Position == 0)
+                {
+                    return Result.Success<string>(string.Empty, input);
+                }
+
+                return Result.Failure<string>(input, "Could not parse the beginning of the line", Enumerable.Empty<string>());
+            };
+
+        /// <summary>
         /// Parses a number from a string and safely casts it to an integer
         /// </summary>
         public static readonly Parser<int> Int =
@@ -87,39 +104,133 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Converts a Parser{char} to a Parser{string}
+        /// 
+        /// TODO: UT
+        /// </summary>
+        /// <param name="this">The Parser</param>
+        /// <returns>A new Parser that returns a string</returns>
+        public static Parser<string> AsString(this Parser<char> @this)
+        {
+            return input =>
+            {
+                var result = @this.Invoke(input);
+                if (result.WasSuccessful)
+                {
+                    return Result.Success<string>(new string(result.Value, 1), result.Remainder);
+                }
+
+                return Result.Failure<string>(result.Remainder, result.Message, result.Expectations);
+            };
+        }
+
+        /// <summary>
+        /// Creates a No-Op failure parser
+        /// </summary>
+        /// <typeparam name="TResult">The return type of this parser</typeparam>
+        /// <returns>A new parser that parses nothing and always fails</returns>
+        public static Parser<TResult> CreateNoOpFailureParser<TResult>()
+        {
+            return i => Result.Failure<TResult>(i, "No-Op Failure Parser", Enumerable.Empty<string>());
+        }
+
+        /// <summary>
         /// Coalesces two parsers, which may have different return types, into a single parser that succeeds if
         /// either of the parsers succeeds. 
         /// 
         /// TODO: UT
         /// </summary>
-        /// <typeparam name="TFirstParserReturnType">The return type of the first parser</typeparam>
-        /// <typeparam name="TSecondParserReturnType">The return type of the second parser</typeparam>
-        /// <param name="firstParser">The first parser</param>
-        /// <param name="secondParser">The second parser</param>
+        /// <typeparam name="TFirst">The return type of the first parser</typeparam>
+        /// <typeparam name="TSecond">The return type of the second parser</typeparam>
+        /// <param name="first">The first parser</param>
+        /// <param name="second">The second parser</param>
         /// <returns>
         /// A new parser that will succeed if either parser succeeds. The return value of the parser is a bool, 
-        /// where "true" means one of the parsers succeeded and "false" means neither parser succeeded
+        /// where "true" means one of the parsers succeeded. This parser, never returns false
         /// </returns>
-        public static Parser<bool> CoalesceOr<TFirstParserReturnType, TSecondParserReturnType>(
-            Parser<TFirstParserReturnType> firstParser,
-            Parser<TSecondParserReturnType> secondParser
+        public static Parser<bool> Or<TFirst, TSecond>(
+            Parser<TFirst> first,
+            Parser<TSecond> second
+        )
+        {
+            return Or(first, second, CreateNoOpFailureParser<bool>());
+        }
+
+        /// <summary>
+        /// Coalesces three parsers, which may have different return types, into a single parser that succeeds if 
+        /// any of the parsers succeeds.
+        /// 
+        /// TODO: UT
+        /// </summary>
+        /// <typeparam name="TFirst">The return type of the first parser</typeparam>
+        /// <typeparam name="TSecond">The return type of the second parser</typeparam>
+        /// <typeparam name="TThird">The return type of the third parser</typeparam>
+        /// <param name="first">The first parser</param>
+        /// <param name="second">The second parser</param>
+        /// <param name="third">The third parser</param>
+        /// <returns>
+        /// A new parser that will succeed if any parser succeeds. The return value of the parser is a bool,
+        /// where true means one of the parsers succeded and "false" means no parser succeeded
+        /// </returns>
+        public static Parser<bool> Or<TFirst, TSecond, TThird>(
+            Parser<TFirst> first,
+            Parser<TSecond> second,
+            Parser<TThird> third
+        )
+        {
+            return Or(first, second, third, CreateNoOpFailureParser<bool>());
+        }
+
+        /// <summary>
+        /// Coalesces three parsers, which may have different return types, into a single parser that succeeds if 
+        /// any of the parsers succeeds.
+        /// 
+        /// TODO: UT
+        /// </summary>
+        /// <typeparam name="TFirst">The return type of the first parser</typeparam>
+        /// <typeparam name="TSecond">The return type of the second parser</typeparam>
+        /// <typeparam name="TThird">The return type of the third parser</typeparam>
+        /// <param name="first">The first parser</param>
+        /// <param name="second">The second parser</param>
+        /// <param name="third">The third parser</param>
+        /// <returns>
+        /// A new parser that will succeed if any parser succeeds. The return value of the parser is a bool,
+        /// where true means one of the parsers succeded and "false" means no parser succeeded
+        /// </returns>
+        public static Parser<bool> Or<TFirst, TSecond, TThird, TFourth>(
+            Parser<TFirst> first,
+            Parser<TSecond> second,
+            Parser<TThird> third,
+            Parser<TFourth> fourth
         )
         {
             return input =>
             {
-                var result = firstParser.Invoke(input);
+                var result = first.Invoke(input);
                 if (result.WasSuccessful)
                 {
                     return Result.Success<bool>(true, result.Remainder);
                 }
 
-                var secondResult = secondParser.Invoke(input);
+                var secondResult = second.Invoke(input);
                 if (secondResult.WasSuccessful)
                 {
                     return Result.Success<bool>(true, result.Remainder);
                 }
 
-                return Result.Failure<bool>(input, "Neither parser succeeded", Enumerable.Empty<string>());
+                var thirdResult = third.Invoke(input);
+                if (thirdResult.WasSuccessful)
+                {
+                    return Result.Success<bool>(true, result.Remainder);
+                }
+
+                var fourthResult = fourth.Invoke(input);
+                if (fourthResult.WasSuccessful)
+                {
+                    return Result.Success<bool>(true, result.Remainder);
+                }
+
+                return Result.Failure<bool>(input, "None of the parsers succeeded", Enumerable.Empty<string>());
             };
         }
 
@@ -193,6 +304,11 @@ namespace FansubFileNameParser
             from _ in Parse.AnyChar.Many().Text()
             select _;
 
+
+        /// <summary>
+        /// Parses any character that isn't a letter
+        /// </summary>
+        public static Parser<char> NonLetterAndNonNumber = Parse.Char(c => !char.IsLetterOrDigit(c), "Non-Letter And Non-Number");
 
         /// <summary>
         /// Evalutes this parser and then consumes the rest of the input and discards it
@@ -271,7 +387,7 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
-        /// Collects the string leading up to a token
+        /// Collects the string leading up to a token. It does NOT consume the token
         /// </summary>
         /// <typeparam name="TThrowAway">The type of result to throw away.</typeparam>
         /// <param name="excepter">The excepter parser.</param>

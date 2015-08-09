@@ -169,15 +169,6 @@ namespace FansubFileNameParser {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 576 I.
-        /// </summary>
-        internal static string FiveSeventySixInterlacedWithSpace {
-            get {
-                return ResourceManager.GetString("FiveSeventySixInterlacedWithSpace", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to 576P.
         /// </summary>
         internal static string FiveSeventySixProgressive {
@@ -187,29 +178,11 @@ namespace FansubFileNameParser {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 576 P.
-        /// </summary>
-        internal static string FiveSeventySixProgressiveWithSpace {
-            get {
-                return ResourceManager.GetString("FiveSeventySixProgressiveWithSpace", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to FLAC.
         /// </summary>
         internal static string FLAC {
             get {
                 return ResourceManager.GetString("FLAC", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 480 I.
-        /// </summary>
-        internal static string FourEightIWithSpace {
-            get {
-                return ResourceManager.GetString("FourEightIWithSpace", resourceCulture);
             }
         }
         
@@ -282,15 +255,6 @@ namespace FansubFileNameParser {
         internal static string TenBit {
             get {
                 return ResourceManager.GetString("TenBit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 10 BIT.
-        /// </summary>
-        internal static string TenBitWithSpace {
-            get {
-                return ResourceManager.GetString("TenBitWithSpace", resourceCulture);
             }
         }
         

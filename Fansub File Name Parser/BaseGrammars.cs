@@ -109,7 +109,7 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Parses a string of text up until a "dash separator token," which is defined as a dash (-) with a 
-        /// single space before and after it: (" - ")
+        /// single space before and after it: (" - "). 
         /// </summary>
         public static readonly Parser<string> LineUpToLastDashSeparatorToken = ExtraParsers.CollectExcept(DashSeparatorToken.Last()).Memoize();
 

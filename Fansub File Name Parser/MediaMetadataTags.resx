@@ -156,9 +156,6 @@
   <data name="TenBit" xml:space="preserve">
     <value>10BIT</value>
   </data>
-  <data name="TenBitWithSpace" xml:space="preserve">
-    <value>10 BIT</value>
-  </data>
   <data name="TV" xml:space="preserve">
     <value>TV</value>
   </data>
@@ -189,9 +186,6 @@
   <data name="VC1" xml:space="preserve">
     <value>VC1</value>
   </data>
-  <data name="FourEightIWithSpace" xml:space="preserve">
-    <value>480 I</value>
-  </data>
   <data name="FourEightyI" xml:space="preserve">
     <value>480I</value>
   </data>
@@ -207,14 +201,8 @@
   <data name="FiveSeventySixInterlaced" xml:space="preserve">
     <value>576I</value>
   </data>
-  <data name="FiveSeventySixInterlacedWithSpace" xml:space="preserve">
-    <value>576 I</value>
-  </data>
   <data name="FiveSeventySixProgressive" xml:space="preserve">
     <value>576P</value>
-  </data>
-  <data name="FiveSeventySixProgressiveWithSpace" xml:space="preserve">
-    <value>576 P</value>
   </data>
   <data name="TenDashBit" xml:space="preserve">
     <value>10-BIT</value>
