@@ -697,7 +697,7 @@ namespace UnitTests.Models
             {"[Elysium]Spice.and.Wolf.II(BD.1080p.FLAC)", new FansubDirectoryEntity
                 {
                     Group = "Elysium".ToMaybe(),
-                    Series = "Spiace and Wolf II".ToMaybe(),
+                    Series = "Spice and Wolf II".ToMaybe(),
                     Metadata = new MediaMetadata
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),

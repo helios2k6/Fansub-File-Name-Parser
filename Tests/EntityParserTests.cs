@@ -65,8 +65,6 @@ namespace UnitTests
         [TestMethod]
         public void TestParseDirectory()
         {
-            var k = "[Coalgirls]_Amagi_Brilliant_Park_01-02_(1920x1080_Blu-Ray_FLAC)";
-            var result = BaseEntityParsers.SeriesName.TryParse(k);
             TestParserHelper<FansubDirectoryEntity>(TestModel.DirectoryTestModel, EntityParsers.EntityParser);
         }
     }

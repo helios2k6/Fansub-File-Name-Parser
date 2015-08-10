@@ -63,18 +63,16 @@ namespace FansubFileNameParser.Entity.Parsers
             select _2;
 
         private static readonly Parser<string> SeriesNameDirectory =
-            from baseSeriesName in BaseEntityParsers.SeriesName
-            from remainingName in ExtraParsers.CollectExcept(
+            from _1 in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
+            from seriesName in ExtraParsers.CollectExcept(
                 ExtraParsers.Or(
                     EpisodeRange,
                     VolumeNumber,
-                    DashSeparatorTokenThenVolumeNumber,
-                    DashSeparatorTokenThenEpisodeRange
+                    DashSeparatorTokenThenEpisodeRange,
+                    DashSeparatorTokenThenVolumeNumber
                 )
             )
-            select string.IsNullOrWhiteSpace(remainingName)
-                ? baseSeriesName
-                : string.Format("{0} {1}", baseSeriesName, remainingName.Trim());
+            select seriesName.Trim();
 
         private static readonly Parser<IFansubEntity> DirectoryParser =
             from _1 in ExtraParsers.ScanFor(BaseGrammars.FileExtension).Not().ResetInput()
