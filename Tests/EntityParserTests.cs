@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser;
 using FansubFileNameParser.Entity;
 using FansubFileNameParser.Entity.Directory;
 using FansubFileNameParser.Entity.Parsers;
@@ -40,15 +41,14 @@ namespace UnitTests
     public sealed class EntityParserTests
     {
         private static void TestParserHelper<TResultType>(
-            IEnumerable<KeyValuePair<string, IFansubEntity>> model,
-            Parser<IFansubEntity> parser
+            IEnumerable<KeyValuePair<string, IFansubEntity>> model
         )
         {
             foreach (var stringToModel in model)
             {
                 var fansubString = stringToModel.Key;
                 var expectedParseResult = stringToModel.Value;
-                var parseResult = parser.TryParse(fansubString);
+                var parseResult = EntityParsers.EntityParser.TryParse(fansubString);
                 Assert.AreEqual<Type>(typeof(TResultType), expectedParseResult.GetType());
                 Assert.IsTrue(parseResult.WasSuccessful);
                 Assert.AreEqual<Type>(expectedParseResult.GetType(), parseResult.Value.GetType());
@@ -59,13 +59,35 @@ namespace UnitTests
         [TestMethod]
         public void TestParseOPED()
         {
-            TestParserHelper<FansubOPEDEntity>(TestModel.OpeningEndingTestModel, EntityParsers.EntityParser);
+            TestParserHelper<FansubOPEDEntity>(TestModel.OpeningEndingTestModel);
         }
 
         [TestMethod]
         public void TestParseDirectory()
         {
-            TestParserHelper<FansubDirectoryEntity>(TestModel.DirectoryTestModel, EntityParsers.EntityParser);
+            TestParserHelper<FansubDirectoryEntity>(TestModel.DirectoryTestModel);
+        }
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OVA =
+            Parse.IgnoreCase("OVA").Return(FansubOriginalAnimationEntity.ReleaseType.OVA);
+
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> ONA =
+            Parse.IgnoreCase("ONA").Return(FansubOriginalAnimationEntity.ReleaseType.ONA);
+
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OAD =
+            Parse.IgnoreCase("OAD").Return(FansubOriginalAnimationEntity.ReleaseType.OAD);
+
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OAToken =
+            OVA.Or(ONA).Or(OAD)
+            ;
+        private static readonly Parser<string> SeriesName =
+            BaseGrammars.ContentBetweenTagGroups.ContinueWith(ExtraParsers.CollectExcept(OAToken));
+
+        [TestMethod]
+        public void TestParseOVA()
+        {
+            var k = "[SFW] Mahou Sensei Negima! OAD ~Mou Hitotsu no Sekai~ 02 [DVD][87942D8A].mkv";
+            var result = OriginalAnimationEntityParsers.OriginalAnimation.TryParse(k);
+            TestParserHelper<FansubOriginalAnimationEntity>(TestModel.OriginalAnimationModel);
         }
     }
 }

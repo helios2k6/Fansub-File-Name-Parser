@@ -49,22 +49,22 @@ namespace FansubFileNameParser.Entity.Parsers
             OVA.Or(ONA).Or(OAD).Memoize();
         #endregion
         #region Root Name
-        private static readonly Parser<string> RootName = Parse.AnyChar.Except(OAToken).Many().Text().Token();
+        private static readonly Parser<string> SeriesName = ExtraParsers.CollectExcept(OAToken);
         #endregion
         #region Title and Episode Number
-        private static readonly Parser<string> OATitle = Parse.AnyChar.Except(ExtraParsers.Int).Many().Text();
+        private static readonly Parser<string> OATitle = ExtraParsers.CollectExcept(ExtraParsers.Int);
 
         private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> TitleThenEpisodeNumber =
             from title in OATitle.Token().OptionalMaybe()
             from episodeNumber in ExtraParsers.Int.OptionalMaybe()
             where title.HasValue || episodeNumber.HasValue
-            select Tuple.Create(title, episodeNumber);
+            select Tuple.Create(title.Select(t => t.Trim()), episodeNumber);
 
         private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> EpisodeNumberThenTitle =
             from episodeNumber in ExtraParsers.Int.Token().OptionalMaybe()
             from title in OATitle.Token().OptionalMaybe()
             where episodeNumber.HasValue || title.HasValue
-            select Tuple.Create(title, episodeNumber);
+            select Tuple.Create(title.Select(t => t.Trim()), episodeNumber);
 
         private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> TitleAndEpisodeNumber =
             TitleThenEpisodeNumber.Or(EpisodeNumberThenTitle);
@@ -73,13 +73,15 @@ namespace FansubFileNameParser.Entity.Parsers
         private static readonly Parser<IFansubEntity> OriginalAnimationParser =
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
-            from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
             from _1 in ExtraParsers.Filter(BaseGrammars.DashSeparatorToken).SetResultAsRemainder()
-            from rootName in BaseGrammars.ContentBetweenTagGroups.ContinueWith(RootName)
+            from _2 in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
+            from series in SeriesName.OptionalMaybe()
             from oaToken in OAToken.Token()
-            from titleAndEpisode in TitleAndEpisodeNumber
-            from _2 in ExtraParsers.RemainingCharacters
+            from titleAndEpisode in TitleAndEpisodeNumber.OptionalMaybe()
+            let title = titleAndEpisode.HasValue ? titleAndEpisode.Value.Item1 : Maybe<string>.Nothing
+            let episodeNumber = titleAndEpisode.HasValue ? titleAndEpisode.Value.Item2 : Maybe<int>.Nothing
+            from _3 in ExtraParsers.RemainingCharacters
             select new FansubOriginalAnimationEntity
             {
                 Group = fansubGroup,
@@ -87,8 +89,8 @@ namespace FansubFileNameParser.Entity.Parsers
                 Metadata = metadata,
                 Extension = extension,
                 Type = oaToken.ToMaybe(),
-                Title = titleAndEpisode.Item1,
-                EpisodeNumber = titleAndEpisode.Item2,
+                Title = title,
+                EpisodeNumber = episodeNumber,
             };
         #endregion
         #endregion

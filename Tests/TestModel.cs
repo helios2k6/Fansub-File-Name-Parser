@@ -158,6 +158,7 @@ namespace UnitTests.Models
                         PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
                         Resolution = new Resolution(848, 480).ToMaybe(),
                         CRC32 = "FDCA30AA".ToMaybe(),
+                        UnusedTags = new[] {"Hatsuyuki"},
                     }.ToMaybe(),
                     Extension = ".mkv".ToMaybe(),
                 }
@@ -807,6 +808,11 @@ namespace UnitTests.Models
         public static IEnumerable<KeyValuePair<string, IFansubEntity>> DirectoryTestModel
         {
             get { return DirectoryInputToEntityMap; }
+        }
+
+        public static IEnumerable<KeyValuePair<string, IFansubEntity>> OriginalAnimationModel
+        {
+            get { return OriginalVideoInputToEntityMap; }
         }
         #endregion
 
