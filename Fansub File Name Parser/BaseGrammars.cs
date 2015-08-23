@@ -119,8 +119,6 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Parses a version number token
-        /// 
-        /// TODO: UT
         /// </summary>
         public static readonly Parser<int> VersionNumber =
             from _1 in Parse.Char('v').Or(Parse.Char('V'))
@@ -157,8 +155,6 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Parses the main content of a title, which excludes the metatags
-        /// 
-        /// TODO: UT
         /// </summary>
         public static readonly Parser<string> MainContent =
             ContentBetweenTagGroups.Or(LineUpToTagDeliminator);

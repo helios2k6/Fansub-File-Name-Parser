@@ -39,8 +39,6 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses the beginning of a line. On success, this returns the empty string. By 
         /// definition, it does not consume any input
-        /// 
-        /// TODO: UT
         /// </summary>
         public static readonly Parser<string> BeginnningOfLine =
             input =>
@@ -82,8 +80,6 @@ namespace FansubFileNameParser
         /// 
         /// This function always succeeds, unless the input is already out of bounds, in which case, this
         /// parser will throw an exception
-        /// 
-        /// TODO: UT
         /// </summary>
         public static Parser<string> Trim = input =>
         {
@@ -122,8 +118,6 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Converts a Parser{char} to a Parser{string}
-        /// 
-        /// TODO: UT
         /// </summary>
         /// <param name="this">The Parser</param>
         /// <returns>A new Parser that returns a string</returns>
@@ -144,8 +138,6 @@ namespace FansubFileNameParser
         /// <summary>
         /// Creates a parser that will only succeed if the return result has at least 1 alphanumeric 
         /// character.
-        /// 
-        /// TODO: UT
         /// </summary>
         /// <param name="this">The principle parser</param>
         /// <returns>A new parser</returns>
@@ -183,8 +175,6 @@ namespace FansubFileNameParser
         /// <summary>
         /// Coalesces two parsers, which may have different return types, into a single parser that succeeds if
         /// either of the parsers succeeds. 
-        /// 
-        /// TODO: UT
         /// </summary>
         /// <typeparam name="TFirst">The return type of the first parser</typeparam>
         /// <typeparam name="TSecond">The return type of the second parser</typeparam>
@@ -205,8 +195,6 @@ namespace FansubFileNameParser
         /// <summary>
         /// Coalesces three parsers, which may have different return types, into a single parser that succeeds if 
         /// any of the parsers succeeds.
-        /// 
-        /// TODO: UT
         /// </summary>
         /// <typeparam name="TFirst">The return type of the first parser</typeparam>
         /// <typeparam name="TSecond">The return type of the second parser</typeparam>
@@ -230,8 +218,6 @@ namespace FansubFileNameParser
         /// <summary>
         /// Coalesces three parsers, which may have different return types, into a single parser that succeeds if 
         /// any of the parsers succeeds.
-        /// 
-        /// TODO: UT
         /// </summary>
         /// <typeparam name="TFirst">The return type of the first parser</typeparam>
         /// <typeparam name="TSecond">The return type of the second parser</typeparam>
@@ -240,6 +226,7 @@ namespace FansubFileNameParser
         /// <param name="first">The first parser</param>
         /// <param name="second">The second parser</param>
         /// <param name="third">The third parser</param>
+        /// <param name="fourth">The fourth parser</param>
         /// <returns>
         /// A new parser that will succeed if any parser succeeds. The return value of the parser is a bool,
         /// where true means one of the parsers succeded and "false" means no parser succeeded
@@ -359,8 +346,6 @@ namespace FansubFileNameParser
 
         /// <summary>
         /// Evalutes this parser and then consumes the rest of the input and discards it
-        /// 
-        /// TODO: UT
         /// </summary>
         /// <typeparam name="TResult">The result of this parser</typeparam>
         /// <param name="this">The parser</param>
@@ -373,41 +358,8 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
-        /// Returns a parser that will cut out the first occurrence of the token that satisfies
-        /// the given parser.
-        /// 
-        /// TODO: UNIT TEST
-        /// </summary>
-        /// <typeparam name="TResult">The result this parser returns</typeparam>
-        /// <param name="cutter">The parser to use to cut out the token</param>
-        /// <returns>A new parser that removes the unwanted token</returns>
-        public static Parser<string> CutOut<TResult>(Parser<TResult> cutter)
-        {
-            return from front in Parse.AnyChar.Except(cutter).Many().Text()
-                   from chomp in cutter
-                   from end in Parse.AnyChar.Many().Text()
-                   select string.Format("{0} {1}", front, end).Trim();
-        }
-
-        /// <summary>
-        /// Returns a parser that will attempt to cut out the first occurance of the token that
-        /// satisfies the given parser, or it will return the original input.
-        /// 
-        /// TODO: UNIT TEST
-        /// </summary>
-        /// <typeparam name="TResult">The result this parser returns</typeparam>
-        /// <param name="cutter">The parser to use to cut out the token</param>
-        /// <returns>A new parser that removes the unwanted token or returns the original input</returns>
-        public static Parser<string> CutOutOrAllInput<TResult>(Parser<TResult> cutter)
-        {
-            return CutOut<TResult>(cutter).Or(Parse.AnyChar.Many().Text());
-        }
-
-        /// <summary>
         /// Cycles through each parser in the IEnumerable{Parser{TResult}} and will return
         /// the result of the first one that successfully parses the input string
-        /// 
-        /// TODO: UNIT TEST
         /// </summary>
         /// <typeparam name="TResult">The type of result to parse</typeparam>
         /// <param name="parsers">The IEnumerable of parsers</param>
@@ -437,8 +389,6 @@ namespace FansubFileNameParser
         /// Transforms the result of a Parser{T} to be Parser{IEnumerable{T}}. This does not
         /// parse any additional tokens beyond what the underlying Parser{T} parses. This merely
         /// allows you to use a Parser{T} as a Parser{IEnumerable{T}}
-        /// 
-        /// TODO: UT
         /// </summary>
         /// <typeparam name="T">The return type</typeparam>
         /// <param name="this">The parser</param>

@@ -34,7 +34,7 @@ namespace UnitTests
     public sealed class ExtraParserTests
     {
         [TestMethod]
-        public void IntParser()
+        public void TestIntParser()
         {
             var inputOutputMap = new Dictionary<string, int>
             {
@@ -47,7 +47,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Implode()
+        public void TestImplode()
         {
             var multiCharParserImploded = Parse.AnyChar.Many().Implode<char, string>(string.Empty, (acc, ch) => string.Format("{0}{1}", acc, ch));
             var testString = "abcdef";
@@ -58,7 +58,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void ContinueWith()
+        public void TestContinueWith()
         {
             var antecedentParser = Parse.AnyChar;
             var continuationParser = Parse.AnyChar;
@@ -77,7 +77,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void ScanFor()
+        public void TestScanFor()
         {
             var excepter = Parse.String("TOKEN").Text();
 
@@ -87,7 +87,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void LineUpTo()
+        public void TestLineUpTo()
         {
             var exceptor = Parse.String("TOKEN").Text();
 
@@ -97,7 +97,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void ResetInput()
+        public void TestResetInput()
         {
             var parser = Parse.String("TOKEN").Text();
 
@@ -111,7 +111,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void OptionalMaybe()
+        public void TestOptionalMaybe()
         {
             var parser = from f in Parse.Char('a').OptionalMaybe()
                          from s in Parse.Char('b').OptionalMaybe()
@@ -127,7 +127,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Last()
+        public void TestLast()
         {
             var lastNumberParser = Parse.Number.Last();
 
@@ -140,7 +140,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Filter()
+        public void TestFilter()
         {
             var filteredParser = ExtraParsers.Filter(Parse.Number);
 
@@ -154,7 +154,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void SetResultAsRemainder()
+        public void TestSetResultAsRemainder()
         {
             var remainderParser = from _ in Parse.Number.SetResultAsRemainder()
                                   from n in Parse.Number
@@ -163,6 +163,71 @@ namespace UnitTests
             var result = remainderParser.TryParse("500");
             Assert.IsTrue(result.WasSuccessful);
             Assert.AreEqual<string>("500", result.Value);
+        }
+
+        [TestMethod]
+        public void TestBeginningOfLine()
+        {
+            var successResult = ExtraParsers.BeginnningOfLine.TryParse("abc");
+            Assert.IsTrue(successResult.WasSuccessful);
+            Assert.AreEqual<string>(string.Empty, successResult.Value);
+
+            var failureParser = from _1 in Parse.AnyChar
+                                from _2 in ExtraParsers.BeginnningOfLine
+                                select _1;
+
+            var failureResult = failureParser.TryParse("abc");
+            Assert.IsFalse(failureResult.WasSuccessful);
+        }
+
+        [TestMethod]
+        public void TestTrim()
+        {
+            var result1 = ExtraParsers.Trim.TryParse(" abc ");
+            Assert.IsTrue(result1.WasSuccessful);
+            Assert.AreEqual<string>("abc", result1.Value);
+
+            var result2 = ExtraParsers.Trim.TryParse(" abc");
+            Assert.IsTrue(result2.WasSuccessful);
+            Assert.AreEqual<string>("abc", result2.Value);
+
+            var result3 = ExtraParsers.Trim.TryParse("abc ");
+            Assert.IsTrue(result3.WasSuccessful);
+            Assert.AreEqual<string>("abc", result3.Value);
+
+            var result4 = ExtraParsers.Trim.TryParse("abc");
+            Assert.IsTrue(result4.WasSuccessful);
+            Assert.AreEqual<string>("abc", result4.Value);
+        }
+
+        [TestMethod]
+        public void TestAtLeastOneCharTrimmed()
+        {
+            var parser = Parse.AnyChar.Many().Text().AtLeastOneCharTrimmed();
+            var successResult = parser.TryParse("abc");
+            Assert.IsTrue(successResult.WasSuccessful);
+            Assert.AreEqual("abc", successResult.Value);
+
+            var failureResult = parser.TryParse("  ");
+            Assert.IsFalse(failureResult.WasSuccessful);
+        }
+
+        [TestMethod]
+        public void TestConsumeAllRemainingInput()
+        {
+            var parser = from _1 in Parse.AnyChar.ConsumeAllRemainingInput()
+                         from _2 in Parse.LineTerminator
+                         select _1;
+
+            var result = parser.TryParse("abc");
+            Assert.IsTrue(result.WasSuccessful);
+            Assert.AreEqual<char>('a', result.Value);
+        }
+
+        [TestMethod]
+        public void TestCutOut()
+        {
+
         }
     }
 }

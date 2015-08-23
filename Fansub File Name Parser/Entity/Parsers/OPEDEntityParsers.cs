@@ -249,8 +249,7 @@ namespace FansubFileNameParser.Entity.Parsers
                 return false;
             }
 
-            var cleanTokenScanner = ExtraParsers.ScanFor(AnyCleanToken);
-            return mediaMetadata.Value.UnusedTags.Any(tag => cleanTokenScanner.TryParse(tag).WasSuccessful);
+            return mediaMetadata.Value.UnusedTags.Any(tag => ExtraParsers.ScanFor(AnyCleanToken).TryParse(tag).WasSuccessful);
         }
 
         private static Maybe<string> FilterOutNonCreditsFromSeriesName(
@@ -264,10 +263,7 @@ namespace FansubFileNameParser.Entity.Parsers
             }
 
             // This always succeeds
-            var k = ExtraParsers.CutOut(tokenizer);
-            var m = k.TryParse(unfilteredSeriesName.Value);
-
-            return ExtraParsers.CutOutOrAllInput(tokenizer).TryParse(unfilteredSeriesName.Value).Value.ToMaybe();
+            return ExtraParsers.Filter(tokenizer).TryParse(unfilteredSeriesName.Value).Value.ToMaybe();
         }
         #endregion
         #region public properies

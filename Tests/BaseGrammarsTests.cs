@@ -23,8 +23,10 @@
  */
 
 using FansubFileNameParser;
+using Functional.Maybe;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sprache;
+using System;
 using System.Collections.Generic;
 
 namespace UnitTests.Model.Grammars
@@ -33,7 +35,7 @@ namespace UnitTests.Model.Grammars
     public sealed class BaseGrammarsTests
     {
         [TestMethod]
-        public void DashSeparatorToken()
+        public void TestDashSeparatorToken()
         {
             var inputOutputMap = new Dictionary<string, string>
             {
@@ -44,7 +46,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void TagDeliminator()
+        public void TestTagDeliminator()
         {
             var inputMap = new Dictionary<string, char>
             {
@@ -59,7 +61,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void MetaTagContent()
+        public void TestMetaTagContent()
         {
             var inputMap = new Dictionary<string, string>
             {
@@ -74,7 +76,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void MetaTagGroup()
+        public void TestMetaTagGroup()
         {
             var inputMap = new Dictionary<string, IEnumerable<string>>
             {
@@ -96,7 +98,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void LineUpToInt()
+        public void TestLineUpToInt()
         {
             var inputOutputMap = new Dictionary<string, string>
             {
@@ -109,7 +111,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void LineUpToLastDashSeparatorToken()
+        public void TestLineUpToLastDashSeparatorToken()
         {
             var inputOutputMap = new Dictionary<string, string>
             {
@@ -123,7 +125,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void LineUntilTagDeliminator()
+        public void TestLineUntilTagDeliminator()
         {
             var inputOutputMap = new Dictionary<string, string>
             {
@@ -141,7 +143,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void MainContent()
+        public void TestMainContent()
         {
             var inputOutputMap = new Dictionary<string, string>
             {
@@ -154,7 +156,20 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void CollectTags()
+        public void TestEpisodeWithVersionNumber()
+        {
+            var inputOutputMap = new Dictionary<string, Tuple<int, Maybe<int>>>
+            {
+                {"3v2", Tuple.Create(3, 2.ToMaybe())},
+                {"3", Tuple.Create(3, Maybe<int>.Nothing)},
+                {"13v99", Tuple.Create(13, 99.ToMaybe())},
+            };
+
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.EpisodeWithVersionNumber);
+        }
+
+        [TestMethod]
+        public void TestCollectTags()
         {
             var inputMap = new Dictionary<string, IEnumerable<string>>
             {
@@ -170,7 +185,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void FileExtension()
+        public void TestFileExtension()
         {
             var inputMap = new Dictionary<string, string>
             {
@@ -186,7 +201,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void ReplaceDotsExceptMediaFileExtension()
+        public void TestReplaceDotsExceptMediaFileExtension()
         {
             var inputMap = new Dictionary<string, string>
             {
@@ -199,7 +214,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void ReplaceUnderscores()
+        public void TestReplaceUnderscores()
         {
             var inputMap = new Dictionary<string, string>
             {
@@ -212,7 +227,7 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void CleanString()
+        public void TestCleanString()
         {
             var inputMap = new Dictionary<string, string>
             {

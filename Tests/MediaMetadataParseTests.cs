@@ -36,7 +36,7 @@ namespace Tests
     public sealed class MediaMetadataParseTests
     {
         [TestMethod]
-        public void ParseAllTags()
+        public void TestParseAllTags()
         {
             foreach (var kvp in TestModel.CreateMediaMetadataTestModel().Take(1000))
             {
@@ -52,7 +52,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void SerializeAndDeserialize()
+        public void TestSerializeAndDeserialize()
         {
             Parallel.ForEach(TestModel.CreateMediaMetadataTestModel().Take(1000), kvp =>
             {
