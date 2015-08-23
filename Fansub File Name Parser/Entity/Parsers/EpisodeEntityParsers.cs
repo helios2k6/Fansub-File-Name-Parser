@@ -33,18 +33,19 @@ namespace FansubFileNameParser.Entity.Parsers
     internal static class EpisodeEntityParsers
     {
         #region private static fields
+        /*
         private static readonly Parser<int> EpisodeNumberParser =
             from _1 in BaseGrammars.LineUpToEpisodeNumberToken.Or(BaseGrammars.LineUpToLastDashSeparatorToken)
             from _2 in BaseGrammars.DashSeparatorToken.Optional()
             from ep in BaseGrammars.EpisodeNumber
             select ep;
-
+        */
         private static readonly Parser<IFansubEntity> EpisodeParser =
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from episode in EpisodeNumberParser
+            //from episode in EpisodeNumberParser
             from _ in ExtraParsers.RemainingCharacters
             select new FansubEpisodeEntity
             {
@@ -52,7 +53,8 @@ namespace FansubFileNameParser.Entity.Parsers
                 Group = fansubGroup,
                 Series = series,
                 Extension = extension,
-                EpisodeNumber = episode.ToMaybe(),
+                //EpisodeNumber = episode.ToMaybe(),
+                EpisodeNumber = Maybe<int>.Nothing,
             };
         #endregion
 

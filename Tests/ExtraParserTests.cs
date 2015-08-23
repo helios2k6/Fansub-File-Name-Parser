@@ -87,11 +87,11 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void CollectExcept()
+        public void LineUpTo()
         {
             var exceptor = Parse.String("TOKEN").Text();
 
-            var result = ExtraParsers.CollectExcept(exceptor).TryParse("abcdTOKENefghTOKEN");
+            var result = ExtraParsers.LineUpTo(exceptor).TryParse("abcdTOKENefghTOKEN");
             Assert.IsTrue(result.WasSuccessful);
             Assert.AreEqual<string>("abcd", result.Value);
         }

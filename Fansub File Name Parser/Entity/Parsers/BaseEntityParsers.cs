@@ -71,7 +71,7 @@ namespace FansubFileNameParser.Entity.Parsers
                 return Result.Failure<MediaMetadata>(input, "Could not parse media metadata", Enumerable.Empty<string>());
             };
 
-            return parser.Memoize();
+            return parser;
         }
 
         private static Parser<string> CreateFansubGroupParser()
@@ -82,7 +82,7 @@ namespace FansubFileNameParser.Entity.Parsers
                                    let groupCandidate = filteredOutDate.FirstOrDefault()
                                    select groupCandidate;
 
-            return group.Memoize();
+            return group;
         }
 
         private static bool IsDate(string dateTimeString)
@@ -106,11 +106,11 @@ namespace FansubFileNameParser.Entity.Parsers
 
         private static Parser<string> CreateSeriesNameParser()
         {
-            var parser = from _ in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
-                         from content in BaseGrammars.LineUpToLastDashSeparatorToken.Or(BaseGrammars.LineUpToEpisodeNumberToken)
+            var parser = from _ in BaseGrammars.MainContent.SetResultAsRemainder()
+                         from content in BaseGrammars.LineUpToLastDashSeparatorToken.Or(BaseGrammars.LineUpToInt)
                          select content.Trim();
 
-            return parser.Memoize();
+            return parser;
         }
         #endregion
         #region public parsers

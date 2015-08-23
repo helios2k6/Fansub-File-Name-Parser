@@ -45,8 +45,8 @@ namespace FansubFileNameParser.Entity.Parsers
         #endregion
 
         #region private methods
-        private static readonly Parser<string> FileExtensionParser = 
-            ExtraParsers.ScanFor(BaseGrammars.FileExtension).Memoize();
+        private static readonly Parser<string> FileExtensionParser =
+            ExtraParsers.ScanFor(BaseGrammars.FileExtension);
         #endregion
     }
 }

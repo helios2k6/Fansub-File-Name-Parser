@@ -82,41 +82,30 @@ namespace UnitTests.Model.Grammars
                 {"[test multiple][tags]", new[] {"test multiple", "tags"}},
                 {"(test)(multiple)(tags)", new[] {"test", "multiple", "tags"}},
                 {"(test multiple)(tags)", new[] {"test multiple", "tags"}},
-                {"[test] [multiple] [tags] ", new[] {"test", "multiple", "tags"}},
-                {" [test multiple] [tags] ", new[] {"test multiple", "tags"}},
-                {" (test) (multiple) (tags) ", new[] {"test", "multiple", "tags"}},
-                {" (test multiple) (tags) ", new[] {"test multiple", "tags"}},
-                {"(test multiple) STUFF IN BETWEEN (tags) ", new[] {"test multiple"}},
+                {"[test] [multiple] [tags]", new[] {"test", "multiple", "tags"}},
+                {"[test multiple] [tags]", new[] {"test multiple", "tags"}},
+                {"(test) (multiple) (tags)", new[] {"test", "multiple", "tags"}},
+                {"(test) (multiple)(tags)", new[] {"test", "multiple", "tags"}},
+                {"(test multiple) (tags)", new[] {"test multiple", "tags"}},
+                {"[test] [multiple][tags]", new[] {"test", "multiple", "tags"}},
+                {"(test)", new[] {"test"}},
             };
 
+            var r = BaseGrammars.MetaTagGroup.TryParse("(TEST)");
             TestUtils.TestMultiTokenParse(inputMap, BaseGrammars.MetaTagGroup);
         }
 
         [TestMethod]
-        public void EpisodeNumber()
-        {
-            var inputOutputMap = new Dictionary<string, int>
-            {
-                {" 4 ", 4},
-                {" 04 ", 4},
-                {" 15 ", 15},
-                {" 015 ", 15},
-            };
-
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.EpisodeNumber);
-        }
-
-        [TestMethod]
-        public void LineUpToEpisodeNumberToken()
+        public void LineUpToInt()
         {
             var inputOutputMap = new Dictionary<string, string>
             {
-                {"[Doki] Akame ga Kill! - 01 (1920x1080 Hi10P BD FLAC) [395609BF].mkv", "[Doki] Akame ga Kill! -"},
-                {"[Coalgirls] Kill Me Baby 01 (1280x720_Blu-ray_FLAC) [1D51648A].mkv", "[Coalgirls] Kill Me Baby"},
-                {"[Coalgirls] Kill Me Baby (1280x720 Blu-Ray FLAC)", "[Coalgirls] Kill Me Baby (1280x720 Blu-Ray FLAC)"},
+                {"[Doki] Akame ga Kill! - 01 (1920x1080 Hi10P BD FLAC) [395609BF].mkv", "[Doki] Akame ga Kill! - "},
+                {"[Coalgirls] Kill Me Baby 01 (1280x720_Blu-ray_FLAC) [1D51648A].mkv", "[Coalgirls] Kill Me Baby "},
+                {"[Coalgirls] Kill Me Baby", "[Coalgirls] Kill Me Baby"},
             };
 
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToEpisodeNumberToken);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToInt);
         }
 
         [TestMethod]
@@ -151,18 +140,17 @@ namespace UnitTests.Model.Grammars
             TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToTagDeliminator);
         }
 
-
         [TestMethod]
-        public void ContentBetweenTagGroups()
+        public void MainContent()
         {
             var inputOutputMap = new Dictionary<string, string>
             {
-                {"Kokoro Connect (2012) [Doki-Chihiro][1920x1080 Hi10P BD FLAC]", "Kokoro Connect"},
-                {"[Vivid] The World God Only Knows - Goddesses Arc [BD 1080p FLAC]", "The World God Only Knows - Goddesses Arc"},
-                {"[BlurayDesuYo] Amagi Brilliant Park - Vol. 1 (BD 1920x1080 10bit FLAC)", "Amagi Brilliant Park - Vol. 1"},
+                {"Kokoro Connect (2012) [Doki-Chihiro][1920x1080 Hi10P BD FLAC]", "Kokoro Connect "},
+                {"[Vivid] The World God Only Knows - Goddesses Arc [BD 1080p FLAC]", " The World God Only Knows - Goddesses Arc "},
+                {"[BlurayDesuYo] Amagi Brilliant Park - Vol. 1 (BD 1920x1080 10bit FLAC)", " Amagi Brilliant Park - Vol. 1 "},
             };
 
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.ContentBetweenTagGroups);
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.MainContent);
         }
 
         [TestMethod]

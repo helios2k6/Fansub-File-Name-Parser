@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using Functional.Maybe;
 using Sprache;
 using System;
 using System.Collections.Generic;
@@ -94,29 +95,45 @@ namespace FansubFileNameParser
         public static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
 
         /// <summary>
-        /// Parses an episode number
+        /// Parses a string of characters, including whitespace. This always succeedes, even if there are
+        /// no characters to parse.
         /// </summary>
-        public static readonly Parser<int> EpisodeNumber =
-            from _1 in Parse.WhiteSpace
-            from ep in ExtraParsers.Int
-            from _2 in Parse.WhiteSpace
-            select ep;
+        public static readonly Parser<string> Line = Parse.AnyChar.Many().Text();
 
         /// <summary>
         /// Parses a string of text up until an episode number token
         /// </summary>
-        public static Parser<string> LineUpToEpisodeNumberToken = ExtraParsers.CollectExcept(EpisodeNumber).Memoize();
+        public static Parser<string> LineUpToInt = ExtraParsers.LineUpTo(ExtraParsers.Int);
 
         /// <summary>
         /// Parses a string of text up until a "dash separator token," which is defined as a dash (-) with a 
         /// single space before and after it: (" - "). 
         /// </summary>
-        public static readonly Parser<string> LineUpToLastDashSeparatorToken = ExtraParsers.CollectExcept(DashSeparatorToken.Last()).Memoize();
+        public static readonly Parser<string> LineUpToLastDashSeparatorToken =
+            ExtraParsers.LineUpTo(DashSeparatorToken.Last());
 
         /// <summary>
         /// Parses a line of text until a tag delmiinator is encountered
         /// </summary>
-        public static readonly Parser<string> LineUpToTagDeliminator = ExtraParsers.CollectExcept(TagDeliminator).Memoize();
+        public static readonly Parser<string> LineUpToTagDeliminator = ExtraParsers.LineUpTo(TagDeliminator);
+
+        /// <summary>
+        /// Parses a version number token
+        /// 
+        /// TODO: UT
+        /// </summary>
+        public static readonly Parser<int> VersionNumber =
+            from _1 in Parse.Char('v').Or(Parse.Char('V'))
+            from number in ExtraParsers.Int
+            select number;
+
+        /// <summary>
+        /// Parses an episode with an optional version number on it
+        /// </summary>
+        public static readonly Parser<Tuple<int, Maybe<int>>> EpisodeWithVersionNumber =
+            from episodeNumber in ExtraParsers.Int
+            from versionNumber in VersionNumber.OptionalMaybe()
+            select Tuple.Create(episodeNumber, versionNumber);
 
         /// <summary>
         /// Parses the content of a metatag
@@ -127,13 +144,24 @@ namespace FansubFileNameParser
         /// <summary>
         /// Parses multiple metadata tags
         /// </summary>
-        public static readonly Parser<IEnumerable<string>> MetaTagGroup = MetaTagContent.Token().Many();
+        public static readonly Parser<IEnumerable<string>> MetaTagGroup =
+            from firstTag in MetaTagContent.AsMany()
+            from remainingTags in MetaTagContent.Token().Many()
+            select firstTag.Concat(remainingTags);
 
         /// <summary>
         /// Parses content that's contained between any group of multiple tags
         /// </summary>
-        public static readonly Parser<string> ContentBetweenTagGroups =
-            LineUpToTagDeliminator.Contained(MetaTagGroup, MetaTagGroup).Memoize();
+        private static readonly Parser<string> ContentBetweenTagGroups =
+            LineUpToTagDeliminator.Contained(MetaTagGroup, MetaTagGroup);
+
+        /// <summary>
+        /// Parses the main content of a title, which excludes the metatags
+        /// 
+        /// TODO: UT
+        /// </summary>
+        public static readonly Parser<string> MainContent =
+            ContentBetweenTagGroups.Or(LineUpToTagDeliminator);
 
         /// <summary>
         /// Parses and captures all of the metadata tags that appear in the string, including the tag deliminator token

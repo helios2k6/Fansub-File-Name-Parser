@@ -74,6 +74,23 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Removes beginning and trailing whitespace from the input string. 
+        /// 
+        /// Does NOT consume any input and the remainder string is equal to the input string. 
+        /// You usually want to combine this parser with the <seealso cref="SetResultAsRemainder"/>
+        /// function.
+        /// 
+        /// This function always succeeds, unless the input is already out of bounds, in which case, this
+        /// parser will throw an exception
+        /// 
+        /// TODO: UT
+        /// </summary>
+        public static Parser<string> Trim = input =>
+        {
+            return Result.Success<string>(input.Source.Substring(input.Position).Trim(), input);
+        };
+
+        /// <summary>
         /// Implodes the <see cref="Parser{T}"/>'s <see cref="IEnumerable{T}"/> with the specified aggregator
         /// </summary>
         /// <typeparam name="TInput">The type of the input.</typeparam>
@@ -121,6 +138,35 @@ namespace FansubFileNameParser
                 }
 
                 return Result.Failure<string>(result.Remainder, result.Message, result.Expectations);
+            };
+        }
+
+        /// <summary>
+        /// Creates a parser that will only succeed if the return result has at least 1 alphanumeric 
+        /// character.
+        /// 
+        /// TODO: UT
+        /// </summary>
+        /// <param name="this">The principle parser</param>
+        /// <returns>A new parser</returns>
+        public static Parser<string> AtLeastOneCharTrimmed(this Parser<string> @this)
+        {
+            return input =>
+            {
+                var result = @this.Invoke(input);
+                if (result.WasSuccessful)
+                {
+                    if (result.Value.Trim().Length <= 0)
+                    {
+                        return Result.Failure<string>(
+                            input,
+                            "The parsed result had less than 1 alphanumeric character",
+                            Enumerable.Empty<string>()
+                         );
+                    }
+                }
+
+                return result;
             };
         }
 
@@ -190,6 +236,7 @@ namespace FansubFileNameParser
         /// <typeparam name="TFirst">The return type of the first parser</typeparam>
         /// <typeparam name="TSecond">The return type of the second parser</typeparam>
         /// <typeparam name="TThird">The return type of the third parser</typeparam>
+        /// <typeparam name="TFourth">The return type of the fourth parser</typeparam>
         /// <param name="first">The first parser</param>
         /// <param name="second">The second parser</param>
         /// <param name="third">The third parser</param>
@@ -387,14 +434,48 @@ namespace FansubFileNameParser
         }
 
         /// <summary>
+        /// Transforms the result of a Parser{T} to be Parser{IEnumerable{T}}. This does not
+        /// parse any additional tokens beyond what the underlying Parser{T} parses. This merely
+        /// allows you to use a Parser{T} as a Parser{IEnumerable{T}}
+        /// 
+        /// TODO: UT
+        /// </summary>
+        /// <typeparam name="T">The return type</typeparam>
+        /// <param name="this">The parser</param>
+        /// <returns>
+        /// A new parser that returns an IEnumerable{T} with the token parsed by the originalParser{T}
+        /// </returns>
+        /// <remarks>
+        /// This does not work like the Many() function! Unlike the Many() parser, this parser will fail if the 
+        /// underlying parser fails
+        /// </remarks>
+        public static Parser<IEnumerable<T>> AsMany<T>(this Parser<T> @this)
+        {
+            return input =>
+            {
+                var result = @this.Invoke(input);
+                if (result.WasSuccessful)
+                {
+                    return Result.Success<IEnumerable<T>>(new[] { result.Value }, result.Remainder);
+                }
+
+                return Result.Failure<IEnumerable<T>>(
+                    input,
+                    string.Format("The underlying Parser did not succeed: {0}", result.Message),
+                    result.Expectations
+                );
+            };
+        }
+
+        /// <summary>
         /// Collects the string leading up to a token. It does NOT consume the token
         /// </summary>
         /// <typeparam name="TThrowAway">The type of result to throw away.</typeparam>
         /// <param name="excepter">The excepter parser.</param>
         /// <returns>A new parser that collects the string all the way up to a specific point</returns>
-        public static Parser<string> CollectExcept<TThrowAway>(Parser<TThrowAway> excepter)
+        public static Parser<string> LineUpTo<TThrowAway>(Parser<TThrowAway> excepter)
         {
-            return Parse.AnyChar.Except(excepter).Many().Text().Select(t => t.Trim());
+            return Parse.AnyChar.Except(excepter).Many().Text();
         }
 
         /// <summary>
@@ -521,6 +602,32 @@ namespace FansubFileNameParser
                 }
 
                 return Result.Success<string>(result.Value, new Input(result.Value));
+            };
+        }
+    }
+
+    /// <summary>
+    /// Extension methods that serve to help test parsers
+    /// </summary>
+    public static class ParserTestUtils
+    {
+        /// <summary>
+        /// A simple aspect interception tool to help debug and determine what is happening during a parse
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="token">Marker token</param>
+        /// <returns></returns>
+        public static Parser<TResult> Intercept<TResult>(
+            this Parser<TResult> @this,
+            string token
+        )
+        {
+            return input =>
+            {
+                var savedToken = token;
+                var result = @this.Invoke(input);
+                return result;
             };
         }
     }

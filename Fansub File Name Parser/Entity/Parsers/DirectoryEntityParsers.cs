@@ -63,8 +63,8 @@ namespace FansubFileNameParser.Entity.Parsers
             select _2;
 
         private static readonly Parser<string> SeriesNameDirectory =
-            from _1 in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
-            from seriesName in ExtraParsers.CollectExcept(
+            from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
+            from seriesName in ExtraParsers.LineUpTo(
                 ExtraParsers.Or(
                     EpisodeRange,
                     VolumeNumber,

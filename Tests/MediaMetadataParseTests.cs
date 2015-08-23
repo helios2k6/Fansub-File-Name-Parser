@@ -38,7 +38,7 @@ namespace Tests
         [TestMethod]
         public void ParseAllTags()
         {
-            foreach (var kvp in TestModel.CreateMediaMetadataTestModel().Take(2000))
+            foreach (var kvp in TestModel.CreateMediaMetadataTestModel().Take(1000))
             {
                 var inputTags = kvp.Key;
                 var expectedMetadata = kvp.Value;
@@ -54,7 +54,7 @@ namespace Tests
         [TestMethod]
         public void SerializeAndDeserialize()
         {
-            Parallel.ForEach(TestModel.CreateMediaMetadataTestModel().Take(2000), kvp =>
+            Parallel.ForEach(TestModel.CreateMediaMetadataTestModel().Take(1000), kvp =>
             {
                 TestSerializationAndDeserialization(kvp.Value);
             });

@@ -25,6 +25,7 @@
 using Functional.Maybe;
 using Sprache;
 using System;
+using System.Linq;
 
 namespace FansubFileNameParser.Entity.Parsers
 {
@@ -34,6 +35,9 @@ namespace FansubFileNameParser.Entity.Parsers
     internal static class OriginalAnimationEntityParsers
     {
         #region private fields
+        private static readonly Lazy<Parser<Tuple<Maybe<string>, Maybe<int>>>> TitleAndEpisodeParserLazy =
+            new Lazy<Parser<Tuple<Maybe<string>, Maybe<int>>>>(CreateTitleAndEpisodeParser);
+
         #region OVA / ONA / OAD
         #region OA Tokens
         private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OVA =
@@ -46,54 +50,115 @@ namespace FansubFileNameParser.Entity.Parsers
             Parse.IgnoreCase("OAD").Return(FansubOriginalAnimationEntity.ReleaseType.OAD);
 
         private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OAToken =
-            OVA.Or(ONA).Or(OAD).Memoize();
+            OVA.Or(ONA).Or(OAD);
+
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> DashThenOAToken =
+            from _ in BaseGrammars.DashSeparatorToken
+            from token in OAToken
+            select token;
         #endregion
         #region Root Name
-        private static readonly Parser<string> SeriesName = ExtraParsers.CollectExcept(OAToken);
+        private static readonly Parser<string> SeriesName =
+            ExtraParsers.LineUpTo(ExtraParsers.Or(OAToken, BaseGrammars.DashSeparatorToken));
         #endregion
-        #region Title and Episode Number
-        private static readonly Parser<string> OATitle = ExtraParsers.CollectExcept(ExtraParsers.Int);
-
-        private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> TitleThenEpisodeNumber =
-            from title in OATitle.Token().OptionalMaybe()
-            from episodeNumber in ExtraParsers.Int.OptionalMaybe()
-            where title.HasValue || episodeNumber.HasValue
-            select Tuple.Create(title.Select(t => t.Trim()), episodeNumber);
-
-        private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> EpisodeNumberThenTitle =
-            from episodeNumber in ExtraParsers.Int.Token().OptionalMaybe()
-            from title in OATitle.Token().OptionalMaybe()
-            where episodeNumber.HasValue || title.HasValue
-            select Tuple.Create(title.Select(t => t.Trim()), episodeNumber);
-
-        private static readonly Parser<Tuple<Maybe<string>, Maybe<int>>> TitleAndEpisodeNumber =
-            TitleThenEpisodeNumber.Or(EpisodeNumberThenTitle);
+        #region title and episode number
+        private static Parser<Tuple<Maybe<string>, Maybe<int>>> TitleAndEpisodeParser
+        {
+            get { return TitleAndEpisodeParserLazy.Value; }
+        }
         #endregion
         #region Composite Parsers
         private static readonly Parser<IFansubEntity> OriginalAnimationParser =
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from _1 in ExtraParsers.Filter(BaseGrammars.DashSeparatorToken).SetResultAsRemainder()
-            from _2 in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
+            from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
             from series in SeriesName.OptionalMaybe()
-            from oaToken in OAToken.Token()
-            from titleAndEpisode in TitleAndEpisodeNumber.OptionalMaybe()
+            from oaToken in OAToken.Or(DashThenOAToken)
+            from titleAndEpisode in TitleAndEpisodeParser.OptionalMaybe()
             let title = titleAndEpisode.HasValue ? titleAndEpisode.Value.Item1 : Maybe<string>.Nothing
             let episodeNumber = titleAndEpisode.HasValue ? titleAndEpisode.Value.Item2 : Maybe<int>.Nothing
-            from _3 in ExtraParsers.RemainingCharacters
+            from _4 in ExtraParsers.RemainingCharacters
             select new FansubOriginalAnimationEntity
             {
                 Group = fansubGroup,
-                Series = series,
+                Series = series.Select(s => s.Trim()),
                 Metadata = metadata,
                 Extension = extension,
                 Type = oaToken.ToMaybe(),
-                Title = title,
+                Title = title.Select(s => s.Trim()),
                 EpisodeNumber = episodeNumber,
             };
         #endregion
         #endregion
+        #endregion
+        #region private static methods
+        private static Parser<Tuple<Maybe<string>, Maybe<int>>> CreateTitleAndEpisodeParser()
+        {
+            // Uses a filtering style mechanism 
+            Parser<Tuple<Maybe<string>, Maybe<int>>> parser = input =>
+            {
+                // Original input string
+                var inputString = input.Source.Substring(input.Position);
+
+                // Reference to final filtered string
+                var finalFilteredString = inputString;
+
+                // Remove any dash tokens
+                var dashesFilteredResult = ExtraParsers.Filter(BaseGrammars.Dash).TryParse(finalFilteredString);
+                if (dashesFilteredResult.WasSuccessful)
+                {
+                    finalFilteredString = dashesFilteredResult.Value;
+                }
+
+                // Trim
+                finalFilteredString = finalFilteredString.Trim();
+
+                // Search for the episode number
+                var episodeNumberSearchResult = ExtraParsers.ScanFor(BaseGrammars.EpisodeWithVersionNumber).TryParse(finalFilteredString);
+                var foundEpisodeNumber = Maybe<int>.Nothing;
+
+                if (episodeNumberSearchResult.WasSuccessful)
+                {
+                    // Set the found episode number
+                    foundEpisodeNumber = episodeNumberSearchResult.Value.Item1.ToMaybe();
+
+                    // remove the episode number from the filtered string
+                    var filteredEpisodeNumberStringResult =
+                        ExtraParsers.Filter(BaseGrammars.EpisodeWithVersionNumber).TryParse(finalFilteredString);
+
+                    // Only filter out the episode number if we found it
+                    if (filteredEpisodeNumberStringResult.WasSuccessful)
+                    {
+                        finalFilteredString = filteredEpisodeNumberStringResult.Value;
+                        finalFilteredString = finalFilteredString.Trim();
+                    }
+                }
+
+                // Whatever is left must be the title
+                var ovaTitle = string.IsNullOrWhiteSpace(finalFilteredString)
+                    ? Maybe<string>.Nothing
+                    : finalFilteredString.ToMaybe();
+
+                // Check to see if we got the episode or the title
+                if (foundEpisodeNumber.IsSomething() || ovaTitle.IsSomething())
+                {
+                    return Result.Success<Tuple<Maybe<string>, Maybe<int>>>(
+                        Tuple.Create(ovaTitle, foundEpisodeNumber),
+                        new Input(string.Empty)
+                    );
+                }
+
+                // If we found neither, then send back failure
+                return Result.Failure<Tuple<Maybe<string>, Maybe<int>>>(
+                    input,
+                    "Could not parse the episode number or title of the OVA",
+                    Enumerable.Empty<string>()
+                );
+            };
+
+            return parser;
+        }
         #endregion
         #region public static properties
         /// <summary>

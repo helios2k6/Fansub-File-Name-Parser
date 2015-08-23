@@ -83,7 +83,7 @@ namespace FansubFileNameParser.Entity.Parsers
         private static readonly Parser<string> NonDashCredit = Parse.IgnoreCase(NonDashCreditString).Text();
 
         private static readonly Parser<string> CreditlessToken =
-            NC.Or(Creditless).Or(NonCredit).Or(NonDashCredit).Memoize();
+            NC.Or(Creditless).Or(NonCredit).Or(NonDashCredit);
 
         private static readonly Parser<string> Clean = Parse.IgnoreCase(CleanString).Text();
 
@@ -122,7 +122,7 @@ namespace FansubFileNameParser.Entity.Parsers
             };
 
         private static readonly Parser<IFansubEntity> SeriesOpeningOrEndingParser =
-            ExtraParsers.Any(AllParsers.Value).ConsumeAllRemainingInput().Memoize();
+            ExtraParsers.Any(AllParsers.Value).ConsumeAllRemainingInput();
         #endregion
         #endregion
         #region private methods
@@ -157,11 +157,11 @@ namespace FansubFileNameParser.Entity.Parsers
                                   Group = fansubGroup,
                                   UnfilteredSeries = series,
                                   Extension = ext,
-                              }).Memoize();
+                              });
 
             // <series name> <dash> <token> (also checks metatags for "clean" tag)
             yield return from core in coreParser.ResetInput()
-                         from _1 in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
+                         from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
                          from _2 in BaseGrammars.LineUpToLastDashSeparatorToken
                          from _3 in BaseGrammars.DashSeparatorToken
                          from token in tokenizer
@@ -178,7 +178,7 @@ namespace FansubFileNameParser.Entity.Parsers
 
             // <series name> <token> <extra content> (also checks metatags for "clean" tag)
             yield return from core in coreParser.ResetInput()
-                         from _1 in BaseGrammars.ContentBetweenTagGroups.SetResultAsRemainder()
+                         from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
                          from token in ExtraParsers.ScanFor(tokenizer.Last())
                          select new FansubOPEDEntity
                          {
