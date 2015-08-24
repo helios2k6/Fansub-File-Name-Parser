@@ -98,33 +98,6 @@ namespace UnitTests.Model.Grammars
         }
 
         [TestMethod]
-        public void TestLineUpToInt()
-        {
-            var inputOutputMap = new Dictionary<string, string>
-            {
-                {"[Doki] Akame ga Kill! - 01 (1920x1080 Hi10P BD FLAC) [395609BF].mkv", "[Doki] Akame ga Kill! - "},
-                {"[Coalgirls] Kill Me Baby 01 (1280x720_Blu-ray_FLAC) [1D51648A].mkv", "[Coalgirls] Kill Me Baby "},
-                {"[Coalgirls] Kill Me Baby", "[Coalgirls] Kill Me Baby"},
-            };
-
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToInt);
-        }
-
-        [TestMethod]
-        public void TestLineUpToLastDashSeparatorToken()
-        {
-            var inputOutputMap = new Dictionary<string, string>
-            {
-                {"[Tsundere] Fate Kaleid Prisma Illya 2wei - 01-02 [BDRip h264 1920x1080 10bit FLAC]", "[Tsundere] Fate Kaleid Prisma Illya 2wei"},
-                {"[Elysium]Spice and Wolf II(BD 1080p FLAC)", "[Elysium]Spice and Wolf II(BD 1080p FLAC)"},
-                {"[UTW] Fate stay night Unlimited Blade Works - 00-12 [BD][h264-1080p][FLAC]", "[UTW] Fate stay night Unlimited Blade Works"},
-                {"[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail - 04 [BD][480p][926257C1].mkv", "[TastyMelon] Black Lagoon OVA - Roberta's Blood Trail"},
-            };
-
-            TestUtils.TestParser(inputOutputMap, BaseGrammars.LineUpToLastDashSeparatorToken);
-        }
-
-        [TestMethod]
         public void TestLineUntilTagDeliminator()
         {
             var inputOutputMap = new Dictionary<string, string>
@@ -166,6 +139,19 @@ namespace UnitTests.Model.Grammars
             };
 
             TestUtils.TestParser(inputOutputMap, BaseGrammars.EpisodeWithVersionNumber);
+        }
+
+        [TestMethod]
+        public void TestEpisodeVersionWithSpaceToken()
+        {
+            var inputOutputMap = new Dictionary<string, Tuple<int, Maybe<int>>>
+            {
+                {" 3v2", Tuple.Create(3, 2.ToMaybe())},
+                {" 3", Tuple.Create(3, Maybe<int>.Nothing)},
+                {" 13v99", Tuple.Create(13, 99.ToMaybe())},
+            };
+
+            TestUtils.TestParser(inputOutputMap, BaseGrammars.EpisodeVersionWithSpaceToken);
         }
 
         [TestMethod]

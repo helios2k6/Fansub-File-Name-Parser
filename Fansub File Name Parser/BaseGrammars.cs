@@ -101,18 +101,6 @@ namespace FansubFileNameParser
         public static readonly Parser<string> Line = Parse.AnyChar.Many().Text();
 
         /// <summary>
-        /// Parses a string of text up until an episode number token
-        /// </summary>
-        public static Parser<string> LineUpToInt = ExtraParsers.LineUpTo(ExtraParsers.Int);
-
-        /// <summary>
-        /// Parses a string of text up until a "dash separator token," which is defined as a dash (-) with a 
-        /// single space before and after it: (" - "). 
-        /// </summary>
-        public static readonly Parser<string> LineUpToLastDashSeparatorToken =
-            ExtraParsers.LineUpTo(DashSeparatorToken.Last());
-
-        /// <summary>
         /// Parses a line of text until a tag delmiinator is encountered
         /// </summary>
         public static readonly Parser<string> LineUpToTagDeliminator = ExtraParsers.LineUpTo(TagDeliminator);
@@ -132,6 +120,14 @@ namespace FansubFileNameParser
             from episodeNumber in ExtraParsers.Int
             from versionNumber in VersionNumber.OptionalMaybe()
             select Tuple.Create(episodeNumber, versionNumber);
+
+        /// <summary>
+        /// Parses a episode token of the form {whitespace}{Episode and Version}
+        /// </summary>
+        public static readonly Parser<Tuple<int, Maybe<int>>> EpisodeVersionWithSpaceToken =
+            from _1 in Parse.WhiteSpace
+            from episodeAndVersion in EpisodeWithVersionNumber
+            select episodeAndVersion;
 
         /// <summary>
         /// Parses the content of a metatag

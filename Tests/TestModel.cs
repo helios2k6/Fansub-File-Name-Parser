@@ -116,7 +116,7 @@ namespace UnitTests.Models
                     {
                         VideoMedia = VideoMedia.Bluray.ToMaybe(),
                         CRC32 = "E84477A3".ToMaybe(),
-                        UnusedTags = new[] {"Yabao"},
+                        UnusedTags = new[] {"Yabai"},
                     }.ToMaybe(),
                     Extension = ".mkv".ToMaybe(),
                 }
@@ -792,6 +792,13 @@ namespace UnitTests.Models
             },
         };
         #endregion
+
+        #region movie test data
+        private static readonly IDictionary<string, IFansubEntity> DirectoryInputToEntityMap = new Dictionary<string, IFansubEntity>
+        {
+
+        };
+        #endregion
         #endregion
 
         #region public properties
@@ -811,9 +818,20 @@ namespace UnitTests.Models
             get { return DirectoryInputToEntityMap; }
         }
 
-        public static IEnumerable<KeyValuePair<string, IFansubEntity>> OriginalAnimationModel
+        /// <summary>
+        /// The OVA teset model
+        /// </summary>
+        public static IEnumerable<KeyValuePair<string, IFansubEntity>> OriginalAnimationTestModel
         {
             get { return OriginalVideoInputToEntityMap; }
+        }
+
+        /// <summary>
+        /// The episode test model
+        /// </summary>
+        public static IEnumerable<KeyValuePair<string, IFansubEntity>> EpisodeTestModel
+        {
+            get { return EpisodeInputToEntityMap; }
         }
         #endregion
 

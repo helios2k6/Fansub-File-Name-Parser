@@ -57,21 +57,27 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void TestParseOPED()
+        public void TestParseOPEDParser()
         {
             TestParserHelper<FansubOPEDEntity>(TestModel.OpeningEndingTestModel);
         }
 
         [TestMethod]
-        public void TestParseDirectory()
+        public void TestParseDirectoryParser()
         {
             TestParserHelper<FansubDirectoryEntity>(TestModel.DirectoryTestModel);
         }
 
         [TestMethod]
-        public void TestParseOVA()
+        public void TestParseOVAParser()
         {
-            TestParserHelper<FansubOriginalAnimationEntity>(TestModel.OriginalAnimationModel);
+            TestParserHelper<FansubOriginalAnimationEntity>(TestModel.OriginalAnimationTestModel);
+        }
+
+        [TestMethod]
+        public void TestEpisodeParser()
+        {
+            TestParserHelper<FansubEpisodeEntity>(TestModel.EpisodeTestModel);
         }
     }
 }
