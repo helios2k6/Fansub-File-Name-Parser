@@ -30,7 +30,7 @@ namespace FansubFileNameParser.Entity.Parsers
     /// <summary>
     /// A static class of Parser{string} objects that parse entity specific strings
     /// </summary>
-    internal static class EntityParsers
+    public static class EntityParsers
     {
         /// <summary>
         /// Tries to parse the string into an <see cref="IFansubEntity"/> object
