@@ -63,7 +63,7 @@ namespace FansubFileNameParser.Entity.Parsers
             select _2;
 
         private static readonly Parser<string> SeriesNameDirectory =
-            from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
+            from _1 in ExtraParsers.MainContent.SetResultAsRemainder()
             from seriesName in ExtraParsers.LineUpTo(
                 ExtraParsers.Or(
                     EpisodeRange,
@@ -75,13 +75,13 @@ namespace FansubFileNameParser.Entity.Parsers
             select seriesName.Trim();
 
         private static readonly Parser<IFansubEntity> DirectoryParser =
-            from _1 in ExtraParsers.ScanFor(BaseGrammars.FileExtension).Not().ResetInput()
+            from _1 in ExtraParsers.ScanFor(ExtraParsers.FileExtension).Not().ResetInput()
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from series in SeriesNameDirectory.OptionalMaybe().ResetInput()
             from vol in ExtraParsers.ScanFor(VolumeNumber).OptionalMaybe()
             from range in ExtraParsers.ScanFor(EpisodeRange).OptionalMaybe()
-            from _2 in ExtraParsers.RemainingCharacters
+            from _2 in BaseGrammars.Line
             select new FansubDirectoryEntity
             {
                 Group = fansubGroup,

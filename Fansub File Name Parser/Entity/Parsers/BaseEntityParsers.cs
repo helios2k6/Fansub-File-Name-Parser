@@ -58,7 +58,7 @@ namespace FansubFileNameParser.Entity.Parsers
             Parser<MediaMetadata> parser = input =>
             {
                 var substring = input.Source.Substring(input.Position);
-                var tags = BaseGrammars.CollectTags.TryParse(substring);
+                var tags = ExtraParsers.CollectTags.TryParse(substring);
                 var mediaMetadata = tags.WasSuccessful
                     ? MediaMetadataParser.TryParseMediaMetadata(tags.Value)
                     : Maybe<MediaMetadata>.Nothing;
@@ -106,9 +106,9 @@ namespace FansubFileNameParser.Entity.Parsers
 
         private static Parser<string> CreateSeriesNameParser()
         {
-            var parser = from _ in BaseGrammars.MainContent.SetResultAsRemainder()
+            var parser = from _ in ExtraParsers.MainContent.SetResultAsRemainder()
                          from content in ExtraParsers.LineUpTo(ExtraParsers.Or(
-                            BaseGrammars.EpisodeVersionWithSpaceToken.Last(),
+                            ExtraParsers.EpisodeVersionWithSpaceToken.Last(),
                             BaseGrammars.DashSeparatorToken.Last()
                          ))
                          select content.Trim();

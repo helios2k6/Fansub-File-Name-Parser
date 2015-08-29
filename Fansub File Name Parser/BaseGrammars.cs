@@ -22,11 +22,7 @@
  * THE SOFTWARE.
  */
 
-using Functional.Maybe;
 using Sprache;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FansubFileNameParser
 {
@@ -35,164 +31,111 @@ namespace FansubFileNameParser
     /// </summary>
     internal static class BaseGrammars
     {
+        #region Single Characters
         /// <summary>
         /// Parses a single dash ('-') character
         /// </summary>
-        public static readonly Parser<char> Dash = Parse.Char('-');
+        public static Parser<char> Dash
+        {
+            get { return Parse.Char('-'); }
+        }
 
         /// <summary>
         /// Parses a single dot ('.') character
         /// </summary>
-        public static readonly Parser<char> Dot = Parse.Char('.');
+        public static Parser<char> Dot
+        {
+            get { return Parse.Char('.'); }
+        }
 
         /// <summary>
         /// Parses a single underscore ('_') character
         /// </summary>
-        public static readonly Parser<char> Underscore = Parse.Char('_');
-
-        /// <summary>
-        /// Parses a single dash separator token (' - ')
-        /// </summary>
-        public static readonly Parser<string> DashSeparatorToken =
-            from frontSpace in Parse.WhiteSpace
-            from dash in BaseGrammars.Dash
-            from backSpace in Parse.WhiteSpace
-            select new string(new[] { frontSpace, dash, backSpace });
+        public static Parser<char> Underscore
+        {
+            get { return Parse.Char('_'); }
+        }
 
         /// <summary>
         /// Parses a single open parenthesis character ('(')
         /// </summary>
-        public static readonly Parser<char> OpenParenthesis = Parse.Char('(');
+        public static Parser<char> OpenParenthesis
+        {
+            get { return Parse.Char('('); }
+        }
 
         /// <summary>
         /// Parses a single closed parenthesis character (')')
         /// </summary>
-        public static readonly Parser<char> ClosedParenthesis = Parse.Char(')');
+        public static Parser<char> ClosedParenthesis
+        {
+            get { return Parse.Char(')'); }
+        }
 
         /// <summary>
         /// Parses a single a open square bracket ('[')
         /// </summary>
-        public static readonly Parser<char> OpenSquareBracket = Parse.Char('[');
+        public static Parser<char> OpenSquareBracket
+        {
+            get { return Parse.Char('['); }
+        }
 
         /// <summary>
         /// Parses a single closed square bracket (']')
         /// </summary>
-        public static readonly Parser<char> ClosedSquareBracket = Parse.Char(']');
-
+        public static Parser<char> ClosedSquareBracket
+        {
+            get { return Parse.Char(']'); }
+        }
+        #endregion
+        #region Single Concepts
         /// <summary>
         /// Parses any open metadata tag deliminator, such as the open parenthesis or open square bracket
         /// </summary>
-        public static readonly Parser<char> OpenTagDeliminator = OpenParenthesis.Or(OpenSquareBracket);
+        public static Parser<char> OpenTagDeliminator
+        {
+            get { return OpenParenthesis.Or(OpenSquareBracket); }
+        }
 
         /// <summary>
         /// Parses any closed metadata tag deliminator, such as the closed parenthesis or closed square bracket
         /// </summary>
-        public static readonly Parser<char> ClosedTagDeliminator = ClosedParenthesis.Or(ClosedSquareBracket);
+        public static Parser<char> ClosedTagDeliminator
+        {
+            get { return ClosedParenthesis.Or(ClosedSquareBracket); }
+        }
 
         /// <summary>
         /// Parses a single tag delminator
         /// </summary>
-        public static readonly Parser<char> TagDeliminator = OpenTagDeliminator.Or(ClosedTagDeliminator);
-
+        public static Parser<char> TagDeliminator
+        {
+            get { return OpenTagDeliminator.Or(ClosedTagDeliminator); }
+        }
+        #endregion
+        #region Multi-character Concepts
         /// <summary>
         /// Parses a string of characters, including whitespace. This always succeedes, even if there are
         /// no characters to parse.
         /// </summary>
-        public static readonly Parser<string> Line = Parse.AnyChar.Many().Text();
+        public static Parser<string> Line
+        {
+            get { return Parse.AnyChar.Many().Text(); }
+        }
 
         /// <summary>
-        /// Parses a line of text until a tag delmiinator is encountered
+        /// Parses a single dash separator token (' - ')
         /// </summary>
-        public static readonly Parser<string> LineUpToTagDeliminator = ExtraParsers.LineUpTo(TagDeliminator);
-
-        /// <summary>
-        /// Parses a version number token
-        /// </summary>
-        public static readonly Parser<int> VersionNumber =
-            from _1 in Parse.Char('v').Or(Parse.Char('V'))
-            from number in ExtraParsers.Int
-            select number;
-
-        /// <summary>
-        /// Parses an episode with an optional version number on it
-        /// </summary>
-        public static readonly Parser<Tuple<int, Maybe<int>>> EpisodeWithVersionNumber =
-            from episodeNumber in ExtraParsers.Int
-            from versionNumber in VersionNumber.OptionalMaybe()
-            select Tuple.Create(episodeNumber, versionNumber);
-
-        /// <summary>
-        /// Parses a episode token of the form {whitespace}{Episode and Version}
-        /// </summary>
-        public static readonly Parser<Tuple<int, Maybe<int>>> EpisodeVersionWithSpaceToken =
-            from _1 in Parse.WhiteSpace
-            from episodeAndVersion in EpisodeWithVersionNumber
-            select episodeAndVersion;
-
-        /// <summary>
-        /// Parses the content of a metatag
-        /// </summary>
-        public static readonly Parser<string> MetaTagContent =
-             BaseGrammars.LineUpToTagDeliminator.Contained(BaseGrammars.OpenTagDeliminator, BaseGrammars.ClosedTagDeliminator);
-
-        /// <summary>
-        /// Parses multiple metadata tags
-        /// </summary>
-        public static readonly Parser<IEnumerable<string>> MetaTagGroup =
-            from firstTag in MetaTagContent.AsMany()
-            from remainingTags in MetaTagContent.Token().Many()
-            select firstTag.Concat(remainingTags);
-
-        /// <summary>
-        /// Parses content that's contained between any group of multiple tags
-        /// </summary>
-        private static readonly Parser<string> ContentBetweenTagGroups =
-            LineUpToTagDeliminator.Contained(MetaTagGroup, MetaTagGroup);
-
-        /// <summary>
-        /// Parses the main content of a title, which excludes the metatags
-        /// </summary>
-        public static readonly Parser<string> MainContent =
-            ContentBetweenTagGroups.Or(LineUpToTagDeliminator);
-
-        /// <summary>
-        /// Parses and captures all of the metadata tags that appear in the string, including the tag deliminator token
-        /// </summary>
-        public static readonly Parser<IEnumerable<string>> CollectTags =
-            ExtraParsers.ScanFor(MetaTagContent).Many();
-
-        /// <summary>
-        /// Parses a file extension
-        /// </summary>
-        public static readonly Parser<string> FileExtension =
-            from dot in Dot
-            from extContent in Parse.AnyChar.Except(Dot.Or(TagDeliminator)).Many().End().Text()
-            select string.Concat(dot, extContent);
-
-        /// <summary>
-        /// Replaces the dots in the string with spaces while preserving the file extension of a media file
-        /// </summary>
-        public static readonly Parser<string> ReplaceDotsExceptMediaFileExtension =
-            from frontSegment in Parse.AnyChar.Except(FileExtension).Many().Text()
-            from extension in FileExtension.Optional()
-            select string.Format(
-                "{0}{1}",
-                frontSegment.Replace('.', ' '),
-                extension.IsDefined
-                ? extension.Get()
-                : string.Empty
-            );
-
-        /// <summary>
-        /// Replaces the underscores of an input string with spaces
-        /// </summary>
-        public static readonly Parser<string> ReplaceUnderscores = ExtraParsers.Filter(Underscore);
-
-        /// <summary>
-        /// Sanitizes the input string by replacing dots and dashes with spaces, with the exception 
-        /// of any file extensions
-        /// </summary>
-        public static readonly Parser<string> CleanInputString =
-            ReplaceDotsExceptMediaFileExtension.ContinueWith(ReplaceUnderscores);
+        public static Parser<string> DashSeparatorToken
+        {
+            get
+            {
+                return from frontSpace in Parse.WhiteSpace
+                       from dash in Dash
+                       from backSpace in Parse.WhiteSpace
+                       select new string(new[] { frontSpace, dash, backSpace });
+            }
+        }
+        #endregion
     }
 }

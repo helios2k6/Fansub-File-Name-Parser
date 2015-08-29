@@ -25,8 +25,6 @@
 using FansubFileNameParser.Utils;
 using Functional.Maybe;
 using Sprache;
-using System;
-using System.Collections.Generic;
 
 namespace FansubFileNameParser.Entity.Parsers
 {
@@ -61,11 +59,11 @@ namespace FansubFileNameParser.Entity.Parsers
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
-            from seriesName in ExtraParsers.LineUpTo(MovieNumberToken).Intercept("Movie - Series Name").OptionalMaybe()
+            from _1 in ExtraParsers.MainContent.SetResultAsRemainder()
+            from seriesName in ExtraParsers.LineUpTo(MovieNumberToken).OptionalMaybe()
             from movieNumber in MovieNumberToken.OptionalMaybe()
             from _2 in BaseGrammars.DashSeparatorToken.OptionalMaybe()
-            from subtitle in ExtraParsers.RemainingCharacters.AtLeastOneCharTrimmed().OptionalMaybe()
+            from subtitle in BaseGrammars.Line.AtLeastOneCharTrimmed().OptionalMaybe()
             select new FansubMovieEntity
             {
                 Metadata = metadata,

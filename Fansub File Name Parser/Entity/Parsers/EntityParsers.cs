@@ -57,7 +57,7 @@ namespace FansubFileNameParser.Entity.Parsers
         }
 
         private static readonly Parser<IFansubEntity> EntityParserField =
-            (from _ in BaseGrammars.CleanInputString.SetResultAsRemainder()
+            (from _ in ExtraParsers.CleanInputString.SetResultAsRemainder()
              from entity in DirectoryEntityParsers.Directory
                                 .Or(OPEDEntityParsers.OpeningOrEnding)
                                 .Or(OriginalAnimationEntityParsers.OriginalAnimation)

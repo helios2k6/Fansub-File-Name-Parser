@@ -116,7 +116,7 @@ namespace FansubFileNameParser.Metadata
         /// </returns>
         public bool Equals(Resolution other)
         {
-            if(EqualsPreamble(other) == false)
+            if (EqualsPreamble(other) == false)
             {
                 return false;
             }
@@ -134,7 +134,7 @@ namespace FansubFileNameParser.Metadata
         /// <exception cref="System.NotImplementedException"></exception>
         public override bool Equals(object other)
         {
-            if(EqualsPreamble(other) == false)
+            if (EqualsPreamble(other) == false)
             {
                 return false;
             }

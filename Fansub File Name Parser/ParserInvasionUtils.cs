@@ -24,29 +24,31 @@
 
 using Sprache;
 
-namespace FansubFileNameParser.Entity.Parsers
+namespace FansubFileNameParser
 {
     /// <summary>
-    /// Contains common File-based entity parsers
+    /// Invasive tools that can be used to debug troublesome Parsers
     /// </summary>
-    internal static class FileEntityParsers
+    public static class ParserInvasionUtils
     {
-        #region public methods
         /// <summary>
-        /// Gets the File Extension parser
+        /// A simple aspect interception tool to help debug and determine what is happening during a parse
         /// </summary>
-        /// <value>
-        /// The File Extension parser
-        /// </value>
-        public static Parser<string> FileExtension
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="token">Marker token</param>
+        /// <returns></returns>
+        public static Parser<TResult> Intercept<TResult>(
+            this Parser<TResult> @this,
+            string token
+        )
         {
-            get { return FileExtensionParser; }
+            return input =>
+            {
+                var savedToken = token;
+                var result = @this.Invoke(input);
+                return result;
+            };
         }
-        #endregion
-
-        #region private methods
-        private static readonly Parser<string> FileExtensionParser =
-            ExtraParsers.ScanFor(ExtraParsers.FileExtension);
-        #endregion
     }
 }

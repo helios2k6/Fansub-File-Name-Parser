@@ -38,9 +38,9 @@ namespace FansubFileNameParser.Entity.Parsers
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
-            from episode in ExtraParsers.ScanFor(BaseGrammars.EpisodeVersionWithSpaceToken.Last())
-            from remainingText in ExtraParsers.RemainingCharacters.AtLeastOneCharTrimmed().OptionalMaybe()
+            from _1 in ExtraParsers.MainContent.SetResultAsRemainder()
+            from episode in ExtraParsers.ScanFor(ExtraParsers.EpisodeVersionWithSpaceToken.Last())
+            from remainingText in BaseGrammars.Line.AtLeastOneCharTrimmed().OptionalMaybe()
             where remainingText.HasValue == false
             select new FansubEpisodeEntity
             {

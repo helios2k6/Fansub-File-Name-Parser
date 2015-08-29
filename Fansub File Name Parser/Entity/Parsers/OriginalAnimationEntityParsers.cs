@@ -81,13 +81,13 @@ namespace FansubFileNameParser.Entity.Parsers
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
+            from _1 in ExtraParsers.MainContent.SetResultAsRemainder()
             from series in SeriesName.OptionalMaybe()
             from oaToken in OAToken
             from titleAndEpisode in TitleAndEpisodeParser.OptionalMaybe()
             let title = titleAndEpisode.HasValue ? titleAndEpisode.Value.Item1 : Maybe<string>.Nothing
             let episodeNumber = titleAndEpisode.HasValue ? titleAndEpisode.Value.Item2 : Maybe<int>.Nothing
-            from _4 in ExtraParsers.RemainingCharacters
+            from _4 in BaseGrammars.Line
             select new FansubOriginalAnimationEntity
             {
                 Group = fansubGroup,
@@ -124,7 +124,7 @@ namespace FansubFileNameParser.Entity.Parsers
                 finalFilteredString = finalFilteredString.Trim();
 
                 // Search for the episode number
-                var episodeNumberSearchResult = ExtraParsers.ScanFor(BaseGrammars.EpisodeWithVersionNumber).TryParse(finalFilteredString);
+                var episodeNumberSearchResult = ExtraParsers.ScanFor(ExtraParsers.EpisodeWithVersionNumber).TryParse(finalFilteredString);
                 var foundEpisodeNumber = Maybe<int>.Nothing;
 
                 if (episodeNumberSearchResult.WasSuccessful)
@@ -134,7 +134,7 @@ namespace FansubFileNameParser.Entity.Parsers
 
                     // remove the episode number from the filtered string
                     var filteredEpisodeNumberStringResult =
-                        ExtraParsers.Filter(BaseGrammars.EpisodeWithVersionNumber).TryParse(finalFilteredString);
+                        ExtraParsers.Filter(ExtraParsers.EpisodeWithVersionNumber).TryParse(finalFilteredString);
 
                     // Only filter out the episode number if we found it
                     if (filteredEpisodeNumberStringResult.WasSuccessful)

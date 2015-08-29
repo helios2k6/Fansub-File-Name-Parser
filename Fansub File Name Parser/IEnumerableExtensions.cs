@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 
-using Functional.Maybe;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -161,7 +161,7 @@ namespace FansubFileNameParser.Entity.Parsers
 
             // <series name> <dash> <token> (also checks metatags for "clean" tag)
             yield return from core in coreParser.ResetInput()
-                         from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
+                         from _1 in ExtraParsers.MainContent.SetResultAsRemainder()
                          from _2 in ExtraParsers.LineUpTo(BaseGrammars.DashSeparatorToken.Last())
                          from _3 in BaseGrammars.DashSeparatorToken
                          from token in tokenizer
@@ -178,7 +178,7 @@ namespace FansubFileNameParser.Entity.Parsers
 
             // <series name> <token> <extra content> (also checks metatags for "clean" tag)
             yield return from core in coreParser.ResetInput()
-                         from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
+                         from _1 in ExtraParsers.MainContent.SetResultAsRemainder()
                          from token in ExtraParsers.ScanFor(tokenizer.Last())
                          select new FansubOPEDEntity
                          {

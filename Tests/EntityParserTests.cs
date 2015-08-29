@@ -49,7 +49,7 @@ namespace UnitTests
             {
                 var fansubString = stringToModel.Key;
 
-                var cleanedString = BaseGrammars.CleanInputString.Parse(fansubString);
+                var cleanedString = ExtraParsers.CleanInputString.Parse(fansubString);
 
                 var expectedParseResult = stringToModel.Value;
                 var parseResult = parser.TryParse(cleanedString);
