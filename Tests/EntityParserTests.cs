@@ -40,7 +40,25 @@ namespace UnitTests
     [TestClass]
     public sealed class EntityParserTests
     {
-        private static void TestParserHelper<TResultType>(
+        private static void TestStandAloneParser(
+            IEnumerable<KeyValuePair<string, IFansubEntity>> model,
+            Parser<IFansubEntity> parser
+        )
+        {
+            foreach (var stringToModel in model)
+            {
+                var fansubString = stringToModel.Key;
+
+                var cleanedString = BaseGrammars.CleanInputString.Parse(fansubString);
+
+                var expectedParseResult = stringToModel.Value;
+                var parseResult = parser.TryParse(cleanedString);
+                Assert.IsTrue(parseResult.WasSuccessful);
+                Assert.AreEqual(expectedParseResult, parseResult.Value);
+            }
+        }
+
+        private static void TestInteractionWithOtherParsers<TResultType>(
             IEnumerable<KeyValuePair<string, IFansubEntity>> model
         )
         {
@@ -57,27 +75,66 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void TestParseOPEDParser()
+        public void TestOPEDParser()
         {
-            TestParserHelper<FansubOPEDEntity>(TestModel.OpeningEndingTestModel);
+            TestStandAloneParser(TestModel.OpeningEndingTestModel, OPEDEntityParsers.OpeningOrEnding);
         }
 
         [TestMethod]
-        public void TestParseDirectoryParser()
+        public void TestOPEDParserIntegration()
         {
-            TestParserHelper<FansubDirectoryEntity>(TestModel.DirectoryTestModel);
+            TestInteractionWithOtherParsers<FansubOPEDEntity>(TestModel.OpeningEndingTestModel);
         }
 
         [TestMethod]
-        public void TestParseOVAParser()
+        public void TestDirectoryParser()
         {
-            TestParserHelper<FansubOriginalAnimationEntity>(TestModel.OriginalAnimationTestModel);
+            TestStandAloneParser(TestModel.DirectoryTestModel, DirectoryEntityParsers.Directory);
+        }
+
+        [TestMethod]
+        public void TestDirectoryParserIntegration()
+        {
+            TestInteractionWithOtherParsers<FansubDirectoryEntity>(TestModel.DirectoryTestModel);
+        }
+
+        [TestMethod]
+        public void TestOVAParser()
+        {
+            TestStandAloneParser(
+                TestModel.OriginalAnimationTestModel,
+                OriginalAnimationEntityParsers.OriginalAnimation
+            );
+        }
+
+        [TestMethod]
+        public void TestOVAParserIntegration()
+        {
+            TestInteractionWithOtherParsers<FansubOriginalAnimationEntity>(TestModel.OriginalAnimationTestModel);
         }
 
         [TestMethod]
         public void TestEpisodeParser()
         {
-            TestParserHelper<FansubEpisodeEntity>(TestModel.EpisodeTestModel);
+            TestStandAloneParser(TestModel.EpisodeTestModel, EpisodeEntityParsers.Episode);
+        }
+
+        [TestMethod]
+        public void TestEpisodeParserIntegration()
+        {
+            TestInteractionWithOtherParsers<FansubEpisodeEntity>(TestModel.EpisodeTestModel);
+        }
+
+        [TestMethod]
+        public void TestMovieParser()
+        {
+            TestStandAloneParser(TestModel.MovieTestModel, MovieEntityParsers.Movie);
+        }
+
+        [TestMethod]
+        public void TestMovieParserIntegration()
+        {
+            TestInteractionWithOtherParsers<FansubMovieEntity>(TestModel.MovieTestModel);
         }
     }
 }

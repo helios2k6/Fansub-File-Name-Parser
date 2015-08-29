@@ -23,6 +23,7 @@
  */
 
 using FansubFileNameParser.Utils;
+using Functional.Maybe;
 using Sprache;
 using System;
 using System.Collections.Generic;
@@ -33,40 +34,44 @@ namespace FansubFileNameParser.Entity.Parsers
     {
         #region private static fields
         private static readonly Parser<int> NumberSignPrefixedMovieNumberToken =
-            from _ in Parse.Char('#')
-            from __ in Parse.WhiteSpace.Many()
+            from _1 in Parse.Char('#')
+            from _2 in Parse.WhiteSpace.Many()
             from movieNumber in ExtraParsers.Int
             select movieNumber;
 
         private static readonly Parser<int> EpisodePrefixedMovieNumberToken =
-            from _ in Parse.IgnoreCase("EP")
-            from __ in Parse.WhiteSpace.Many()
+            from _1 in Parse.IgnoreCase("EP")
+            from _2 in Parse.WhiteSpace.Many()
             from movieNumber in ExtraParsers.Int
             select movieNumber;
 
-        private static readonly Parser<char> RomanNumeralToken = Parse.IgnoreCase('I').Or(Parse.IgnoreCase('V')).Or(Parse.IgnoreCase('X'));
+        private static readonly Parser<char> RomanNumeralToken =
+            Parse.IgnoreCase('I').Or(Parse.IgnoreCase('V')).Or(Parse.IgnoreCase('X'));
 
         private static readonly Parser<int> RomanNumeralMovieNumber =
             from romanNumerals in RomanNumeralToken.AtLeastOnce().Text()
             select RomanNumerals.TranslateRomanNumeralToInt(romanNumerals);
 
-        private static readonly Parser<int> MovieNumberParser =
-            ExtraParsers.ScanFor(NumberSignPrefixedMovieNumberToken)
-                .Or(ExtraParsers.ScanFor(EpisodePrefixedMovieNumberToken))
-                .Or(ExtraParsers.ScanFor(RomanNumeralMovieNumber));
+        private static readonly Parser<int> MovieNumberToken =
+            from _1 in Parse.WhiteSpace
+            from number in NumberSignPrefixedMovieNumberToken.Or(EpisodePrefixedMovieNumberToken).Or(RomanNumeralMovieNumber)
+            select number;
 
         private static readonly Parser<IFansubEntity> MovieParser =
             from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
             from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
-            from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
-            from movieNumber in MovieNumberParser.OptionalMaybe()
-            from _ in ExtraParsers.RemainingCharacters
+            from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
+            from seriesName in ExtraParsers.LineUpTo(MovieNumberToken).Intercept("Movie - Series Name").OptionalMaybe()
+            from movieNumber in MovieNumberToken.OptionalMaybe()
+            from _2 in BaseGrammars.DashSeparatorToken.OptionalMaybe()
+            from subtitle in ExtraParsers.RemainingCharacters.AtLeastOneCharTrimmed().OptionalMaybe()
             select new FansubMovieEntity
             {
                 Metadata = metadata,
                 Group = fansubGroup,
-                Series = series,
+                Series = seriesName.Select(t => t.Trim()),
+                Subtitle = subtitle.Select(t => t.Trim()),
                 Extension = extension,
                 MovieNumber = movieNumber,
             };

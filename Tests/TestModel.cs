@@ -121,6 +121,21 @@ namespace UnitTests.Models
                     Extension = ".mkv".ToMaybe(),
                 }
             },
+            {
+                "[Commie] Persona 4 - 25 [B87F03D9].mkv",
+                new FansubEpisodeEntity
+                {
+                    Group = "Commie".ToMaybe(),
+                    Series = "Persona 4".ToMaybe(),
+                    EpisodeNumber = 25.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        CRC32 = "B87F03D9".ToMaybe(),
+                        UnusedTags = new[] {"Commie"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe(),
+                }
+            },
         };
         #endregion
 
@@ -610,7 +625,9 @@ namespace UnitTests.Models
         #region directory test data
         private static readonly IDictionary<string, IFansubEntity> DirectoryInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
-            {"Kokoro Connect (2012) [Doki-Chihiro][1920x1080 Hi10P BD FLAC]", new FansubDirectoryEntity 
+            {
+                "Kokoro Connect (2012) [Doki-Chihiro][1920x1080 Hi10P BD FLAC]", 
+                new FansubDirectoryEntity 
                 { 
                     Group = "Doki-Chihiro".ToMaybe(), 
                     Series = "Kokoro Connect".ToMaybe(),
@@ -624,7 +641,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[Vivid] The World God Only Knows - Goddesses Arc [BD 1080p FLAC]", new FansubDirectoryEntity
+            {
+                "[Vivid] The World God Only Knows - Goddesses Arc [BD 1080p FLAC]", 
+                new FansubDirectoryEntity
                 {
                     Group = "Vivid".ToMaybe(),
                     Series = "The World God Only Knows - Goddesses Arc".ToMaybe(),
@@ -637,7 +656,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[BlurayDesuYo] Amagi Brilliant Park - Vol. 1 (BD 1920x1080 10bit FLAC)", new FansubDirectoryEntity
+            {
+                "[BlurayDesuYo] Amagi Brilliant Park - Vol. 1 (BD 1920x1080 10bit FLAC)",
+                new FansubDirectoryEntity
                 {
                     Group = "BlurayDesuYo".ToMaybe(),
                     Series = "Amagi Brilliant Park".ToMaybe(),
@@ -652,7 +673,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[Coalgirls]_Amagi_Brilliant_Park_01-02_(1920x1080_Blu-Ray_FLAC)", new FansubDirectoryEntity
+            {
+                "[Coalgirls]_Amagi_Brilliant_Park_01-02_(1920x1080_Blu-Ray_FLAC)",
+                new FansubDirectoryEntity
                 {
                     Group = "Coalgirls".ToMaybe(),
                     Series = "Amagi Brilliant Park".ToMaybe(),
@@ -666,7 +689,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[FFF] Medaka Box Abnormal - Vol.03 [BD][1080p-FLAC]", new FansubDirectoryEntity
+            {
+                "[FFF] Medaka Box Abnormal - Vol.03 [BD][1080p-FLAC]", 
+                new FansubDirectoryEntity
                 {
                     Group = "FFF".ToMaybe(),
                     Series = "Medaka Box Abnormal".ToMaybe(),
@@ -680,7 +705,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[Tsundere] Fate Kaleid Prisma Illya 2wei - 01-02 [BDRip h264 1920x1080 10bit FLAC]", new FansubDirectoryEntity
+            {
+                "[Tsundere] Fate Kaleid Prisma Illya 2wei - 01-02 [BDRip h264 1920x1080 10bit FLAC]",
+                new FansubDirectoryEntity
                 {
                     Group = "Tsundere".ToMaybe(),
                     Series = "Fate Kaleid Prisma Illya 2wei".ToMaybe(),
@@ -696,7 +723,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[Elysium]Spice.and.Wolf.II(BD.1080p.FLAC)", new FansubDirectoryEntity
+            {
+                "[Elysium]Spice.and.Wolf.II(BD.1080p.FLAC)", 
+                new FansubDirectoryEntity
                 {
                     Group = "Elysium".ToMaybe(),
                     Series = "Spice and Wolf II".ToMaybe(),
@@ -709,7 +738,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[Yabai]_Spice_and_Wolf_II_[BD]", new FansubDirectoryEntity
+            {
+                "[Yabai]_Spice_and_Wolf_II_[BD]", 
+                new FansubDirectoryEntity
                 {
                     Group = "Yabai".ToMaybe(),
                     Series = "Spice and Wolf II".ToMaybe(),
@@ -720,7 +751,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[Zurako] Spice and Wolf II (BD 1080p AAC)", new FansubDirectoryEntity
+            {
+                "[Zurako] Spice and Wolf II (BD 1080p AAC)",
+                new FansubDirectoryEntity
                 {
                     Group = "Zurako".ToMaybe(),
                     Series = "Spice and Wolf II".ToMaybe(),
@@ -733,7 +766,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[UTW]_Fate_stay_night_Unlimited_Blade_Works_-_00-12_[BD][h264-1080p][FLAC]", new FansubDirectoryEntity
+            {
+                "[UTW]_Fate_stay_night_Unlimited_Blade_Works_-_00-12_[BD][h264-1080p][FLAC]",
+                new FansubDirectoryEntity
                 {
                     Group = "UTW".ToMaybe(),
                     Series = "Fate stay night Unlimited Blade Works".ToMaybe(),
@@ -748,7 +783,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[Commie] Chihayafuru 2 - Volume 1 [BD 720p AAC]", new FansubDirectoryEntity
+            {
+                "[Commie] Chihayafuru 2 - Volume 1 [BD 720p AAC]", 
+                new FansubDirectoryEntity
                 {
                     Group = "Commie".ToMaybe(),
                     Series = "Chihayafuru 2".ToMaybe(),
@@ -762,7 +799,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[Coalgirls]_Hyouka_(1920x1080_Blu-Ray_FLAC)", new FansubDirectoryEntity
+            {
+                "[Coalgirls]_Hyouka_(1920x1080_Blu-Ray_FLAC)", 
+                new FansubDirectoryEntity
                 {
                     Group = "Coalgirls".ToMaybe(),
                     Series = "Hyouka".ToMaybe(),
@@ -775,7 +814,9 @@ namespace UnitTests.Models
                     }.ToMaybe(),
                 }
             },
-            {"[Doki] Mahouka Koukou no Rettousei - Vol 1 (1920x1080 Hi10P BD FLAC)", new FansubDirectoryEntity
+            {
+                "[Doki] Mahouka Koukou no Rettousei - Vol 1 (1920x1080 Hi10P BD FLAC)", 
+                new FansubDirectoryEntity
                 {
                     Group = "Doki".ToMaybe(),
                     Series = "Mahouka Koukou no Rettousei".ToMaybe(),
@@ -794,9 +835,101 @@ namespace UnitTests.Models
         #endregion
 
         #region movie test data
-        private static readonly IDictionary<string, IFansubEntity> DirectoryInputToEntityMap = new Dictionary<string, IFansubEntity>
+        private static readonly IDictionary<string, IFansubEntity> MovieInputToEntityMap = new Dictionary<string, IFansubEntity>
         {
-
+            {
+                "[Coalgirls]_Magical_Girl_Madoka_Magica_the_Movie_III_-_Rebellion_(1920x1080_Blu-ray_FLAC)_[557238A8].mkv",
+                new FansubMovieEntity
+                {
+                    Group = "Coalgirls".ToMaybe(),
+                    Series = "Magical Girl Madoka Magica the Movie".ToMaybe(),
+                    MovieNumber = 3.ToMaybe(),
+                    Subtitle = "Rebellion".ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "557238A8".ToMaybe(),
+                        UnusedTags = new[] {"Coalgirls"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe()
+                }
+            },
+            {
+                "[Commie] Persona 3 the Movie #2 - Midsummer Knight's Dream [BD 720p AAC] [DDB2BF3C].mkv",
+                new FansubMovieEntity
+                {
+                    Group = "Commie".ToMaybe(),
+                    Series = "Persona 3 the Movie".ToMaybe(),
+                    MovieNumber = 2.ToMaybe(),
+                    Subtitle = "Midsummer Knight's Dream".ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.SevenTwentyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.AAC.ToMaybe(),
+                        CRC32 = "DDB2BF3C".ToMaybe(),
+                        UnusedTags = new[] {"Commie"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe()
+                }
+            },
+            {
+                "[Commie] Persona 3 the Movie #1 - Spring of Birth [BD 720p AAC] [1C7DAA54].mkv",
+                new FansubMovieEntity
+                {
+                    Group = "Commie".ToMaybe(),
+                    Series = "Persona 3 the Movie".ToMaybe(),
+                    MovieNumber = 1.ToMaybe(),
+                    Subtitle = "Spring of Birth".ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.SevenTwentyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.AAC.ToMaybe(),
+                        CRC32 = "1C7DAA54".ToMaybe(),
+                        UnusedTags = new[] {"Commie"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe()
+                }
+            },
+            {
+                "[Doki] Suzumiya Haruhi no Shoushitsu (1920x1080 Hi10P BD FLAC) [3F1D19CD].mkv",
+                new FansubMovieEntity
+                {
+                    Group = "Doki".ToMaybe(),
+                    Series = "Suzumiya Haruhi no Shoushitsu".ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        Resolution = new Resolution(1920, 1080).ToMaybe(),
+                        PixelBitDepth = PixelBitDepth.TenBits.ToMaybe(),
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        AudioCodec = AudioCodec.FLAC.ToMaybe(),
+                        CRC32 = "3F1D19CD".ToMaybe(),
+                        UnusedTags = new[] {"Doki"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe()
+                }
+            },
+            {
+                "[Elysium]Rin.Daughters.of.Mnemosyne.EP4(BD.720p.AAC)[47ADB435].mkv",
+                new FansubMovieEntity
+                {
+                    Group = "Elysium".ToMaybe(),
+                    Series = "Rin Daughters of Mnemosyne".ToMaybe(),
+                    MovieNumber = 4.ToMaybe(),
+                    Metadata = new MediaMetadata
+                    {
+                        VideoMedia = VideoMedia.Bluray.ToMaybe(),
+                        VideoMode = VideoMode.SevenTwentyProgressive.ToMaybe(),
+                        AudioCodec = AudioCodec.AAC.ToMaybe(),
+                        CRC32 = "47ADB435".ToMaybe(),
+                        UnusedTags = new[] {"Elysium"},
+                    }.ToMaybe(),
+                    Extension = ".mkv".ToMaybe()
+                }
+            },
         };
         #endregion
         #endregion
@@ -832,6 +965,14 @@ namespace UnitTests.Models
         public static IEnumerable<KeyValuePair<string, IFansubEntity>> EpisodeTestModel
         {
             get { return EpisodeInputToEntityMap; }
+        }
+
+        /// <summary>
+        /// The movie test model
+        /// </summary>
+        public static IEnumerable<KeyValuePair<string, IFansubEntity>> MovieTestModel
+        {
+            get { return MovieInputToEntityMap; }
         }
         #endregion
 

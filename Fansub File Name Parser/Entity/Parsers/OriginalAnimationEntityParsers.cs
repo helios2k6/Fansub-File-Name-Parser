@@ -49,13 +49,22 @@ namespace FansubFileNameParser.Entity.Parsers
         private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OAD =
             Parse.IgnoreCase("OAD").Return(FansubOriginalAnimationEntity.ReleaseType.OAD);
 
-        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OAToken =
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OATypeToken =
             OVA.Or(ONA).Or(OAD);
 
-        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> DashThenOAToken =
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> DashThenOATypeToken =
             from _ in BaseGrammars.DashSeparatorToken
-            from token in OAToken
+            from token in OATypeToken
             select token;
+
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> SpaceThenOATypeToken =
+            from _1 in Parse.WhiteSpace
+            from token in OATypeToken
+            select token;
+
+        private static readonly Parser<FansubOriginalAnimationEntity.ReleaseType> OAToken =
+            DashThenOATypeToken.Or(SpaceThenOATypeToken);
+
         #endregion
         #region Root Name
         private static readonly Parser<string> SeriesName =
@@ -74,7 +83,7 @@ namespace FansubFileNameParser.Entity.Parsers
             from extension in FileEntityParsers.FileExtension.OptionalMaybe().ResetInput()
             from _1 in BaseGrammars.MainContent.SetResultAsRemainder()
             from series in SeriesName.OptionalMaybe()
-            from oaToken in OAToken.Or(DashThenOAToken)
+            from oaToken in OAToken
             from titleAndEpisode in TitleAndEpisodeParser.OptionalMaybe()
             let title = titleAndEpisode.HasValue ? titleAndEpisode.Value.Item1 : Maybe<string>.Nothing
             let episodeNumber = titleAndEpisode.HasValue ? titleAndEpisode.Value.Item2 : Maybe<int>.Nothing

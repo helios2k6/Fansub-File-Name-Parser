@@ -54,10 +54,10 @@ namespace Tests
         [TestMethod]
         public void TestSerializeAndDeserialize()
         {
-            Parallel.ForEach(TestModel.CreateMediaMetadataTestModel().Take(1000), kvp =>
+            foreach (var kvp in TestModel.CreateMediaMetadataTestModel().Take(1000))
             {
                 TestSerializationAndDeserialization(kvp.Value);
-            });
+            }
         }
 
         private static void TestSerializationAndDeserialization(MediaMetadata originalObject)

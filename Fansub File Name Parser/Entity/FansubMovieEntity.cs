@@ -38,6 +38,7 @@ namespace FansubFileNameParser.Entity
     {
         #region private static fields
         private const string MovieNumberKey = "MovieNumber";
+        private const string SubtitleKey = "Subtitle";
         #endregion
 
         #region ctor
@@ -47,6 +48,7 @@ namespace FansubFileNameParser.Entity
         public FansubMovieEntity()
         {
             MovieNumber = Maybe<int>.Nothing;
+            Subtitle = Maybe<string>.Nothing;
         }
 
         /// <summary>
@@ -58,6 +60,7 @@ namespace FansubFileNameParser.Entity
             : base(info, context)
         {
             MovieNumber = MaybeExtensions.GetValueNullableMaybe<int>(info, MovieNumberKey);
+            Subtitle = info.GetString(SubtitleKey).ToMaybe();
         }
         #endregion
 
@@ -70,6 +73,15 @@ namespace FansubFileNameParser.Entity
         /// </value>
         [JsonProperty(PropertyName = "MovieNumber")]
         public Maybe<int> MovieNumber { get; set; }
+
+        /// <summary>
+        /// Gets or sets the movie subtitle.
+        /// </summary>
+        /// <value>
+        /// The movie subtitle.
+        /// </value>
+        [JsonProperty(PropertyName = "Subtitle")]
+        public Maybe<string> Subtitle { get; set; }
         #endregion
 
         #region public methods
@@ -81,7 +93,12 @@ namespace FansubFileNameParser.Entity
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0} [Movie Number = {1}]", base.ToString(), MovieNumber);
+            return string.Format(
+                "{0} [Movie Number = {1}] [Subtitle = {2}]",
+                base.ToString(),
+                MovieNumber,
+                Subtitle
+            );
         }
 
         /// <summary>
@@ -99,7 +116,8 @@ namespace FansubFileNameParser.Entity
             }
 
             return base.Equals(other)
-                && MovieNumber.Equals(other.MovieNumber);
+                && MovieNumber.Equals(other.MovieNumber)
+                && Subtitle.Equals(other.Subtitle);
         }
 
         /// <summary>
@@ -123,7 +141,8 @@ namespace FansubFileNameParser.Entity
         public override int GetHashCode()
         {
             return base.GetHashCode()
-                ^ MovieNumber.GetHashCode();
+                ^ MovieNumber.GetHashCode()
+                ^ Subtitle.GetHashCode();
         }
 
         /// <summary>
@@ -143,6 +162,7 @@ namespace FansubFileNameParser.Entity
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue(MovieNumberKey, MovieNumber.ToNullable());
+            info.AddValue(SubtitleKey, Subtitle.OrElseDefault());
 
             base.GetObjectData(info, context);
         }
