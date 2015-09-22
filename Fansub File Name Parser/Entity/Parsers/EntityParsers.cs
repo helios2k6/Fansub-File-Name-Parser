@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Utils;
 using Functional.Maybe;
 using Sprache;
 
@@ -63,6 +64,6 @@ namespace FansubFileNameParser.Entity.Parsers
                                 .Or(OriginalAnimationEntityParsers.OriginalAnimation)
                                 .Or(EpisodeEntityParsers.Episode)
                                 .Or(MovieEntityParsers.Movie)
-             select entity);
+             select entity).Profile("EntityParser");
     }
 }

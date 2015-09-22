@@ -24,7 +24,7 @@
 
 using Sprache;
 
-namespace FansubFileNameParser
+namespace FansubFileNameParser.Utils
 {
     /// <summary>
     /// Invasive tools that can be used to debug troublesome Parsers

@@ -90,10 +90,11 @@
     <Compile Include="Metadata\VideoMedia.cs" />
     <Compile Include="Metadata\VideoMode.cs" />
     <Compile Include="ExtraParsers.cs" />
-    <Compile Include="ParserInvasionUtils.cs" />
+    <Compile Include="Utils\ParserInvasionUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entity\Directory\FansubDirectoryEntity.cs" />
     <Compile Include="IOptionExtensions.cs" />
+    <Compile Include="Utils\ProfilingUtilities.cs" />
     <Compile Include="Utils\RomanNumerals.cs" />
   </ItemGroup>
   <ItemGroup>

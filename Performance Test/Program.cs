@@ -23,8 +23,10 @@
  */
 
 using FansubFileNameParser.Entity.Parsers;
+using FansubFileNameParser.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace PerformanceTest
 {
@@ -86,6 +88,12 @@ namespace PerformanceTest
                     var value = result.Value;
                     Console.WriteLine("Parsed {0}", result);
                 }
+            }
+
+            var profileData = ProfilingUtilities.DumpProfileData();
+            using (var file = new StreamWriter(@"PROFILE_DATA.txt"))
+            {
+                file.Write(profileData);
             }
         }
     }

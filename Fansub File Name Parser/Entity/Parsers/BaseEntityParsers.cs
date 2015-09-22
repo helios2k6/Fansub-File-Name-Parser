@@ -23,6 +23,7 @@
  */
 
 using FansubFileNameParser.Metadata;
+using FansubFileNameParser.Utils;
 using Functional.Maybe;
 using Sprache;
 using System;
@@ -71,7 +72,7 @@ namespace FansubFileNameParser.Entity.Parsers
                 return Result.Failure<MediaMetadata>(input, "Could not parse media metadata", Enumerable.Empty<string>());
             };
 
-            return parser;
+            return parser.Profile("MediaMetadataParser");
         }
 
         private static Parser<string> CreateFansubGroupParser()
@@ -82,7 +83,7 @@ namespace FansubFileNameParser.Entity.Parsers
                                    let groupCandidate = filteredOutDate.FirstOrDefault()
                                    select groupCandidate;
 
-            return group;
+            return group.Profile("FansubGroupParser");
         }
 
         private static bool IsDate(string dateTimeString)
@@ -113,7 +114,7 @@ namespace FansubFileNameParser.Entity.Parsers
                          ))
                          select content.Trim();
 
-            return parser;
+            return parser.Profile("SeriesNameParser");
         }
         #endregion
         #region public parsers
