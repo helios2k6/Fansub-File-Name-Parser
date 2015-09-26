@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Utils;
 using Functional.Maybe;
 using Sprache;
 using System;
@@ -178,7 +179,7 @@ namespace FansubFileNameParser.Entity.Parsers
         /// </value>
         public static Parser<IFansubEntity> OriginalAnimation
         {
-            get { return OriginalAnimationParser; }
+            get { return OriginalAnimationParser.Profile("OriginalAnimationParser"); }
         }
         #endregion
     }

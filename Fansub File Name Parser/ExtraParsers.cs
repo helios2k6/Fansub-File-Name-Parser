@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Utils;
 using Functional.Maybe;
 using Sprache;
 using System;
@@ -516,7 +517,7 @@ namespace FansubFileNameParser
         /// </summary>
         public static Parser<string> CleanInputString
         {
-            get { return ReplaceDotsExceptMediaFileExtension.ContinueWith(ReplaceUnderscores); }
+            get { return ReplaceDotsExceptMediaFileExtension.ContinueWith(ReplaceUnderscores).Profile("CleanInputStringParser"); }
         }
         #endregion
         /// <summary>

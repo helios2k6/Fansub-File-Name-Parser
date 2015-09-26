@@ -89,12 +89,15 @@ namespace FansubFileNameParser.Utils
         {
             return input =>
             {
+#if PROFILE
                 var timer = Stopwatch.StartNew();
+#endif
                 var result = @this.Invoke(input);
+#if PROFILE
                 var ticks = timer.ElapsedTicks;
 
                 Profiler.AddOrUpdateProfile(parserName, ticks);
-
+#endif
                 return result;
             };
         }

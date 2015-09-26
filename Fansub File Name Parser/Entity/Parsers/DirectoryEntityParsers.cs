@@ -23,6 +23,7 @@
  */
 
 using FansubFileNameParser.Entity.Directory;
+using FansubFileNameParser.Utils;
 using Sprache;
 using System;
 
@@ -100,7 +101,7 @@ namespace FansubFileNameParser.Entity.Parsers
         /// </value>
         public static Parser<IFansubEntity> Directory
         {
-            get { return DirectoryParser; }
+            get { return DirectoryParser.Profile("DirectoryParser"); }
         }
         #endregion
     }

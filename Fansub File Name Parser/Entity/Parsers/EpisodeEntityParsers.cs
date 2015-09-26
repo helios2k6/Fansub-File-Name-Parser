@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Utils;
 using Functional.Maybe;
 using Sprache;
 
@@ -61,7 +62,7 @@ namespace FansubFileNameParser.Entity.Parsers
         /// </value>
         public static Parser<IFansubEntity> Episode
         {
-            get { return EpisodeParser; }
+            get { return EpisodeParser.Profile("EpisodeParser"); }
         }
         #endregion
     }

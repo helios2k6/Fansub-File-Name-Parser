@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+using FansubFileNameParser.Utils;
 using Sprache;
 
 namespace FansubFileNameParser.Entity.Parsers
@@ -46,7 +47,7 @@ namespace FansubFileNameParser.Entity.Parsers
 
         #region private methods
         private static readonly Parser<string> FileExtensionParser =
-            ExtraParsers.ScanFor(ExtraParsers.FileExtension);
+            ExtraParsers.ScanFor(ExtraParsers.FileExtension).Memoize();
         #endregion
     }
 }

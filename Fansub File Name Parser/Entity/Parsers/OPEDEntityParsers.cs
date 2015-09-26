@@ -23,6 +23,7 @@
  */
 
 using FansubFileNameParser.Metadata;
+using FansubFileNameParser.Utils;
 using Functional.Maybe;
 using Sprache;
 using System;
@@ -60,6 +61,9 @@ namespace FansubFileNameParser.Entity.Parsers
 
         private static Lazy<IEnumerable<Parser<IFansubEntity>>> AllParsers =
             new Lazy<IEnumerable<Parser<IFansubEntity>>>(GenerateAllParsers);
+
+        private static Lazy<Parser<bool>> InitialScanParser = new Lazy<Parser<bool>>(CreateInitialScanner);
+
         #region Parsers
         private static readonly Parser<string> OP = Parse.IgnoreCase(OPString).Text();
 
@@ -141,12 +145,40 @@ namespace FansubFileNameParser.Entity.Parsers
             return GenerateParserTemplates(MainEndingToken, FansubOPEDEntity.Segment.ED.ToMaybe());
         }
 
+        private static Parser<bool> CreateInitialScanner()
+        {
+            Parser<bool> parser = input =>
+            {
+                var substring = input.Source.Substring(input.Position);
+                var indexOfOP = substring.IndexOf(" OP ");
+                var indexOfED = substring.IndexOf(" ED ");
+
+                if (indexOfOP > -1 || indexOfED > -1)
+                {
+                    return Result.Success<bool>(true, input);
+                }
+
+                var indexOfNCOP = substring.IndexOf(" NCOP ");
+                var indexOfNCED = substring.IndexOf(" NCED ");
+
+                if (indexOfNCOP > -1 || indexOfNCED > -1)
+                {
+                    return Result.Success<bool>(true, input);
+                }
+
+                return Result.Failure<bool>(input, "Did not find (NC)OP or (NC)ED in initial scan", Enumerable.Empty<string>());
+            };
+
+            return parser.Memoize();
+        }
+
         private static IEnumerable<Parser<IFansubEntity>> GenerateParserTemplates(
             Parser<OPEDParseResult> tokenizer,
             Maybe<FansubOPEDEntity.Segment> segment
         )
         {
-            var coreParser = (from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
+            var coreParser = (from _1 in InitialScanParser.Value
+                              from metadata in BaseEntityParsers.MediaMetadata.OptionalMaybe().ResetInput()
                               from fansubGroup in BaseEntityParsers.FansubGroup.OptionalMaybe().ResetInput()
                               from series in BaseEntityParsers.SeriesName.OptionalMaybe().ResetInput()
                               from ext in FileEntityParsers.FileExtension.OptionalMaybe()
@@ -275,7 +307,7 @@ namespace FansubFileNameParser.Entity.Parsers
         /// </value>
         public static Parser<IFansubEntity> OpeningOrEnding
         {
-            get { return SeriesOpeningOrEndingParser; }
+            get { return SeriesOpeningOrEndingParser.Profile("OpeningOrEndingParser"); }
         }
         #endregion
     }

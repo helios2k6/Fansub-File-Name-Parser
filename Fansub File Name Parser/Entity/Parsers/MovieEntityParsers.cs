@@ -83,7 +83,7 @@ namespace FansubFileNameParser.Entity.Parsers
         /// </value>
         public static Parser<IFansubEntity> Movie
         {
-            get { return MovieParser; }
+            get { return MovieParser.Profile("MovieParser"); }
         }
         #endregion
     }
