@@ -64,7 +64,7 @@ namespace FansubFileNameParser.Utils
             // Sanity check
             if (IsRomanNumeral(left) == false || IsRomanNumeral(right) == false)
             {
-                throw new ArgumentException("left");
+                throw new ArgumentException(string.Format("One of these characters is not a roman numeral. Left = {0} | Right = {1}", left, right));
             }
 
             if (left == 'I')
